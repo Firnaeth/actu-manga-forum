@@ -177,7 +177,7 @@
             authLink.onclick = async () => { await supabase.auth.signOut(); localStorage.clear(); window.location.reload(); };
         }
 
-        // GESTION ADMINISTRATION (Corrigé pour forcer l'affichage avec ton pseudo exact)
+        // GESTION ADMINISTRATION
         const adminBar = document.getElementById('admin-bar-container');
         if (currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku" || currentUserRole === "admin") {
             adminBar.classList.remove('hidden');
@@ -185,7 +185,6 @@
         
         document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
             document.getElementById('admin-panel-form').classList.toggle('hidden');
-            // Pré-remplir les champs avec les valeurs actuelles
             const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
                 title: "Bienvenue sur Actu Manga World", 
                 subtitle: "Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !", 
@@ -248,17 +247,22 @@
 
             if (usersListContainer) {
                 const formattedUsers = profiles.map(user => {
-                    let color = "#333";
-                    if (user.role === 'admin') color = "#d9534f";
-                    else if (user.role === 'moderator') color = "#5cb85c";
-                    else if (user.role === 'vip') color = "#f0ad4e";
+                    // Attribution automatique de la classe CSS du rôle
+                    let roleClass = "group-member";
+                    if (user.role === 'admin' || user.username === 'Admin_Otaku' || user.username === 'Otaku_33') {
+                        roleClass = "group-admin";
+                    } else if (user.role === 'moderator') {
+                        roleClass = "group-moderator";
+                    } else {
+                        roleClass = "group-chroniqueur";
+                    }
 
-                    return `<a href="profile.html?user=${encodeURIComponent(user.username)}" style="color: ${color}; font-weight: bold; text-decoration: none;">${user.username}</a>`;
+                    return `<a href="profile.html?user=${encodeURIComponent(user.username)}" class="${roleClass}" style="text-decoration: none;">${user.username}</a>`;
                 });
                 usersListContainer.innerHTML = formattedUsers.join(', ');
             }
 
-            // 2. Mise à jour du bloc du haut ("Staff & Membres") avec l'image par défaut propre
+            // 2. Mise à jour du bloc du haut ("Staff & Membres")
             if (staffContainer) {
                 staffContainer.innerHTML = profiles.map(user => {
                     const avatar = (user.avatar_url && user.avatar_url.trim() !== "") ? user.avatar_url : defaultAvatar;
