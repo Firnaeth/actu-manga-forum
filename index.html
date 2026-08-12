@@ -177,9 +177,11 @@
             authLink.onclick = async () => { await supabase.auth.signOut(); localStorage.clear(); window.location.reload(); };
         }
 
-        // GESTION ADMINISTRATION
+        // GESTION ADMINISTRATION (Corrigé pour forcer l'affichage avec ton pseudo exact)
         const adminBar = document.getElementById('admin-bar-container');
-        if (currentUsername && (currentUserRole === "admin" || currentUsername === "Admin_Otaku" || currentUsername === "Otaku_33")) adminBar.classList.remove('hidden');
+        if (currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku" || currentUserRole === "admin") {
+            adminBar.classList.remove('hidden');
+        }
         
         document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
             document.getElementById('admin-panel-form').classList.toggle('hidden');
