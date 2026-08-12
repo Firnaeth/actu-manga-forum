@@ -39,7 +39,7 @@
             <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
         </div>
 
-        <!-- BARRE DE NAVIGATION VINTAGE -->
+        <!-- BARRE DE NAVIGATION VINTAGE (Sans Zone Gaming) -->
         <nav class="forum-nav">
             <a href="index.html" class="nav-link">Index</a>
             <a href="community.html" class="nav-link">Fiches & Critiques</a>
@@ -142,7 +142,7 @@
             <tbody>
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">🎮</span></td>
-                    <td class="forum-desc"><a href="community.html" class="forum-title">Jeux Vidéo Manga & VS Fighting</a><p>Discussions et avis jeux vidéo.</p></td>
+                    <td class="forum-desc"><a href="gaming.html" class="forum-title">Jeux Vidéo Manga & VS Fighting</a><p>Discussions et avis jeux vidéo.</p></td>
                     <td class="stat-cell">156</td>
                     <td class="stat-cell">1890</td>
                     <td class="last-post-cell"><a href="sheet-view.html?item=elden-ring">Elden Ring DLC</a></td>
@@ -247,7 +247,6 @@
 
             if (usersListContainer) {
                 const formattedUsers = profiles.map(user => {
-                    // Attribution automatique de la classe CSS du rôle
                     let roleClass = "group-member";
                     if (user.role === 'admin' || user.username === 'Admin_Otaku' || user.username === 'Otaku_33') {
                         roleClass = "group-admin";
