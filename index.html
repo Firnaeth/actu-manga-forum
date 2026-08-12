@@ -64,10 +64,9 @@
             <div class="news-flex">
                 <!-- Staff Box -->
                 <div class="staff-box">
-                    <div class="mini-title">Staff en ligne</div>
-                    <div class="staff-avatars">
-                        <a href="profile.html?user=Admin_Otaku"><img src="https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg" alt="Admin" title="Admin"></a>
-                        <a href="profile.html?user=Yoru_Chan"><img src="https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg" alt="Modo" title="Modo"></a>
+                    <div class="mini-title">Staff & Membres</div>
+                    <div class="staff-avatars" id="staff-avatars-container">
+                        <!-- Rempli dynamiquement par Supabase -->
                     </div>
                 </div>
 
@@ -106,7 +105,7 @@
                     <td class="stat-cell">1580</td>
                     <td class="last-post-cell">
                         <a href="topic.html?topic=planning">Planning Août 2026</a><br>
-                        <small>Aujourd'hui à 14:10 par <a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a></small>
+                        <small>Aujourd'hui à 14:10 par <span class="group-admin">Admin</span></small>
                     </td>
                 </tr>
                 <tr>
@@ -121,7 +120,7 @@
                     <td class="stat-cell">940</td>
                     <td class="last-post-cell">
                         <a href="topic.html?topic=licences">Nouvelle licence Akata</a><br>
-                        <small>Hier à 21:45 par <a href="profile.html?user=Yoru_Chan" class="group-member">Yoru_Chan</a></small>
+                        <small>Hier à 21:45 par <span class="group-member">Membre</span></small>
                     </td>
                 </tr>
             </tbody>
@@ -150,7 +149,7 @@
                     <td class="stat-cell">4200</td>
                     <td class="last-post-cell">
                         <a href="sheet-view.html?item=chainsaw-man">[MANGA] Chainsaw Man</a><br>
-                        <small>10/08 à 14:15 par <a href="profile.html?user=Yoru_Chan" class="group-member">Yoru_Chan</a></small>
+                        <small>10/08 à 14:15</small>
                     </td>
                 </tr>
                 <tr>
@@ -165,57 +164,25 @@
                     <td class="stat-cell">620</td>
                     <td class="last-post-cell">
                         <a href="contest-view.html">Affiche du Forum #01</a><br>
-                        <small>Aujourd'hui à 11:30 par <a href="profile.html?user=Yoru_Chan" class="group-member">Yoru_Chan</a></small>
+                        <small>Aujourd'hui à 11:30</small>
                     </td>
                 </tr>
             </tbody>
         </table>
 
-        <!-- CATÉGORIE 3 : ZONE GAMING & JEUX VIDÉO -->
-        <table class="forum-table">
-            <thead>
-                <tr>
-                    <th colspan="2" class="cat-title">_ Zone Gaming & Jeux Vidéo _</th>
-                    <th class="stat-head">Sujets</th>
-                    <th class="stat-head">Messages</th>
-                    <th class="last-post-head">Dernier Message</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="icon-cell">
-                        <span class="category-emoji">🎮</span>
-                    </td>
-                    <td class="forum-desc">
-                        <a href="community.html" class="forum-title">Jeux Vidéo Manga & VS Fighting</a>
-                        <p>Discussions, fiches et avis sur les jeux vidéo, RPGs et Versus Fighting.</p>
-                    </td>
-                    <td class="stat-cell">156</td>
-                    <td class="stat-cell">1890</td>
-                    <td class="last-post-cell">
-                        <a href="sheet-view.html?item=elden-ring">[JEU] Elden Ring DLC</a><br>
-                        <small>Hier à 18:20 par <a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a></small>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- WIDGET QUI EST EN LIGNE -->
+        <!-- WIDGET QUI EST EN LIGNE (DYNAMIQUE SUPABASE) -->
         <div class="online-box">
             <div class="box-title">Qui est en ligne ?</div>
             <div class="box-content">
-                <p>Il y a actuellement <strong>2</strong> membres connectés sur le forum.</p>
+                <p id="online-count-msg">Chargement des membres inscrits...</p>
                 <hr class="box-hr">
-                <p><small>Membres connectés :
-                    <a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a>,
-                    <a href="profile.html?user=Yoru_Chan" class="group-member">Yoru_Chan</a>
-                </small></p>
+                <p><small>Membres inscrits : <span id="online-users-list">...</span></small></p>
             </div>
         </div>
 
     </div>
 
-    <!-- SCRIPT AVEC INTEGRATION SUPABASE -->
+    <!-- SCRIPT AVEC INTÉGRATION SUPABASE DYNAMIQUE -->
     <script type="module">
         import { supabase } from './supabase.js';
 
@@ -247,7 +214,7 @@
         // --- GESTION DU PANNEAU D'ADMINISTRATION ---
         const adminBar = document.getElementById('admin-bar-container');
 
-        if (currentUsername && (currentUsername === "Admin_Otaku" || currentUserRole === "admin")) {
+        if (currentUsername && (currentUserRole === "admin" || currentUsername === "Admin_Otaku")) {
             adminBar.classList.remove('hidden');
         } else {
             adminBar.classList.add('hidden');
@@ -297,7 +264,50 @@
             alert("L'en-tête du forum a été mis à jour !");
         });
 
+        // --- DYNAMISATION DE LA LISTE DES MEMBRES (SUPABASE) ---
+        async function loadOnlineUsers() {
+            const { data: profiles, error } = await supabase
+                .from('profiles')
+                .select('username, role, avatar_url');
+
+            const countMsg = document.getElementById('online-count-msg');
+            const usersListContainer = document.getElementById('online-users-list');
+            const staffContainer = document.getElementById('staff-avatars-container');
+
+            if (error || !profiles || profiles.length === 0) {
+                countMsg.innerHTML = "Il y a actuellement <strong>0</strong> membre inscrit sur le forum.";
+                usersListContainer.innerHTML = "<em>Aucun membre.</em>";
+                if (staffContainer) staffContainer.innerHTML = "<em>Aucun membre.</em>";
+                return;
+            }
+
+            // Nombre total de membres
+            countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
+
+            // Génération de la liste des membres avec couleurs de rôles
+            const formattedUsers = profiles.map(user => {
+                let color = "#333";
+                if (user.role === 'admin') color = "#d9534f";
+                else if (user.role === 'moderator') color = "#5cb85c";
+                else if (user.role === 'vip') color = "#f0ad4e";
+
+                return `<a href="profile.html?user=${encodeURIComponent(user.username)}" style="color: ${color}; font-weight: bold; text-decoration: none;">${user.username}</a>`;
+            });
+
+            usersListContainer.innerHTML = formattedUsers.join(', ');
+
+            // Remplir le bloc "Staff & Membres" avec les vrais avatars
+            if (staffContainer) {
+                staffContainer.innerHTML = profiles.map(user => {
+                    const defaultAvatar = "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg";
+                    const avatar = user.avatar_url || defaultAvatar;
+                    return `<a href="profile.html?user=${encodeURIComponent(user.username)}"><img src="${avatar}" alt="${user.username}" title="${user.username}"></a>`;
+                }).join('');
+            }
+        }
+
         loadHeaderConfig();
+        loadOnlineUsers();
     </script>
 </body>
 </html>
