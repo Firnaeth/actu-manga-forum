@@ -15,7 +15,7 @@
 
         <div class="form-box">
             <div class="box-title">Créer une nouvelle Fiche (Manga / Anime / Jeu Vidéo)</div>
-            <form class="retro-form">
+            <form class="retro-form" id="create-sheet-form">
                 <div class="form-group">
                     <label for="type">Type de Fiche :</label>
                     <select id="type" required>
@@ -27,7 +27,7 @@
 
                 <div class="form-group">
                     <label for="title">Titre de l'œuvre :</label>
-                    <input type="text" id="title" placeholder="Ex: Elden Ring / Chainsaw Man" required>
+                    <input type="text" id="title" placeholder="Ex: Seikon no Qwazer / Chainsaw Man" required>
                 </div>
 
                 <div class="form-group">
@@ -37,7 +37,19 @@
 
                 <div class="form-group">
                     <label for="details">Auteur / Studio / Développeur :</label>
-                    <input type="text" id="details" placeholder="Ex: Tatsuki Fujimoto / FromSoftware">
+                    <input type="text" id="details" placeholder="Ex: Hiroyuki Yoshino / FromSoftware">
+                </div>
+
+                <!-- NOUVEAU CHAMP : TRANCHE D'ÂGE -->
+                <div class="form-group">
+                    <label for="age-rating">Tranche d'âge conseillée :</label>
+                    <select id="age-rating" required>
+                        <option value="0 ans et +">👶 0 ans et + (Tous publics)</option>
+                        <option value="10 ans et +">👦 10 ans et +</option>
+                        <option value="12 ans et +">🧑 12 ans et +</option>
+                        <option value="16 ans et +">🔞 16 ans et + (Avertissement)</option>
+                        <option value="18 ans et +">🔥 18 ans et + (Public averti)</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -62,11 +74,42 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn-submit">Publier la Fiche</button>
+                    <button type="submit" class="btn-submit">Publier la Fiche</button>
+                    <a href="community.html" class="btn-reply" style="background: #e74c3c; text-decoration: none; text-align: center; margin-left: 10px;">Annuler</a>
                 </div>
             </form>
         </div>
     </div>
 
+    <script>
+        document.getElementById('create-sheet-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Récupération des valeurs du formulaire
+            const newSheet = {
+                id: Date.now(),
+                type: document.getElementById('type').value,
+                title: document.getElementById('title').value,
+                cover: document.getElementById('cover').value || 'https://via.placeholder.com/150',
+                details: document.getElementById('details').value,
+                ageRating: document.getElementById('age-rating').value,
+                rating: document.getElementById('rating').value,
+                synopsis: document.getElementById('synopsis').value,
+                review: document.getElementById('review').value,
+                author: localStorage.getItem('forumUsername') || 'Otaku_33',
+                date: "À l'instant"
+            };
+
+            // Récupération des fiches existantes ou tableau vide dans le localStorage
+            let sheetsList = JSON.parse(localStorage.getItem('forumSheetsData')) || [];
+            sheetsList.unshift(newSheet); // Ajoute la nouvelle fiche au début
+
+            // Sauvegarde
+            localStorage.setItem('forumSheetsData', JSON.stringify(sheetsList));
+
+            alert('Fiche publiée avec succès !');
+            window.location.href = 'community.html'; // Redirection vers l'espace communauté/fiches
+        });
+    </script>
 </body>
 </html>
