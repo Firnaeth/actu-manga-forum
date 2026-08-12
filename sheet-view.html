@@ -5,6 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fiche - Forum Actu Manga</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Style pour le formulaire de modification rapide */
+        .edit-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .edit-modal-content {
+            background: #fff;
+            padding: 20px;
+            width: 500px;
+            max-width: 90%;
+            border-radius: 5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .edit-modal-content label {
+            display: block;
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .edit-modal-content input, .edit-modal-content textarea, .edit-modal-content select {
+            width: 100%;
+            padding: 6px;
+            margin-top: 4px;
+            border: 1px solid #bdc3c7;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
 
@@ -22,7 +59,7 @@
                         <span id="sheet-badge" class="badge">TYPE</span>
                         <!-- Boutons d'administration -->
                         <div id="admin-actions" style="display: none; gap: 5px;">
-                            <button onclick="editSheet()" style="background: #f39c12; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px;">Modifier</button>
+                            <button onclick="openEditModal()" style="background: #f39c12; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px;">Modifier</button>
                             <button onclick="deleteSheet()" style="background: #e74c3c; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px;">Supprimer</button>
                         </div>
                     </div>
@@ -80,17 +117,72 @@
 
     </div>
 
+    <!-- MODALE DE MODIFICATION DE FICHE -->
+    <div id="editModal" class="edit-modal">
+        <div class="edit-modal-content">
+            <h3 style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px;">Modifier la Fiche</h3>
+            <form id="editForm">
+                <label>Titre de l'œuvre :</label>
+                <input type="text" id="edit-title" required>
+
+                <label>Type de Fiche :</label>
+                <select id="edit-type">
+                    <option value="manga">Manga</option>
+                    <option value="anime">Anime</option>
+                    <option value="game">Jeu Vidéo</option>
+                </select>
+
+                <label>URL de l'affiche / image :</label>
+                <input type="url" id="edit-cover" required>
+
+                <label>Auteur / Studio :</label>
+                <input type="text" id="edit-author" required>
+
+                <label>Tranche d'âge :</label>
+                <select id="edit-age">
+                    <option value="Tous publics">Tous publics</option>
+                    <option value="10 ans et +">10 ans et +</option>
+                    <option value="12 ans et +">12 ans et +</option>
+                    <option value="16 ans et +">16 ans et +</option>
+                    <option value="18 ans et +">18 ans et +</option>
+                </select>
+
+                <label>Note (1 à 5 étoiles) :</label>
+                <select id="edit-rating">
+                    <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                    <option value="4">⭐⭐⭐⭐☆ (4/5)</option>
+                    <option value="3">⭐⭐⭐☆☆ (3/5)</option>
+                    <option value="2">⭐⭐☆☆☆ (2/5)</option>
+                    <option value="1">⭐☆☆☆☆ (1/5)</option>
+                </select>
+
+                <label>Synopsis / Résumé :</label>
+                <textarea id="edit-synopsis" rows="4" required></textarea>
+
+                <label>Avis personnel :</label>
+                <textarea id="edit-review" rows="3" required></textarea>
+
+                <div style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" onclick="closeEditModal()" style="background: #95a5a6; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 3px;">Annuler</button>
+                    <button type="submit" style="background: #27ae60; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 3px;">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- SCRIPT DYNAMIQUE DE LA FICHE -->
     <script>
         const defaultSheets = {
             "elden-ring": {
                 title: "Elden Ring : Shadow of the Erdtree",
                 type: "🎮 JEU VIDÉO",
+                rawType: "game",
                 badgeClass: "badge game",
                 cover: "https://images.alphacoders.com/605/605592.png",
                 author: "FromSoftware / Bandai Namco",
                 genre: "Action-RPG / Dark Fantasy",
                 ageRating: "18 ans et +",
+                ratingNum: 5,
                 rating: "⭐⭐⭐⭐⭐ (5/5)",
                 creator: '<a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a>',
                 synopsis: "Guidé par Miquella le Débonnaire, traversez le Royaume des Ombres et découvrez les secrets les plus sombres de l'Entre-Terre. Affrontez des boss légendaires et explorez une toute nouvelle carte.",
@@ -99,11 +191,13 @@
             "chainsaw-man": {
                 title: "Chainsaw Man - Tome 1 à 15",
                 type: "📖 MANGA",
+                rawType: "manga",
                 badgeClass: "badge manga",
                 cover: "https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg",
                 author: "Tatsuki Fujimoto (Kurokawa)",
                 genre: "Shonen / Action / Horreur",
                 ageRating: "16 ans et +",
+                ratingNum: 4,
                 rating: "⭐⭐⭐⭐☆ (4/5)",
                 creator: '<a href="profile.html?user=Yoru_Chan" class="group-member">Yoru_Chan</a>',
                 synopsis: "Pour payer ses dettes, Denji vit dans la misère en chassant des démons avec Pochita. Après une trahison, il renaît en fusionnant avec son chien-démon pour devenir Chainsaw Man !",
@@ -112,11 +206,13 @@
             "demon-slayer": {
                 title: "Demon Slayer : Kimetsu no Yaiba",
                 type: "📺 ANIME",
+                rawType: "anime",
                 badgeClass: "badge anime",
                 cover: "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg",
                 author: "Studio ufotable",
                 genre: "Animation / Action / Historique",
                 ageRating: "12 ans et +",
+                ratingNum: 5,
                 rating: "⭐⭐⭐⭐⭐ (5/5)",
                 creator: '<a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a>',
                 synopsis: "Dans le Japon de l'ère Taisho, Tanjiro cherche un moyen de rendre à sa sœur Nezuko sa forme humaine après qu'elle a été transformée en démon.",
@@ -132,8 +228,8 @@
             let typeMap = { manga: "📖 MANGA", anime: "📺 ANIME", game: "🎮 JEU VIDÉO" };
             let badgeMap = { manga: "badge manga", anime: "badge anime", game: "badge game" };
             
-            let stars = "";
             let ratingNum = parseInt(item.rating) || 5;
+            let stars = "";
             for(let i=0; i<ratingNum; i++) stars += "⭐";
             stars += ` (${ratingNum}/5)`;
 
@@ -143,11 +239,13 @@
             sheets[key] = {
                 title: item.title,
                 type: typeMap[item.type] || "📖 MANGA",
+                rawType: item.type || "manga",
                 badgeClass: badgeMap[item.type] || "badge manga",
                 cover: item.cover || "https://via.placeholder.com/150",
                 author: item.details || "Auteur inconnu",
-                genre: item.type.toUpperCase(),
+                genre: item.type ? item.type.toUpperCase() : "MANGA",
                 ageRating: item.ageRating || "Tous publics",
+                ratingNum: ratingNum,
                 rating: stars,
                 creator: `<a href="profile.html?user=${authorName}" class="${authorClass}">${authorName}</a>`,
                 synopsis: item.synopsis || "Aucun synopsis renseigné.",
@@ -159,6 +257,7 @@
         const itemParam = urlParams.get('item') || 'elden-ring';
         const data = sheets[itemParam] || defaultSheets["elden-ring"];
 
+        // Affichage des données sur la page
         document.getElementById('sheet-title').textContent = data.title;
         document.getElementById('bread-title').textContent = data.title;
         document.getElementById('sheet-cover').src = data.cover;
@@ -179,7 +278,7 @@
             document.getElementById('admin-actions').style.display = 'flex';
         }
 
-        // Fonctions de suppression / modification
+        // Fonctions d'administration
         function deleteSheet() {
             if (confirm("Voulez-vous vraiment supprimer cette fiche ?")) {
                 let updatedList = rawList.filter(i => i.title.toLowerCase().replace(/[^a-z0-9]/g, '-') !== itemParam);
@@ -189,10 +288,56 @@
             }
         }
 
-        function editSheet() {
-            alert("Mode modification : Vous pouvez recréer la fiche pour mettre à jour ses informations.");
-            window.location.href = "create-sheet.html";
+        function openEditModal() {
+            // Remplir le formulaire modal avec les données actuelles
+            document.getElementById('edit-title').value = data.title;
+            document.getElementById('edit-type').value = data.rawType || 'manga';
+            document.getElementById('edit-cover').value = data.cover;
+            document.getElementById('edit-author').value = data.author;
+            document.getElementById('edit-age').value = data.ageRating;
+            document.getElementById('edit-rating').value = data.ratingNum || 5;
+            document.getElementById('edit-synopsis').value = data.synopsis;
+            document.getElementById('edit-review').value = data.review;
+
+            document.getElementById('editModal').style.display = 'flex';
         }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Enregistrement des modifications du formulaire modal
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let updatedItem = {
+                title: document.getElementById('edit-title').value,
+                type: document.getElementById('edit-type').value,
+                cover: document.getElementById('edit-cover').value,
+                details: document.getElementById('edit-author').value,
+                ageRating: document.getElementById('edit-age').value,
+                rating: document.getElementById('edit-rating').value,
+                synopsis: document.getElementById('edit-synopsis').value,
+                review: document.getElementById('edit-review').value,
+                author: localStorage.getItem('forumUsername') || 'Otaku_33',
+                date: "Modifié à l'instant"
+            };
+
+            // Mettre à jour dans rawList
+            let index = rawList.findIndex(i => i.title.toLowerCase().replace(/[^a-z0-9]/g, '-') === itemParam);
+            if (index !== -1) {
+                rawList[index] = updatedItem;
+            } else {
+                // Si c'était une fiche par défaut, on l'ajoute comme nouvelle fiche personnalisée
+                rawList.push(updatedItem);
+            }
+
+            localStorage.setItem('forumSheetsData', JSON.stringify(rawList));
+            alert("Fiche modifiée avec succès !");
+            
+            let newKey = updatedItem.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            window.location.href = `sheet-view.html?item=${newKey}`;
+        });
     </script>
 
 </body>
