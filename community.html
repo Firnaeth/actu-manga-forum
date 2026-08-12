@@ -29,13 +29,13 @@
 
         <!-- BANNIÈRE CONCOURS EN VIGUEUR -->
         <div class="contest-banner-box">
-            <div class="box-title">🏆 CONCOURS DU MOIS : DESSIN & AFFICHE (NON-IA)</div>
+            <div class="box-title">🏆 CONCOURS DU MOIS : DESSIN & FAN-ART</div>
             <div style="padding: 12px; font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
               <div>
-                <strong>Thème :</strong> Dessine la mascotte du forum ou une affiche manga !<br>
-                <small style="color: #e74c3c; font-weight: bold;">⚠️ 100% Fait main (Digital ou Traditionnel) — Zéro IA toléré</small>
+                <strong>Thème :</strong> Dessine ton personnage manga préféré !<br>
+                <small style="color: #7f8c8d;">Exprime ton talent et partage tes créations avec la communauté.</small>
                </div>
-              <a href="contest-view.html" class="btn-submit" style="text-decoration: none; padding: 6px 12px;">Voir & Participer &raquo;</a>
+              <a href="contest-view.html" class="btn-submit" style="text-decoration: none; padding: 6px 12px;">Participer &raquo;</a>
              </div>
         </div>
 
@@ -110,17 +110,11 @@
             let key = item.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
             
             let stars = "";
-            for(let i=0; i<item.rating; i++) stars += "⭐";
+            let ratingNum = parseInt(item.rating) || 5;
+            for(let i=0; i<ratingNum; i++) stars += "⭐";
 
-            // Attribution automatique du rôle selon l'auteur (ex: si c'est un chroniqueur ou admin)
             let authorName = item.author || 'Otaku_33';
-            let authorClass = 'group-member';
-            if (authorName === 'Admin_Otaku') {
-                authorClass = 'group-admin';
-            } else {
-                // Tu pourras ajouter tes conditions de rôles ici (ex: si le membre a beaucoup de fiches -> 'group-chroniqueur')
-                authorClass = 'group-chroniqueur'; 
-            }
+            let authorClass = (authorName === 'Admin_Otaku' || authorName === 'Otaku_33') ? 'group-admin' : 'group-member';
 
             customSheets[key] = {
                 id: key,
