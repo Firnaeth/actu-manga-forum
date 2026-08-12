@@ -116,8 +116,32 @@
             }
         };
 
-        // Gestion du localStorage pour récupérer aussi les fiches créées dynamiquement
-        let sheets = JSON.parse(localStorage.getItem('forumSheetsMapData')) || defaultSheets;
+        let sheets = { ...defaultSheets };
+
+        let rawList = JSON.parse(localStorage.getItem('forumSheetsData')) || [];
+        rawList.forEach(item => {
+            let key = item.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            let typeMap = { manga: "📖 MANGA", anime: "📺 ANIME", game: "🎮 JEU VIDÉO" };
+            let badgeMap = { manga: "badge manga", anime: "badge anime", game: "badge game" };
+            
+            let stars = "";
+            for(let i=0; i<item.rating; i++) stars += "⭐";
+            stars += ` (${item.rating}/5)`;
+
+            sheets[key] = {
+                title: item.title,
+                type: typeMap[item.type] || "📖 MANGA",
+                badgeClass: badgeMap[item.type] || "badge manga",
+                cover: item.cover || "https://via.placeholder.com/150",
+                author: item.details || "Auteur inconnu",
+                genre: item.type.toUpperCase(),
+                ageRating: item.ageRating || "Tous publics",
+                rating: stars,
+                creator: `<a href="profile.html?user=${item.author}" class="group-admin">${item.author}</a>`,
+                synopsis: item.synopsis || "Aucun synopsis renseigné.",
+                review: item.review || "Aucun avis personnel renseigné."
+            };
+        });
 
         const urlParams = new URLSearchParams(window.location.search);
         const itemParam = urlParams.get('item') || 'elden-ring';
@@ -128,15 +152,15 @@
         document.getElementById('sheet-cover').src = data.cover;
         document.getElementById('sheet-author').textContent = data.author;
         document.getElementById('sheet-genre').textContent = data.genre;
-        document.getElementById('sheet-age').textContent = data.ageRating || 'Tous publics';
+        document.getElementById('sheet-age').textContent = data.ageRating;
         document.getElementById('sheet-rating').textContent = data.rating;
-        document.getElementById('sheet-creator').innerHTML = data.creator || data.author;
+        document.getElementById('sheet-creator').innerHTML = data.creator;
         document.getElementById('sheet-synopsis').textContent = data.synopsis;
         document.getElementById('sheet-review').textContent = data.review;
 
         const badge = document.getElementById('sheet-badge');
         badge.textContent = data.type;
-        badge.className = data.badgeClass || "badge manga";
+        badge.className = data.badgeClass;
     </script>
 
 </body>
