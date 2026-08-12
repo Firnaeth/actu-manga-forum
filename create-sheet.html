@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer une Fiche - Forum Actu Manga</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="wrapper">
+        <div class="breadcrumb">
+            <a href="index.html">Index du Forum</a> &raquo; <a href="community.html">Espace Communauté</a> &raquo; <span>Créer une Fiche</span>
+        </div>
+
+        <div class="form-box">
+            <div class="box-title">Créer une nouvelle Fiche (Manga / Anime / Jeu Vidéo)</div>
+            <form class="retro-form">
+                <div class="form-group">
+                    <label for="type">Type de Fiche :</label>
+                    <select id="type" required>
+                        <option value="manga">📖 Manga</option>
+                        <option value="anime">📺 Anime</option>
+                        <option value="game">🎮 Jeu Vidéo</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="title">Titre de l'œuvre :</label>
+                    <input type="text" id="title" placeholder="Ex: Elden Ring / Chainsaw Man" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cover">URL de l'affiche / Jaquette :</label>
+                    <input type="url" id="cover" placeholder="https://lien-de-l-image.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="details">Auteur / Studio / Développeur :</label>
+                    <input type="text" id="details" placeholder="Ex: Tatsuki Fujimoto / FromSoftware">
+                </div>
+
+                <div class="form-group">
+                    <label for="rating">Ta Note :</label>
+                    <select id="rating">
+                        <option value="5">⭐⭐⭐⭐⭐ (5/5 - Chef-d'œuvre)</option>
+                        <option value="4">⭐⭐⭐⭐☆ (4/5 - Excellent)</option>
+                        <option value="3">⭐⭐⭐☆☆ (3/5 - Bon)</option>
+                        <option value="2">⭐⭐☆☆☆ (2/5 - Moyen)</option>
+                        <option value="1">⭐☆☆☆☆ (1/5 - À éviter)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="synopsis">Synopsis / Résumé :</label>
+                    <textarea id="synopsis" rows="4" placeholder="Résumé de l'œuvre..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="review">Ton avis personnel :</label>
+                    <textarea id="review" rows="6" placeholder="Ce que tu as pensé des graphismes, du scénario, etc."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-submit">Publier la Fiche</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
