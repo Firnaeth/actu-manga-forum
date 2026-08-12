@@ -19,11 +19,11 @@
         <!-- ACTION & FILTRES -->
         <div class="topic-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <a href="create-sheet.html" class="btn-reply">+ Créer une Fiche</a>
-            <div class="filter-tags">
-                <span class="tag active">Tous</span>
-                <span class="tag">📖 Mangas</span>
-                <span class="tag">📺 Animes</span>
-                <span class="tag">🎮 Jeux Vidéo</span>
+            <div class="filter-tags" id="filter-container">
+                <span class="tag active" data-filter="all">Tous</span>
+                <span class="tag" data-filter="manga">📖 Mangas</span>
+                <span class="tag" data-filter="anime">📺 Animes</span>
+                <span class="tag" data-filter="game">🎮 Jeux Vidéo</span>
             </div>
         </div>
 
@@ -32,80 +32,168 @@
             <div class="box-title">🏆 CONCOURS DU MOIS : DESSIN & AFFICHE (NON-IA)</div>
             <div style="padding: 12px; font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
               <div>
-                 <strong>Thème :</strong> Dessine la mascotte du forum ou une affiche manga !<br>
-                  <small style="color: #e74c3c; font-weight: bold;">⚠️ 100% Fait main (Digital ou Traditionnel) — Zéro IA toléré</small>
+                <strong>Thème :</strong> Dessine la mascotte du forum ou une affiche manga !<br>
+                <small style="color: #e74c3c; font-weight: bold;">⚠️ 100% Fait main (Digital ou Traditionnel) — Zéro IA toléré</small>
                </div>
               <a href="contest-view.html" class="btn-submit" style="text-decoration: none; padding: 6px 12px;">Voir & Participer &raquo;</a>
              </div>
         </div>
-
-      
 
         <!-- TABLEAU DES FICHES -->
         <table class="forum-table">
             <thead>
                 <tr>
                     <th colspan="2" class="cat-title">_ Fiches de la communauté _</th>
-                    <th class="stat-head">Note</th>
+                    <th class="stat-head">Note / Âge</th>
                     <th class="stat-head">Réponses</th>
                     <th class="last-post-head">Auteur</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Fiche 1 : Jeu Vidéo -->
-                <tr>
-                    <td class="icon-cell">
-                        <span style="font-size: 24px;">🎮</span>
-                    </td>
-                    <td class="forum-desc">
-                        <a href="sheet-view.html?item=elden-ring" class="forum-title">[JEU] Elden Ring : Shadow of the Erdtree</a>
-                        <p>Action-RPG / FromSoftware — Un DLC magistral et exigeant.</p>
-                    </td>
-                    <td class="stat-cell" style="color: #f1c40f;">⭐⭐⭐⭐⭐</td>
-                    <td class="stat-cell">42</td>
-                    <td class="last-post-cell">
-                        Par <a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a><br>
-                        <small>Hier à 18:20</small>
-                    </td>
-                </tr>
-
-                <!-- Fiche 2 : Manga -->
-                <tr>
-                    <td class="icon-cell">
-                        <span style="font-size: 24px;">📖</span>
-                    </td>
-                    <td class="forum-desc">
-                        <a href="sheet-view.html?item=chainsaw-man" class="forum-title">[MANGA] Chainsaw Man - Tome 1 à 15</a>
-                        <p>Shonen / Tatsuki Fujimoto — Une folie visuelle et un rythme effréné.</p>
-                    </td>
-                    <td class="stat-cell" style="color: #f1c40f;">⭐⭐⭐⭐☆</td>
-                    <td class="stat-cell">89</td>
-                    <td class="last-post-cell">
-                        Par <a href="profile.html?user=Yoru_Chan" class="group-member">Yoru_Chan</a><br>
-                        <small>10/08 à 14:15</small>
-                    </td>
-                </tr>
-
-                <!-- Fiche 3 : Anime -->
-                <tr>
-                    <td class="icon-cell">
-                        <span style="font-size: 24px;">📺</span>
-                    </td>
-                    <td class="forum-desc">
-                        <a href="sheet-view.html?item=demon-slayer" class="forum-title">[ANIME] Demon Slayer : Kimetsu no Yaiba</a>
-                        <p>Anime / Ufotable — Une animation à couper le souffle.</p>
-                    </td>
-                    <td class="stat-cell" style="color: #f1c40f;">⭐⭐⭐⭐⭐</td>
-                    <td class="stat-cell">112</td>
-                    <td class="last-post-cell">
-                        Par <a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a><br>
-                        <small>09/08 à 22:30</small>
-                    </td>
-                </tr>
+            <tbody id="sheets-table-body">
+                <!-- Les fiches seront injectées dynamiquement ici par le script -->
             </tbody>
         </table>
 
     </div>
+
+    <script>
+        // 1. Fiches par défaut de référence
+        const defaultSheets = {
+            "elden-ring": {
+                id: "elden-ring",
+                type: "game",
+                icon: "🎮",
+                badgeClass: "badge game",
+                title: "[JEU] Elden Ring : Shadow of the Erdtree",
+                description: "Action-RPG / FromSoftware — Un DLC magistral et exigeant.",
+                ageRating: "18 ans et +",
+                rating: "⭐⭐⭐⭐⭐",
+                responses: 42,
+                author: 'Admin_Otaku',
+                authorClass: 'group-admin',
+                date: "Hier à 18:20"
+            },
+            "chainsaw-man": {
+                id: "chainsaw-man",
+                type: "manga",
+                icon: "📖",
+                badgeClass: "badge manga",
+                title: "[MANGA] Chainsaw Man - Tome 1 à 15",
+                description: "Shonen / Tatsuki Fujimoto — Une folie visuelle et un rythme effréné.",
+                ageRating: "16 ans et +",
+                rating: "⭐⭐⭐⭐☆",
+                responses: 89,
+                author: 'Yoru_Chan',
+                authorClass: 'group-member',
+                date: "10/08 à 14:15"
+            },
+            "demon-slayer": {
+                id: "demon-slayer",
+                type: "anime",
+                icon: "📺",
+                badgeClass: "badge anime",
+                title: "[ANIME] Demon Slayer : Kimetsu no Yaiba",
+                description: "Anime / Ufotable — Une animation à couper le souffle.",
+                ageRating: "12 ans et +",
+                rating: "⭐⭐⭐⭐⭐",
+                responses: 112,
+                author: 'Admin_Otaku',
+                authorClass: 'group-admin',
+                date: "09/08 à 22:30"
+            }
+        };
+
+        // 2. Fusion avec le localStorage (pour inclure les nouvelles fiches comme Bleach)
+        let customSheets = JSON.parse(localStorage.getItem('forumSheetsMapData')) || {};
+        
+        // Si le localStorage contient un tableau (venant du formulaire de création), on l'intègre proprement dans l'objet global
+        let rawList = JSON.parse(localStorage.getItem('forumSheetsData')) || [];
+        rawList.forEach(item => {
+            let iconMap = { manga: "📖", anime: "📺", game: "🎮" };
+            let prefixMap = { manga: "[MANGA]", anime: "[ANIME]", game: "[JEU]" };
+            let key = item.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            
+            let stars = "";
+            for(let i=0; i<item.rating; i++) stars += "⭐";
+
+            customSheets[key] = {
+                id: key,
+                type: item.type,
+                icon: iconMap[item.type] || "📖",
+                title: `${prefixMap[item.type] || ''} ${item.title}`,
+                description: `${item.details || 'Auteur inconnu'} — ${item.synopsis ? item.synopsis.substring(0, 50) + '...' : ''}`,
+                ageRating: item.ageRating || 'Tous publics',
+                rating: stars,
+                responses: 0,
+                author: item.author || 'Otaku_33',
+                authorClass: 'group-admin',
+                date: item.date || "À l'instant"
+            };
+        });
+
+        // Fusion finale
+        const allSheets = { ...defaultSheets, ...customSheets };
+
+        // 3. Fonction d'affichage des fiches dans le tableau
+        function renderSheets(filter = 'all') {
+            const tbody = document.getElementById('sheets-table-body');
+            tbody.innerHTML = '';
+
+            const keys = Object.keys(allSheets);
+            let hasResults = false;
+
+            keys.forEach(key => {
+                const sheet = allSheets[key];
+                if (filter === 'all' || sheet.type === filter) {
+                    hasResults = true;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="icon-cell">
+                                <span style="font-size: 24px;">${sheet.icon}</span>
+                            </td>
+                            <td class="forum-desc">
+                                <a href="sheet-view.html?item=${sheet.id}" class="forum-title">${sheet.title}</a>
+                                <p>${sheet.description}</p>
+                            </td>
+                            <td class="stat-cell" style="color: #f1c40f;">
+                                ${sheet.rating}<br>
+                                <small style="color: #e74c3c; font-weight: bold; font-size: 10px;">${sheet.ageRating}</small>
+                            </td>
+                            <td class="stat-cell">${sheet.responses}</td>
+                            <td class="last-post-cell">
+                                Par <a href="profile.html?user=${sheet.author}" class="${sheet.authorClass}">${sheet.author}</a><br>
+                                <small>${sheet.date}</small>
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if (!hasResults) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #7f8c8d;">Aucune fiche trouvée pour cette catégorie.</td></tr>`;
+            }
+        }
+
+        // Affichage initial
+        renderSheets('all');
+
+        // 4. Gestion interactive des clics sur les filtres
+        const tags = document.querySelectorAll('#filter-container .tag');
+        tags.forEach(tag => {
+            tag.addEventListener('click', function() {
+                tags.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                let filterType = 'all';
+                let text = this.textContent.trim();
+                if (text.includes('Mangas')) filterType = 'manga';
+                if (text.includes('Animes')) filterType = 'anime';
+                if (text.includes('Jeux Vidéo')) filterType = 'game';
+
+                renderSheets(filterType);
+            });
+        });
+    </script>
 
 </body>
 </html>
