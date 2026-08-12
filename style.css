@@ -83,31 +83,23 @@ body {
     background: linear-gradient(135deg, #a8c0ff, #3f2b96);
     color: white;
     text-align: center;
-    padding: 15px;
+    padding: 12px;
     border-radius: 4px;
-    margin-bottom: 15px;
-    height: auto !important; 
-    min-height: 80px; /* Une hauteur minimale confortable */
-    padding: 15px !important;
-    overflow: visible !important;
+    margin-bottom: 10px;
 }
 
 .welcome-banner h2 {
     margin: 0 0 4px 0;
     font-size: 15px;
     letter-spacing: 1px;
-    white-space: normal !important;
-    word-wrap: break-word !important;
-    line-height: 1.4 !important;
 }
 
 .welcome-banner p {
     margin: 0;
-    font-size: 14px;
-    white-space: normal !important;
-    word-wrap: break-word !important;
-    line-height: 1.4 !important;
+    font-size: 11px;
+    opacity: 0.9;
 }
+
 
 .news-flex {
     display: flex;
