@@ -548,6 +548,23 @@ a.group-admin:hover, a.group-member:hover {
     text-decoration: underline;
 }
 
+/* Style pour les administrateurs */
+.group-admin {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* Style pour ton nouveau rôle de membres actifs (ex: Chroniqueur) */
+.group-chroniqueur {
+    color: #3498db;
+    font-weight: bold;
+}
+
+/* Style pour les membres classiques */
+.group-member {
+    color: #2ecc71;
+}
+
 /* Style du formulaire de sélection et filtres fiches */
 .retro-form select {
     padding: 6px;
