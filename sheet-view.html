@@ -136,6 +136,15 @@
             for(let i=0; i<item.rating; i++) stars += "⭐";
             stars += ` (${item.rating}/5)`;
 
+            // Gestion dynamique du rôle pour l'auteur de la fiche
+            let authorName = item.author || 'Otaku_33';
+            let authorClass = 'group-member';
+            if (authorName === 'Admin_Otaku') {
+                authorClass = 'group-admin';
+            } else {
+                authorClass = 'group-chroniqueur';
+            }
+
             sheets[key] = {
                 title: item.title,
                 type: typeMap[item.type] || "📖 MANGA",
@@ -145,7 +154,7 @@
                 genre: item.type.toUpperCase(),
                 ageRating: item.ageRating || "Tous publics",
                 rating: stars,
-                creator: `<a href="profile.html?user=${item.author}" class="group-admin">${item.author}</a>`,
+                creator: `<a href="profile.html?user=${authorName}" class="${authorClass}">${authorName}</a>`,
                 synopsis: item.synopsis || "Aucun synopsis renseigné.",
                 review: item.review || "Aucun avis personnel renseigné."
             };
@@ -170,7 +179,7 @@
         badge.textContent = data.type;
         badge.className = data.badgeClass;
 
-        // Afficher les boutons d'administration (Simulé ici pour les fiches personnalisées ou modérateurs)
+        // Afficher les boutons d'administration
         if (localStorage.getItem('isAdmin') === 'true' || rawList.some(i => i.title.toLowerCase().replace(/[^a-z0-9]/g, '-') === itemParam)) {
             document.getElementById('admin-actions').style.display = 'flex';
         }
