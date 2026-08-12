@@ -5,192 +5,244 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fiches & Critiques - Forum Actu Manga</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Styles spécifiques pour le bloc Concours et les filtres */
+        .contest-banner {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            border-radius: 6px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #2980b9;
+        }
+        .contest-header {
+            background: rgba(0,0,0,0.15);
+            color: white;
+            padding: 8px 15px;
+            font-weight: bold;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .contest-body {
+            padding: 15px;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .contest-body p {
+            margin: 0;
+            font-size: 12px;
+            color: #2c3e50;
+        }
+        .btn-participate {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-participate:hover {
+            background: #2980b9;
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .filter-btn {
+            background: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #34495e;
+        }
+        .filter-btn.active, .filter-btn:hover {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+    </style>
 </head>
 <body>
 
     <div id="wrapper">
-        <!-- BREADCRUMB / NAVIGATION -->
         <div class="breadcrumb">
             <a href="index.html">Index du Forum</a> &raquo; <span>Fiches & Critiques</span>
         </div>
 
-        <h1 class="topic-main-title">Espace Fiches : Mangas, Animes & Jeux Vidéo</h1>
-
-        <!-- ACTION & FILTRES -->
-        <div class="topic-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <a href="create-sheet.html" class="btn-reply">+ Créer une Fiche</a>
-            <div class="filter-tags" id="filter-container">
-                <span class="tag active" data-filter="all">Tous</span>
-                <span class="tag" data-filter="manga">📖 Mangas</span>
-                <span class="tag" data-filter="anime">📺 Animes</span>
-                <span class="tag" data-filter="game">🎮 Jeux Vidéo</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <a href="sheet-create.html" class="btn-submit" style="text-decoration: none; padding: 6px 14px; font-size: 12px; background: #e84393; display: inline-block; border-radius: 4px; font-weight: bold;">+ Créer une Fiche</a>
+            
+            <!-- Filtres rapides -->
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterSheets('all')">Tous</button>
+                <button class="filter-btn" onclick="filterSheets('manga')">📖 Mangas</button>
+                <button class="filter-btn" onclick="filterSheets('anime')">📺 Animes</button>
+                <button class="filter-btn" onclick="filterSheets('game')">🎮 Jeux Vidéo</button>
             </div>
         </div>
 
-        <!-- BANNIÈRE CONCOURS EN VIGUEUR -->
-        <div class="contest-banner-box">
-            <div class="box-title">🏆 CONCOURS DU MOIS : DESSIN & FAN-ART</div>
-            <div style="padding: 12px; font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <strong>Thème :</strong> Dessine ton personnage manga préféré !<br>
-                <small style="color: #7f8c8d;">Exprime ton talent et partage tes créations avec la communauté.</small>
-               </div>
-              <a href="contest-view.html" class="btn-submit" style="text-decoration: none; padding: 6px 12px;">Participer &raquo;</a>
-             </div>
+        <!-- EN-TÊTE ESPACE FICHES -->
+        <div style="background: #fdf2f8; border: 1px solid #f8bbd0; padding: 10px 15px; border-radius: 5px; margin-bottom: 15px; font-weight: bold; color: #c2185b;">
+            Espace Fiches : Mangas, Animes & Jeux Vidéo
         </div>
 
-        <!-- TABLEAU DES FICHES -->
+        <!-- BANNIÈRE CONCOURS DU MOIS (STYLE DEMANDÉ) -->
+        <div class="contest-banner">
+            <div class="contest-header">
+                🏆 CONCOURS DU MOIS : DESSIN & FAN-ART
+            </div>
+            <div class="contest-body">
+                <div>
+                    <p style="font-weight: bold; font-size: 13px; color: #2c3e50; margin-bottom: 3px;">Thème : Dessine ton personnage manga préféré !</p>
+                    <p style="color: #7f8c8d;">Exprime ton talent et partage tes créations avec la communauté.</p>
+                </div>
+                <a href="#" onclick="alert('Les participations au concours ouvrent bientôt !')" class="btn-participate">Participer »</a>
+            </div>
+        </div>
+
+        <!-- TABLEAU DES FICHES DE LA COMMUNAUTÉ -->
         <table class="forum-table">
             <thead>
                 <tr>
-                    <th colspan="2" class="cat-title">_ Fiches de la communauté _</th>
-                    <th class="stat-head">Note / Âge</th>
-                    <th class="stat-head">Réponses</th>
-                    <th class="last-post-head">Auteur</th>
+                    <th style="width: 5%;">_</th>
+                    <th style="width: 55%;">_ Fiches de la communauté _</th>
+                    <th style="width: 20%;">NOTE / ÂGE</th>
+                    <th style="width: 10%;">RÉPONSES</th>
+                    <th style="width: 10%;">AUTEUR</th>
                 </tr>
             </thead>
-            <tbody id="sheets-table-body">
-                <!-- Les fiches seront injectées dynamiquement ici par le script -->
+            <tbody id="sheets-list-body">
+                <!-- Les fiches dynamiques s'inséreront ici -->
             </tbody>
         </table>
 
     </div>
 
+    <!-- SCRIPT DE CHARGEMENT ET FILTRAGE DES FICHES -->
     <script>
-        // 1. Fiches par défaut de référence
-        const defaultSheets = {
-            "elden-ring": {
-                id: "elden-ring",
+        const defaultSheets = [
+            {
+                key: "elden-ring",
                 type: "game",
                 icon: "🎮",
                 title: "[JEU] Elden Ring : Shadow of the Erdtree",
-                description: "Action-RPG / FromSoftware — Un DLC magistral et exigeant.",
-                ageRating: "18 ans et +",
+                desc: "Action-RPG / FromSoftware — Un DLC magistral et exigeant.",
                 rating: "⭐⭐⭐⭐⭐",
-                responses: 42,
-                author: 'Admin_Otaku',
-                authorClass: 'group-admin',
+                age: "18 ans et +",
+                replies: 42,
+                author: "Admin_Otaku",
                 date: "Hier à 18:20"
             },
-            "chainsaw-man": {
-                id: "chainsaw-man",
+            {
+                key: "chainsaw-man",
                 type: "manga",
                 icon: "📖",
                 title: "[MANGA] Chainsaw Man - Tome 1 à 15",
-                description: "Shonen / Tatsuki Fujimoto — Une folie visuelle et un rythme effréné.",
-                ageRating: "16 ans et +",
+                desc: "Shonen / Tatsuki Fujimoto — Une folie visuelle et un rythme effréné.",
                 rating: "⭐⭐⭐⭐☆",
-                responses: 89,
-                author: 'Yoru_Chan',
-                authorClass: 'group-member',
+                age: "16 ans et +",
+                replies: 89,
+                author: "Yoru_Chan",
                 date: "10/08 à 14:15"
             },
-            "demon-slayer": {
-                id: "demon-slayer",
+            {
+                key: "demon-slayer",
                 type: "anime",
                 icon: "📺",
                 title: "[ANIME] Demon Slayer : Kimetsu no Yaiba",
-                description: "Anime / Ufotable — Une animation à couper le souffle.",
-                ageRating: "12 ans et +",
+                desc: "Anime / Ufotable — Une animation à couper le souffle.",
                 rating: "⭐⭐⭐⭐⭐",
-                responses: 112,
-                author: 'Admin_Otaku',
-                authorClass: 'group-admin',
-                date: "09/08 à 22:30"
+                age: "12 ans et +",
+                replies: 112,
+                author: "Admin_Otaku",
+                date: "09/08 à 22:10"
             }
-        };
+        ];
 
-        // 2. Récupération des fiches personnalisées stockées dans le localStorage
-        let customSheets = {};
-        let rawList = JSON.parse(localStorage.getItem('forumSheetsData')) || [];
+        let customSheets = JSON.parse(localStorage.getItem('forumSheetsData')) || [];
         
-        rawList.forEach(item => {
+        let allSheets = [...defaultSheets];
+        
+        customSheets.forEach(item => {
+            let key = item.originalKey || item.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
             let iconMap = { manga: "📖", anime: "📺", game: "🎮" };
-            let prefixMap = { manga: "[MANGA]", anime: "[ANIME]", game: "[JEU]" };
-            let key = item.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            let typePrefix = { manga: "[MANGA]", anime: "[ANIME]", game: "[JEU]" };
             
-            let stars = "";
             let ratingNum = parseInt(item.rating) || 5;
+            let stars = "";
             for(let i=0; i<ratingNum; i++) stars += "⭐";
 
             let authorName = item.author || 'Otaku_33';
-            let authorClass = (authorName === 'Admin_Otaku' || authorName === 'Otaku_33') ? 'group-admin' : 'group-member';
 
-            customSheets[key] = {
-                id: key,
-                type: item.type,
-                icon: iconMap[item.type] || "📖",
-                title: `${prefixMap[item.type] || ''} ${item.title}`,
-                description: `${item.details || 'Auteur inconnu'} — ${item.synopsis ? item.synopsis.substring(0, 50) + '...' : ''}`,
-                ageRating: item.ageRating || 'Tous publics',
-                rating: stars,
-                responses: 0,
-                author: authorName,
-                authorClass: authorClass,
-                date: item.date || "À l'instant"
-            };
+            // Éviter les doublons
+            if(!allSheets.some(s => s.key === key)) {
+                allSheets.push({
+                    key: key,
+                    type: item.type || "manga",
+                    icon: iconMap[item.type] || "📖",
+                    title: `${typePrefix[item.type] || "[MANGA]"} ${item.title}`,
+                    desc: `${item.details || 'Auteur inconnu'} — ${item.synopsis ? item.synopsis.substring(0, 45) + '...' : ''}`,
+                    rating: stars,
+                    age: item.ageRating || "Tous publics",
+                    replies: 0,
+                    author: authorName,
+                    date: item.date || "À l'instant"
+                });
+            }
         });
 
-        const allSheets = { ...defaultSheets, ...customSheets };
+        function renderSheets(filterType = 'all') {
+            let tbody = document.getElementById('sheets-list-body');
+            tbody.innerHTML = "";
 
-        // 3. Fonction d'affichage des fiches dans le tableau
-        function renderSheets(filter = 'all') {
-            const tbody = document.getElementById('sheets-table-body');
-            tbody.innerHTML = '';
-
-            const keys = Object.keys(allSheets);
-            let hasResults = false;
-
-            keys.forEach(key => {
-                const sheet = allSheets[key];
-                if (filter === 'all' || sheet.type === filter) {
-                    hasResults = true;
-                    tbody.innerHTML += `
-                        <tr>
-                            <td class="icon-cell">
-                                <span style="font-size: 24px;">${sheet.icon}</span>
-                            </td>
-                            <td class="forum-desc">
-                                <a href="sheet-view.html?item=${sheet.id}" class="forum-title">${sheet.title}</a>
-                                <p>${sheet.description}</p>
-                            </td>
-                            <td class="stat-cell" style="color: #f1c40f;">
-                                ${sheet.rating}<br>
-                                <small style="color: #e74c3c; font-weight: bold; font-size: 10px;">${sheet.ageRating}</small>
-                            </td>
-                            <td class="stat-cell">${sheet.responses}</td>
-                            <td class="last-post-cell">
-                                Par <a href="profile.html?user=${sheet.author}" class="${sheet.authorClass}">${sheet.author}</a><br>
-                                <small>${sheet.date}</small>
-                            </td>
-                        </tr>
-                    `;
-                }
-            });
-
-            if (!hasResults) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #7f8c8d;">Aucune fiche trouvée pour cette catégorie.</td></tr>`;
+            let filtered = allSheets;
+            if (filterType !== 'all') {
+                filtered = allSheets.filter(s => s.type === filterType);
             }
+
+            filtered.forEach(sheet => {
+                let authorClass = (sheet.author === 'Admin_Otaku' || sheet.author === 'Otaku_33') ? 'group-admin' : 'group-member';
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="text-align: center; font-size: 16px;">${sheet.icon}</td>
+                    <td>
+                        <a href="sheet-view.html?item=${sheet.key}" style="font-weight: bold; color: #3498db; font-size: 13px; text-decoration: none;">${sheet.title}</a><br>
+                        <small style="color: #7f8c8d;">${sheet.desc}</small>
+                    </td>
+                    <td>
+                        <span style="color: #f1c40f; font-size: 11px;">${sheet.rating}</span><br>
+                        <span style="color: #e74c3c; font-size: 10px; font-weight: bold;">${sheet.age}</span>
+                    </td>
+                    <td style="text-align: center; font-weight: bold; color: #2c3e50;">${sheet.replies}</td>
+                    <td>
+                        Par <a href="profile.html?user=${sheet.author}" class="${authorClass}" style="font-size: 11px;">${sheet.author}</a><br>
+                        <small style="color: #95a5a6; font-size: 9px;">${sheet.date}</small>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
+        function filterSheets(type) {
+            // Mettre à jour les boutons actifs
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderSheets(type);
+        }
+
+        // Affichage initial
         renderSheets('all');
-
-        // 4. Gestion des filtres
-        const tags = document.querySelectorAll('#filter-container .tag');
-        tags.forEach(tag => {
-            tag.addEventListener('click', function() {
-                tags.forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-
-                let filterType = 'all';
-                let text = this.textContent.trim();
-                if (text.includes('Mangas')) filterType = 'manga';
-                if (text.includes('Animes')) filterType = 'anime';
-                if (text.includes('Jeux Vidéo')) filterType = 'game';
-
-                renderSheets(filterType);
-            });
-        });
     </script>
 
 </body>
