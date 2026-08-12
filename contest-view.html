@@ -2,76 +2,90 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[CONCOURS] Affiche Manga Non-IA #01 - Forum Actu Manga</title>
+    <title>Concours de Dessin - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .contest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .art-card { border: 1px solid #ccc; padding: 10px; text-align: center; background: #f9f9f9; }
+        .art-card img { max-width: 100%; height: auto; border: 1px solid #ddd; }
+        .upload-section { margin-top: 40px; padding: 20px; border-top: 2px solid #333; }
+    </style>
 </head>
 <body>
 
     <div id="wrapper">
-        <div class="breadcrumb">
-            <a href="index.html">Index du Forum</a> &raquo; <a href="community.html">Espace Communauté</a> &raquo; <span>Concours de Dessin</span>
+        <h1>🎨 Concours de Dessin : Thème du mois</h1>
+
+        <!-- Galerie des participants -->
+        <div id="contest-gallery" class="contest-grid">
+            <p>Chargement des dessins...</p>
         </div>
 
-        <div class="contest-card">
-            <div class="box-title">🎨 Concours #01 : Crée l'Affiche du Forum (100% Dessin / Traditionnel & Digital)</div>
-
-            <div class="contest-details">
-                <div class="contest-rules">
-                    <h3>📜 Règlement du Concours</h3>
-                    <ul>
-                        <li><strong>Thème :</strong> Dessine la mascotte du forum ou ton personnage de manga préféré en été.</li>
-                        <li><strong>Règle d'or :</strong> 🛑 <strong style="color: #e74c3c;">STRICTEMENT SANS IA</strong>. Les dessins faits ou retouchés par IA seront disqualifiés.</li>
-                        <li><strong>Formats acceptés :</strong> Dessin traditionnel (papier/crayon scanné) ou Dessin Digital (Photoshop, Krita, Procreate...). W.I.P (étapes de création) recommandé !</li>
-                        <li><strong>Date limite :</strong> 31 Août 2026 à 23h59.</li>
-                        <li><strong>Récompense :</strong> Un badge exclusif « ✏️ Artiste du Mois » sur ton profil + choix du prochain thème !</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- FORMULAIRE DE PARTICIPATION -->
-            <div class="reply-box" style="margin-top: 20px;">
-                <div class="box-title">Participer au concours (Poster ta création)</div>
-                <form class="reply-form">
-                    <div class="form-group">
-                        <label for="art-title">Titre de ta création :</label>
-                        <input type="text" id="art-title" placeholder="Ex: Luffy sous le soleil d'été" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="art-tool">Logiciel / Matériel utilisé :</label>
-                        <input type="text" id="art-tool" placeholder="Ex: Crayon de couleur / Clip Studio Paint" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="art-file">Lien ou Image de ton dessin :</label>
-                        <input type="file" id="art-file" accept="image/*">
-                    </div>
-                    <button type="button" class="btn-submit">Envoyer ma participation</button>
-                </form>
-            </div>
+        <!-- Formulaire d'upload (Masqué si non connecté) -->
+        <div id="upload-form-container" class="upload-section hidden">
+            <h3>Participer au concours</h3>
+            <form id="form-add-contest">
+                <input type="text" id="input-art-title" placeholder="Titre de votre œuvre" required>
+                <input type="file" id="input-art-file" accept="image/*" required>
+                <button type="submit" class="btn-admin-edit">Envoyer ma participation</button>
+            </form>
         </div>
-
-        <!-- LISTE DES PARTICIPATIONS (EXEMPLE) -->
-        <h2 style="font-size: 14px; margin-top: 25px; color: #2c3e50;">Participations des membres (1)</h2>
-
-        <div class="post-box">
-            <div class="post-user">
-                <a href="profile.html?user=Yoru_Chan" class="username group-member">Yoru_Chan</a>
-                <div class="user-rank">Membre Habitué</div>
-                <a href="profile.html?user=Yoru_Chan">
-                    <img src="https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg" alt="Avatar" class="user-avatar">
-                </a>
-            </div>
-            <div class="post-content">
-                <div class="post-date">Posté aujourd'hui à 11:30</div>
-                <div class="post-text">
-                    <p><strong>Titre :</strong> Pause plage pour Zoro 🌊</p>
-                    <p><strong>Matériel :</strong> Aquerelle + Feutre noir 0.3mm (No IA)</p>
-                    <p><img src="https://images.alphacoders.com/605/605592.png" alt="Dessin Yoru" class="post-attached-image"></p>
-                </div>
-            </div>
-        </div>
-
     </div>
 
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        const gallery = document.getElementById('contest-gallery');
+        const uploadContainer = document.getElementById('upload-form-container');
+        const username = localStorage.getItem('forumUsername');
+
+        // 1. Afficher le formulaire si connecté
+        if (username) uploadContainer.classList.remove('hidden');
+
+        // 2. Charger les dessins depuis la base
+        async function loadGallery() {
+            const { data, error } = await supabase.from('contest_entries').select('*');
+            if (error) { gallery.innerHTML = "Erreur de chargement."; return; }
+            
+            if (data.length === 0) { gallery.innerHTML = "Aucun dessin pour le moment."; return; }
+
+            gallery.innerHTML = data.map(art => `
+                <div class="art-card">
+                    <img src="${art.image_url}" alt="${art.title}">
+                    <p><strong>${art.title}</strong><br><small>par ${art.author}</small></p>
+                </div>
+            `).join('');
+        }
+
+        // 3. Gérer l'upload du dessin
+        document.getElementById('form-add-contest').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = document.getElementById('input-art-file').files[0];
+            const title = document.getElementById('input-art-title').value;
+
+            // Envoi dans le Storage
+            const fileName = `${Date.now()}_${file.name}`;
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('concours') // Ton Bucket Supabase
+                .upload(fileName, file);
+
+            if (uploadError) { alert("Erreur d'upload : " + uploadError.message); return; }
+
+            // Récupérer l'URL publique
+            const { data: urlData } = supabase.storage.from('concours').getPublicUrl(fileName);
+
+            // Sauvegarde dans la table SQL
+            await supabase.from('contest_entries').insert([{ 
+                title: title, 
+                image_url: urlData.publicUrl, 
+                author: username 
+            }]);
+
+            alert("Dessin publié !");
+            window.location.reload();
+        });
+
+        loadGallery();
+    </script>
 </body>
 </html>
