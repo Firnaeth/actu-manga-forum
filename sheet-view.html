@@ -18,7 +18,15 @@
             <div class="sheet-header">
                 <img id="sheet-cover" src="" alt="Affiche" class="sheet-cover">
                 <div class="sheet-info">
-                    <span id="sheet-badge" class="badge">TYPE</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span id="sheet-badge" class="badge">TYPE</span>
+                        <!-- Boutons d'administration (Modifiable / Supprimable) -->
+                        <div id="admin-actions" style="display: none; gap: 5px;">
+                            <button onclick="editSheet()" style="background: #f39c12; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px;">Modifier</button>
+                            <button onclick="deleteSheet()" style="background: #e74c3c; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px;">Supprimer</button>
+                        </div>
+                    </div>
+
                     <h1 id="sheet-title">Chargement...</h1>
                     <p><strong>Auteur / Studio :</strong> <span id="sheet-author">-</span></p>
                     <p><strong>Genre :</strong> <span id="sheet-genre">-</span></p>
@@ -112,13 +120,13 @@
                 rating: "⭐⭐⭐⭐⭐ (5/5)",
                 creator: '<a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a>',
                 synopsis: "Dans le Japon de l'ère Taisho, Tanjiro cherche un moyen de rendre à sa sœur Nezuko sa forme humaine après qu'elle a été transformée en démon.",
-                review: "L'animation du studio Ufotable est purement visuelle et magistrale. Les combats à l'épée sont parmi les plus beaux de l'histoire de l'animation !"
+                review: "L'animation du studio ufotable est purement visuelle et magistrale. Les combats à l'épée sont parmi les plus beaux de l'histoire de l'animation !"
             }
         };
 
         let sheets = { ...defaultSheets };
-
         let rawList = JSON.parse(localStorage.getItem('forumSheetsData')) || [];
+        
         rawList.forEach(item => {
             let key = item.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
             let typeMap = { manga: "📖 MANGA", anime: "📺 ANIME", game: "🎮 JEU VIDÉO" };
@@ -161,6 +169,26 @@
         const badge = document.getElementById('sheet-badge');
         badge.textContent = data.type;
         badge.className = data.badgeClass;
+
+        // Afficher les boutons d'administration (Simulé ici pour les fiches personnalisées ou modérateurs)
+        if (localStorage.getItem('isAdmin') === 'true' || rawList.some(i => i.title.toLowerCase().replace(/[^a-z0-9]/g, '-') === itemParam)) {
+            document.getElementById('admin-actions').style.display = 'flex';
+        }
+
+        // Fonctions de suppression / modification
+        function deleteSheet() {
+            if (confirm("Voulez-vous vraiment supprimer cette fiche ?")) {
+                let updatedList = rawList.filter(i => i.title.toLowerCase().replace(/[^a-z0-9]/g, '-') !== itemParam);
+                localStorage.setItem('forumSheetsData', JSON.stringify(updatedList));
+                alert("Fiche supprimée avec succès !");
+                window.location.href = "community.html";
+            }
+        }
+
+        function editSheet() {
+            alert("Mode modification : Vous pouvez recréer la fiche pour mettre à jour ses informations.");
+            window.location.href = "create-sheet.html";
+        }
     </script>
 
 </body>
