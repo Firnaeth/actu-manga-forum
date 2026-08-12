@@ -20,7 +20,7 @@
                 <div class="sheet-info">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span id="sheet-badge" class="badge">TYPE</span>
-                        <!-- Boutons d'administration (Modifiable / Supprimable) -->
+                        <!-- Boutons d'administration -->
                         <div id="admin-actions" style="display: none; gap: 5px;">
                             <button onclick="editSheet()" style="background: #f39c12; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px;">Modifier</button>
                             <button onclick="deleteSheet()" style="background: #e74c3c; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px;">Supprimer</button>
@@ -133,17 +133,12 @@
             let badgeMap = { manga: "badge manga", anime: "badge anime", game: "badge game" };
             
             let stars = "";
-            for(let i=0; i<item.rating; i++) stars += "⭐";
-            stars += ` (${item.rating}/5)`;
+            let ratingNum = parseInt(item.rating) || 5;
+            for(let i=0; i<ratingNum; i++) stars += "⭐";
+            stars += ` (${ratingNum}/5)`;
 
-            // Gestion dynamique du rôle pour l'auteur de la fiche
             let authorName = item.author || 'Otaku_33';
-            let authorClass = 'group-member';
-            if (authorName === 'Admin_Otaku') {
-                authorClass = 'group-admin';
-            } else {
-                authorClass = 'group-chroniqueur';
-            }
+            let authorClass = (authorName === 'Admin_Otaku' || authorName === 'Otaku_33') ? 'group-admin' : 'group-member';
 
             sheets[key] = {
                 title: item.title,
