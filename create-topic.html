@@ -41,9 +41,20 @@
     </div>
 
     <script>
-        // Restriction si non-admin
-        const currentRole = localStorage.getItem('forumUserRole') || 'group-member';
-        if (currentRole !== 'group-admin' && currentRole !== 'group-modo') {
+        // Restriction élargie pour Admin, Otaku_33 et Modérateurs
+        const currentRole = localStorage.getItem('forumUserRole') || 'member';
+        const currentUsername = localStorage.getItem('forumUsername') || '';
+        
+        const isStaff = (
+            currentRole === 'admin' || 
+            currentRole === 'group-admin' || 
+            currentRole === 'moderator' || 
+            currentRole === 'group-modo' || 
+            currentUsername === 'Otaku_33' || 
+            currentUsername === 'Admin_Otaku'
+        );
+
+        if (!isStaff) {
             alert('Accès réservé au Staff !');
             window.location.href = 'topic.html';
         }
@@ -54,7 +65,7 @@
             const key = document.getElementById('topic-type').value;
             const title = document.getElementById('topic-title-input').value;
             const content = document.getElementById('topic-content').value;
-            const username = localStorage.getItem('forumUsername') || 'Admin_Otaku';
+            const username = currentUsername || 'Otaku_33';
 
             let topicsData = JSON.parse(localStorage.getItem('forumTopicsData')) || {};
 
@@ -64,8 +75,8 @@
                     {
                         id: Date.now(),
                         username: username,
-                        userRank: "Fondateur",
-                        rankClass: "group-admin",
+                        userRank: (currentRole === 'moderator' || currentRole === 'group-modo') ? "Modérateur" : "Fondateur",
+                        rankClass: (currentRole === 'moderator' || currentRole === 'group-modo') ? "moderator" : "admin",
                         avatar: "https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg",
                         date: "Posté à l'instant",
                         text: `<p>${content}</p>`
