@@ -55,9 +55,10 @@
         </nav>
 
         <!-- ANNONCE & ACTUALITÉS -->
-            <div class="welcome-banner" style="padding: 20px 15px; text-align: center; height: auto;">
-                <h2 id="forum-title-display" style="margin: 0 0 10px 0; font-size: 22px; color: #fff;">Bienvenue sur Actu Manga World</h2>
-                <p id="forum-subtitle-display" style="margin: 0; font-size: 14px; color: #fff; line-height: 1.4;">Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !</p>
+        <div class="news-container">
+            <div class="welcome-banner">
+                <h2 id="forum-title-display">Bienvenue sur Actu Manga World</h2>
+                <p id="forum-subtitle-display">Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !</p>
             </div>
 
             <div class="news-flex">
@@ -179,11 +180,44 @@
         // GESTION ADMINISTRATION
         const adminBar = document.getElementById('admin-bar-container');
         if (currentUsername && (currentUserRole === "admin" || currentUsername === "Admin_Otaku")) adminBar.classList.remove('hidden');
-        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => document.getElementById('admin-panel-form').classList.toggle('hidden'));
+        
+        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.toggle('hidden');
+            // Pré-remplir les champs avec les valeurs actuelles
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
+                title: "Bienvenue sur Actu Manga World", 
+                subtitle: "Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !", 
+                banner: "https://images.alphacoders.com/605/605592.png" 
+            };
+            document.getElementById('input-forum-title').value = config.title;
+            document.getElementById('input-forum-subtitle').value = config.subtitle;
+            document.getElementById('input-forum-banner').value = config.banner;
+        });
+
+        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.add('hidden');
+        });
+
+        // ENREGISTREMENT CONFIG EN-TÊTE
+        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newConfig = {
+                title: document.getElementById('input-forum-title').value,
+                subtitle: document.getElementById('input-forum-subtitle').value,
+                banner: document.getElementById('input-forum-banner').value
+            };
+            localStorage.setItem('forumHeaderConfig', JSON.stringify(newConfig));
+            alert("En-tête mis à jour avec succès !");
+            window.location.reload();
+        });
 
         // CHARGEMENT CONFIG EN-TÊTE
         function loadHeaderConfig() {
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { title: "Bienvenue sur Actu Manga World", subtitle: "Toutes les sorties VF...", banner: "https://images.alphacoders.com/605/605592.png" };
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
+                title: "Bienvenue sur Actu Manga World", 
+                subtitle: "Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !", 
+                banner: "https://images.alphacoders.com/605/605592.png" 
+            };
             document.getElementById('forum-title-display').textContent = config.title;
             document.getElementById('forum-subtitle-display').textContent = config.subtitle;
             document.getElementById('forum-banner-img').src = config.banner;
