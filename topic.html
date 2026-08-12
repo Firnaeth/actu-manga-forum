@@ -14,7 +14,7 @@
 <body>
 
     <div id="wrapper">
-        <!-- BARRE DE SIMULATION ADMIN / MEMBRE -->
+        <!-- BARRE DE CONNEXION / RÔLE -->
         <div class="admin-bar">
             <span>Connecté en tant que : <strong id="current-user-display">---</strong></span>
             <div>
@@ -51,18 +51,18 @@
     </div>
 
     <script>
-        // --- 1. GESTION DU RÔLE DANS LOCALSTORAGE ---
-        if (!localStorage.getItem('forumUserRole')) {
-            localStorage.setItem('forumUserRole', 'group-admin');
-            localStorage.setItem('forumUsername', 'Admin_Otaku');
+        // --- 1. GESTION DU RÔLE ET DE LA SESSION ---
+        if (!localStorage.getItem('forumUsername')) {
+            localStorage.setItem('forumUserRole', 'admin');
+            localStorage.setItem('forumUsername', 'Otaku_33');
         }
 
         function switchRole(role) {
             if (role === 'group-admin') {
-                localStorage.setItem('forumUserRole', 'group-admin');
-                localStorage.setItem('forumUsername', 'Admin_Otaku');
+                localStorage.setItem('forumUserRole', 'admin');
+                localStorage.setItem('forumUsername', 'Otaku_33');
             } else {
-                localStorage.setItem('forumUserRole', 'group-member');
+                localStorage.setItem('forumUserRole', 'member');
                 localStorage.setItem('forumUsername', 'Yoru_Chan');
             }
             location.reload();
@@ -70,9 +70,11 @@
 
         const currentRole = localStorage.getItem('forumUserRole');
         const currentUsername = localStorage.getItem('forumUsername');
-        const isStaff = (currentRole === 'group-admin' || currentRole === 'group-modo');
 
-        document.getElementById('current-user-display').textContent = `${currentUsername} (${isStaff ? 'Staff/Admin' : 'Membre'})`;
+        // Vérification élargie pour inclure Otaku_33 et admin
+        const isStaff = (currentRole === 'admin' || currentUsername === 'Otaku_33' || currentUsername === 'Admin_Otaku');
+
+        document.getElementById('current-user-display').textContent = `${currentUsername} (${isStaff ? 'Administrateur' : 'Membre'})`;
 
         const btnCreate = document.getElementById('btn-create-topic');
         if (!isStaff && btnCreate) {
@@ -86,9 +88,9 @@
                 posts: [
                     {
                         id: 1,
-                        username: "Admin_Otaku",
+                        username: "Otaku_33",
                         userRank: "Fondateur",
-                        rankClass: "group-admin",
+                        rankClass: "admin",
                         avatar: "https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg",
                         date: "Posté aujourd'hui à 14:10",
                         text: "<p>Voici les principales sorties prévues ce mois-ci : Chainsaw Man T16, Kaiju N°8 T12.</p>"
@@ -146,7 +148,7 @@
                 id: Date.now(),
                 username: currentUsername,
                 userRank: isStaff ? "Fondateur" : "Membre",
-                rankClass: currentRole,
+                rankClass: isStaff ? "admin" : "member",
                 avatar: isStaff ? "https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg" : "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg",
                 date: "À l'instant",
                 text: `<p>${msg}</p>`
