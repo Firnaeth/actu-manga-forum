@@ -3,101 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S'enregistrer / Connexion - Forum Actu Manga</title>
+    <title>Authentification - Forum Actu Manga</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .auth-container {
+            max-width: 500px;
+            margin: 30px auto;
+            background: #fff;
+            border: 1px solid #ffb6c1;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .auth-header {
+            background: linear-gradient(to right, #ffb6c1, #ffc0cb);
+            color: #333;
+            padding: 12px 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            border-bottom: 1px solid #ffa07a;
+            text-align: center;
+        }
+
+        .auth-form {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #444;
+        }
+
+        .form-group input {
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.95em;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            border-color: #ff80ab;
+            outline: none;
+            box-shadow: 0 0 5px rgba(255, 128, 171, 0.4);
+        }
+
+        .auth-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .btn-auth {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-login {
+            background-color: #ff80ab;
+            color: white;
+        }
+
+        .btn-login:hover {
+            background-color: #ff4081;
+        }
+
+        .btn-register {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+
+        .btn-register:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
 </head>
 <body>
 
     <div id="wrapper">
-        <div class="breadcrumb">
+
+        <!-- BANNIÈRE EN-TÊTE PRINCIPALE -->
+        <div class="main-header">
+            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
+        </div>
+
+        <!-- BARRE DE NAVIGATION -->
+        <nav class="forum-nav">
+            <a href="index.html" class="nav-link">Index</a>
+            <a href="community.html" class="nav-link">Fiches & Critiques</a>
+            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
+            <a href="#" class="nav-link">Rechercher</a>
+            <a href="register.html" class="nav-link highlight">S'enregistrer</a>
+            <a href="#" class="nav-link">FAQ</a>
+        </nav>
+
+        <!-- FIL D'ARIANE / BREADCRUMB -->
+        <div class="breadcrumb" style="margin-top: 15px;">
             <a href="index.html">Index du Forum</a> &raquo; Authentification
         </div>
 
-        <div class="profile-container">
-            <div class="profile-header">
-                <h2>Rejoindre la Communauté / Se connecter</h2>
+        <!-- FORMULAIRE ACCUEIL & INSCRIPTION -->
+        <div class="auth-container">
+            <div class="auth-header">
+                Rejoindre la Communauté / Se connecter
             </div>
-            
-            <div class="manga-content">
-                <form id="form-auth" class="admin-panel-inputs">
-                    <label>Adresse E-mail :</label>
-                    <input type="email" id="auth-email" required placeholder="votre@email.com">
 
-                    <label>Mot de passe :</label>
-                    <input type="password" id="auth-password" required placeholder="******">
+            <form id="auth-form" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Adresse E-mail :</label>
+                    <input type="email" id="email" placeholder="votre@email.com" required>
+                </div>
 
-                    <label>Pseudo Forum (nécessaire pour l'inscription) :</label>
-                    <input type="text" id="auth-username" placeholder="Ex: Otaku_99">
+                <div class="form-group">
+                    <label for="password">Mot de passe :</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
 
-                    <div class="admin-form-actions" style="margin-top: 15px;">
-                        <button type="button" id="btn-login" class="btn-mp">Se connecter</button>
-                        <button type="button" id="btn-register" class="btn-admin-edit">S'inscrire</button>
-                    </div>
-                </form>
-            </div>
+                <div class="form-group">
+                    <label for="username">Pseudo Forum <small>(nécessaire uniquement pour l'inscription)</small> :</label>
+                    <input type="text" id="username" placeholder="Ex: Otaku_33">
+                </div>
+
+                <div class="auth-actions">
+                    <button type="button" id="btn-login" class="btn-auth btn-login">Se connecter</button>
+                    <button type="submit" id="btn-register" class="btn-auth btn-register">S'inscrire</button>
+                </div>
+            </form>
         </div>
+
     </div>
 
+    <!-- SCRIPT AVEC SUPABASE -->
     <script type="module">
         import { supabase } from './supabase.js';
 
-        const emailInput = document.getElementById('auth-email');
-        const passwordInput = document.getElementById('auth-password');
-        const usernameInput = document.getElementById('auth-username');
+        const authForm = document.getElementById('auth-form');
+        const btnLogin = document.getElementById('btn-login');
+
+        // CONNEXION
+        btnLogin.addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                alert("Veuillez remplir l'e-mail et le mot de passe !");
+                return;
+            }
+
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                alert("Erreur de connexion : " + error.message);
+            } else {
+                // Récupérer le pseudo depuis la table profiles
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('username, role')
+                    .eq('id', data.user.id)
+                    .single();
+
+                const username = profile?.username || email.split('@')[0];
+                const role = profile?.role || 'user';
+
+                localStorage.setItem('forumUsername', username);
+                localStorage.setItem('forumUserRole', role);
+
+                alert("Connexion réussie ! Bienvenue " + username);
+                window.location.href = "index.html";
+            }
+        });
 
         // INSCRIPTION
-        document.getElementById('btn-register').addEventListener('click', async () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            const username = usernameInput.value.trim();
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
 
-            if (!email || !password || !username) {
-                alert("Veuillez remplir tous les champs !");
+            if (!username) {
+                alert("Veuillez indiquer un pseudo pour vous inscrire !");
                 return;
             }
 
             const { data, error } = await supabase.auth.signUp({ email, password });
 
             if (error) {
-                alert("Erreur lors de l'inscription : " + error.message);
-                return;
-            }
-
-            if (data.user) {
-                const { error: profileError } = await supabase.from('profiles').insert([
-                    { id: data.user.id, username: username, role: 'membre' }
-                ]);
+                alert("Erreur d'inscription : " + error.message);
+            } else if (data.user) {
+                // Créer le profil dans la table
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .insert([{ id: data.user.id, username: username, role: 'user' }]);
 
                 if (profileError) {
-                    alert("Compte créé mais erreur sur le profil : " + profileError.message);
+                    alert("Compte créé mais erreur profil : " + profileError.message);
                 } else {
                     localStorage.setItem('forumUsername', username);
-                    localStorage.setItem('forumUserRole', 'membre');
+                    localStorage.setItem('forumUserRole', 'user');
                     alert("Inscription réussie !");
                     window.location.href = "index.html";
                 }
-            }
-        });
-
-        // CONNEXION
-        document.getElementById('btn-login').addEventListener('click', async () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-            if (error) {
-                alert("Erreur de connexion : " + error.message);
-                return;
-            }
-
-            const { data: profile } = await supabase.from('profiles').select('username, role').eq('id', data.user.id).single();
-
-            if (profile) {
-                localStorage.setItem('forumUsername', profile.username);
-                localStorage.setItem('forumUserRole', profile.role);
-                alert("Connexion réussie !");
-                window.location.href = "index.html";
             }
         });
     </script>
