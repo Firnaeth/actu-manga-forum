@@ -190,13 +190,41 @@
             document.getElementById('forum-banner-img').src = config.banner;
         }
 
-        // CHARGEMENT MEMBRES
+        // CHARGEMENT MEMBRES (HAUT ET BAS)
         async function loadOnlineUsers() {
-            const { data: profiles } = await supabase.from('profiles').select('username, role, avatar_url');
+            const { data: profiles, error } = await supabase.from('profiles').select('username, role, avatar_url');
+            
             const staffContainer = document.getElementById('staff-avatars-container');
+            const countMsg = document.getElementById('online-count-msg');
+            const usersListContainer = document.getElementById('online-users-list');
             const defaultAvatar = "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg";
 
-            if (profiles && staffContainer) {
+            if (error || !profiles || profiles.length === 0) {
+                if (countMsg) countMsg.innerHTML = "Il y a actuellement <strong>0</strong> membre inscrit sur le forum.";
+                if (usersListContainer) usersListContainer.innerHTML = "<em>Aucun membre.</em>";
+                if (staffContainer) staffContainer.innerHTML = "<em>Aucun membre.</em>";
+                return;
+            }
+
+            // 1. Mise à jour du texte du bas ("Qui est en ligne ?")
+            if (countMsg) {
+                countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
+            }
+
+            if (usersListContainer) {
+                const formattedUsers = profiles.map(user => {
+                    let color = "#333";
+                    if (user.role === 'admin') color = "#d9534f";
+                    else if (user.role === 'moderator') color = "#5cb85c";
+                    else if (user.role === 'vip') color = "#f0ad4e";
+
+                    return `<a href="profile.html?user=${encodeURIComponent(user.username)}" style="color: ${color}; font-weight: bold; text-decoration: none;">${user.username}</a>`;
+                });
+                usersListContainer.innerHTML = formattedUsers.join(', ');
+            }
+
+            // 2. Mise à jour du bloc du haut ("Staff & Membres") avec l'image par défaut propre
+            if (staffContainer) {
                 staffContainer.innerHTML = profiles.map(user => {
                     const avatar = (user.avatar_url && user.avatar_url.trim() !== "") ? user.avatar_url : defaultAvatar;
                     return `
