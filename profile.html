@@ -9,18 +9,20 @@
 <body>
 
     <div id="wrapper">
+        <!-- BREADCRUMB -->
         <div class="breadcrumb">
-            <a href="index.html">Index du Forum</a> &raquo; Profil de <span id="bread-username">Chargement...</span>
+            <a href="index.html">Index du Forum</a> &raquo; Profil de <span id="bread-username">Membre</span>
         </div>
 
+        <!-- CARTE PROFIL -->
         <div class="profile-container">
             <div class="profile-header">
                 <div class="avatar-box">
                     <img id="user-avatar" src="" alt="Avatar">
                 </div>
                 <div class="user-title">
-                    <h2 id="user-name">-</h2>
-                    <div class="rank" id="user-rank">-</div>
+                    <h2 id="user-name">Membre</h2>
+                    <div class="rank" id="user-rank">Membre</div>
                 </div>
             </div>
 
@@ -28,6 +30,10 @@
                 <tr>
                     <td class="label-col">Date d'inscription :</td>
                     <td id="user-joined">-</td>
+                </tr>
+                <tr>
+                    <td class="label-col">Nombre de messages :</td>
+                    <td id="user-posts">0 message</td>
                 </tr>
                 <tr>
                     <td class="label-col">Manga favori :</td>
@@ -38,9 +44,36 @@
                     <td id="user-sig"><em>-</em></td>
                 </tr>
             </table>
+
+            <div class="mp-box">
+                <a href="#" class="btn-mp">Envoyer un Message Privé (MP)</a>
+            </div>
+        </div>
+
+        <!-- MANGATHÈQUE -->
+        <div class="manga-section">
+            <div class="manga-header">
+                📊 Mangathèque de <span id="mangatheque-owner">Membre</span> (<span id="total-volumes-count">0</span> tomes)
+            </div>
+            <div class="manga-content">
+                <!-- FORMULAIRE D'AJOUT -->
+                <div id="add-manga-box">
+                    <form class="add-manga-form" id="form-add-manga">
+                        <input type="text" id="manga-title-input" class="input-flex-2" placeholder="Titre du manga (ex: Bleach)" required>
+                        <input type="number" id="manga-count-input" class="input-flex-1" placeholder="Nb tomes" min="1" required>
+                        <button type="submit" class="btn-mp btn-add-padding">+ Ajouter</button>
+                    </form>
+                </div>
+
+                <!-- LISTE DES MANGAS -->
+                <div class="manga-grid" id="manga-list-container">
+                    <!-- Injecté par JS -->
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- SCRIPT DYNAMIQUE AVEC SUPABASE -->
     <script type="module">
         import { supabase } from './supabase.js';
 
@@ -48,33 +81,159 @@
         const urlParams = new URLSearchParams(window.location.search);
         const profileUser = urlParams.get('user') || currentUsername;
 
-        if (!profileUser) {
-            alert("Veuillez vous connecter pour voir votre profil.");
+        // --- BLOQUER L'ACCÈS SI NON CONNECTÉ ET PAS DE PROFIL CIBLÉ ---
+        if (!currentUsername && !urlParams.get('user')) {
+            alert("Vous devez être connecté ou inscrit pour consulter un profil !");
             window.location.href = "register.html";
         }
 
-        async function loadProfile() {
-            const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('username', profileUser)
-                .single();
+        const usersInfo = {
+            "Otaku_33": {
+                rank: "Administrateur / Fondateur",
+                joined: "15 Janvier 2026",
+                posts: "1 420 messages",
+                fav: "Monster / Berserk / Nana",
+                sig: "« Je serai le Roi des Pirates ! »",
+                avatar: "https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg"
+            },
+            "Yoru_Chan": {
+                rank: "Membre Habitué",
+                joined: "03 Mars 2026",
+                posts: "89 messages",
+                fav: "Chainsaw Man / Jujutsu Kaisen",
+                sig: "Mangathèque en cours de remplissage...",
+                avatar: "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg"
+            }
+        };
 
-            if (error || !profile) {
-                document.getElementById('user-name').textContent = "Utilisateur introuvable";
+        const userData = usersInfo[profileUser] || {
+            rank: "Membre",
+            joined: "Récemment",
+            posts: "1 message",
+            fav: "Non spécifié",
+            sig: "Abonné au forum.",
+            avatar: "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg"
+        };
+
+        document.getElementById('bread-username').textContent = profileUser || 'Inconnu';
+        document.getElementById('user-name').textContent = profileUser || 'Inconnu';
+        document.getElementById('mangatheque-owner').textContent = profileUser || 'Inconnu';
+        document.getElementById('user-rank').textContent = userData.rank;
+        document.getElementById('user-joined').textContent = userData.joined;
+        document.getElementById('user-posts').textContent = userData.posts;
+        document.getElementById('user-fav').textContent = userData.fav;
+        document.getElementById('user-sig').innerHTML = `<em>${userData.sig}</em>`;
+        document.getElementById('user-avatar').src = userData.avatar;
+
+        // Cacher le formulaire d'ajout si le profil consulté n'est pas celui de l'utilisateur connecté
+        if (profileUser !== currentUsername) {
+            document.getElementById('add-manga-box').style.display = 'none';
+        }
+
+        const defaultMangas = {
+            "Otaku_33": [
+                { id: 1, title: "Bleach", count: 636 }
+            ],
+            "Yoru_Chan": [
+                { id: 1, title: "Chainsaw Man", count: 15 },
+                { id: 2, title: "Jujutsu Kaisen", count: 23 }
+            ]
+        };
+
+        if (!localStorage.getItem('forumMangatheques')) {
+            localStorage.setItem('forumMangatheques', JSON.stringify(defaultMangas));
+        }
+
+        const allMangatheques = JSON.parse(localStorage.getItem('forumMangatheques'));
+        let userMangaList = allMangatheques[profileUser] || [];
+
+        function renderMangatheque() {
+            const container = document.getElementById('manga-list-container');
+            const totalCounter = document.getElementById('total-volumes-count');
+
+            if (userMangaList.length === 0) {
+                container.innerHTML = '<p class="empty-manga-msg">Aucun manga dans la collection.</p>';
+                totalCounter.textContent = "0";
                 return;
             }
 
-            document.getElementById('bread-username').textContent = profile.username;
-            document.getElementById('user-name').textContent = profile.username;
-            document.getElementById('user-rank').textContent = profile.role === 'admin' ? 'Administrateur' : 'Membre';
-            document.getElementById('user-joined').textContent = new Date(profile.created_at).toLocaleDateString('fr-FR');
-            document.getElementById('user-fav').textContent = profile.favorite_manga || 'Non renseigné';
-            document.getElementById('user-sig').innerHTML = `<em>${profile.signature || ''}</em>`;
-            document.getElementById('user-avatar').src = profile.avatar_url;
+            let total = 0;
+            container.innerHTML = userMangaList.map(item => {
+                total += parseInt(item.count);
+                const isOwner = profileUser === currentUsername;
+                return `
+                    <div class="manga-item">
+                        <div class="manga-info">
+                            <strong>${item.title}</strong>
+                            <div class="volume-counter">
+                                📖 <span>${item.count} tomes</span>
+                                ${isOwner ? `
+                                    <button class="btn-qty" data-id="${item.id}" data-action="minus">-</button>
+                                    <button class="btn-qty" data-id="${item.id}" data-action="plus">+</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                        ${isOwner ? `
+                            <button class="btn-del" data-id="${item.id}" data-action="delete">x</button>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            totalCounter.textContent = total;
+            attachMangathequeEvents();
         }
 
-        loadProfile();
+        function attachMangathequeEvents() {
+            document.querySelectorAll('.btn-qty').forEach(btn => {
+                btn.onclick = function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    const action = this.getAttribute('data-action');
+                    updateCount(id, action === 'plus' ? 1 : -1);
+                };
+            });
+
+            document.querySelectorAll('.btn-del').forEach(btn => {
+                btn.onclick = function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    removeManga(id);
+                };
+            });
+        }
+
+        document.getElementById('form-add-manga').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('manga-title-input').value;
+            const count = parseInt(document.getElementById('manga-count-input').value);
+
+            userMangaList.push({ id: Date.now(), title: title, count: count });
+            saveAndRender();
+
+            document.getElementById('manga-title-input').value = '';
+            document.getElementById('manga-count-input').value = '';
+        });
+
+        function updateCount(id, change) {
+            const manga = userMangaList.find(m => m.id === id);
+            if (manga) {
+                manga.count += change;
+                if (manga.count < 1) manga.count = 1;
+                saveAndRender();
+            }
+        }
+
+        function removeManga(id) {
+            userMangaList = userMangaList.filter(item => item.id !== id);
+            saveAndRender();
+        }
+
+        function saveAndRender() {
+            allMangatheques[profileUser] = userMangaList;
+            localStorage.setItem('forumMangatheques', JSON.stringify(allMangatheques));
+            renderMangatheque();
+        }
+
+        renderMangatheque();
     </script>
 </body>
 </html>
