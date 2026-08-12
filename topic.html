@@ -79,6 +79,8 @@
         const btnCreate = document.getElementById('btn-create-topic');
         if (!isStaff && btnCreate) {
             btnCreate.style.display = 'none';
+        } else if (btnCreate) {
+             btnCreate.style.display = 'inline-block'; // S'affiche pour le staff (Admin et Modo)
         }
 
         // --- 2. DONNÉES PAR DÉFAUT & LOCALSTORAGE ---
