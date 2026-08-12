@@ -86,21 +86,27 @@ body {
     padding: 15px;
     border-radius: 4px;
     margin-bottom: 15px;
+    height: auto !important; 
+    min-height: 80px; /* Une hauteur minimale confortable */
+    padding: 15px !important;
+    overflow: visible !important;
 }
 
 .welcome-banner h2 {
     margin: 0 0 4px 0;
     font-size: 15px;
     letter-spacing: 1px;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    line-height: 1.4 !important;
 }
 
 .welcome-banner p {
     margin: 0;
     font-size: 14px;
-    white-space: normal;      /* Autorise le texte à aller à la ligne */
-    overflow: visible;        /* Empêche de masquer ce qui dépasse */
-    text-overflow: clip;      /* Supprime les "..." si tu en avais */
-    display: block;           /* Force le bloc à occuper la place nécessaire */
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    line-height: 1.4 !important;
 }
 
 .news-flex {
