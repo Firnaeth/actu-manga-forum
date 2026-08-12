@@ -224,7 +224,7 @@
         let rawList = JSON.parse(localStorage.getItem('forumSheetsData')) || [];
         
         rawList.forEach(item => {
-            let key = item.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            let key = item.originalKey || item.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
             let typeMap = { manga: "📖 MANGA", anime: "📺 ANIME", game: "🎮 JEU VIDÉO" };
             let badgeMap = { manga: "badge manga", anime: "badge anime", game: "badge game" };
             
@@ -273,15 +273,15 @@
         badge.textContent = data.type;
         badge.className = data.badgeClass;
 
-        // Afficher les boutons d'administration
-        if (localStorage.getItem('isAdmin') === 'true' || rawList.some(i => i.title.toLowerCase().replace(/[^a-z0-9]/g, '-') === itemParam)) {
+        // Afficher les boutons d'administration (Admin ou créateur de la fiche)
+        if (localStorage.getItem('isAdmin') === 'true' || rawList.some(i => (i.originalKey || i.title.toLowerCase().replace(/[^a-z0-9]/g, '-')) === itemParam) || defaultSheets[itemParam]) {
             document.getElementById('admin-actions').style.display = 'flex';
         }
 
         // Fonctions d'administration
         function deleteSheet() {
             if (confirm("Voulez-vous vraiment supprimer cette fiche ?")) {
-                let updatedList = rawList.filter(i => i.title.toLowerCase().replace(/[^a-z0-9]/g, '-') !== itemParam);
+                let updatedList = rawList.filter(i => (i.originalKey || i.title.toLowerCase().replace(/[^a-z0-9]/g, '-')) !== itemParam);
                 localStorage.setItem('forumSheetsData', JSON.stringify(updatedList));
                 alert("Fiche supprimée avec succès !");
                 window.location.href = "community.html";
@@ -310,7 +310,10 @@
         document.getElementById('editForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            let newKey = document.getElementById('edit-title').value.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            
             let updatedItem = {
+                originalKey: newKey,
                 title: document.getElementById('edit-title').value,
                 type: document.getElementById('edit-type').value,
                 cover: document.getElementById('edit-cover').value,
@@ -323,19 +326,19 @@
                 date: "Modifié à l'instant"
             };
 
-            // Mettre à jour dans rawList
-            let index = rawList.findIndex(i => i.title.toLowerCase().replace(/[^a-z0-9]/g, '-') === itemParam);
+            // Chercher si la fiche existe déjà dans le localStorage via son identifiant actuel
+            let index = rawList.findIndex(i => (i.originalKey || i.title.toLowerCase().replace(/[^a-z0-9]/g, '-')) === itemParam);
+            
             if (index !== -1) {
                 rawList[index] = updatedItem;
             } else {
-                // Si c'était une fiche par défaut, on l'ajoute comme nouvelle fiche personnalisée
+                // Si c'était une fiche par défaut, on l'ajoute dans le tableau persistant
                 rawList.push(updatedItem);
             }
 
             localStorage.setItem('forumSheetsData', JSON.stringify(rawList));
             alert("Fiche modifiée avec succès !");
             
-            let newKey = updatedItem.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
             window.location.href = `sheet-view.html?item=${newKey}`;
         });
     </script>
