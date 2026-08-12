@@ -112,6 +112,16 @@
             let stars = "";
             for(let i=0; i<item.rating; i++) stars += "⭐";
 
+            // Attribution automatique du rôle selon l'auteur (ex: si c'est un chroniqueur ou admin)
+            let authorName = item.author || 'Otaku_33';
+            let authorClass = 'group-member';
+            if (authorName === 'Admin_Otaku') {
+                authorClass = 'group-admin';
+            } else {
+                // Tu pourras ajouter tes conditions de rôles ici (ex: si le membre a beaucoup de fiches -> 'group-chroniqueur')
+                authorClass = 'group-chroniqueur'; 
+            }
+
             customSheets[key] = {
                 id: key,
                 type: item.type,
@@ -121,8 +131,8 @@
                 ageRating: item.ageRating || 'Tous publics',
                 rating: stars,
                 responses: 0,
-                author: item.author || 'Otaku_33',
-                authorClass: 'group-admin',
+                author: authorName,
+                authorClass: authorClass,
                 date: item.date || "À l'instant"
             };
         });
