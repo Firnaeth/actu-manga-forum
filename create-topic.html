@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer un Nouveau Sujet - Forum Actu Manga</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="wrapper">
+        <div class="breadcrumb">
+            <a href="index.html">Index du Forum</a> &raquo; <span>Créer un nouveau sujet</span>
+        </div>
+
+        <h1 class="topic-main-title">📝 Création d'un Nouveau Sujet / Planning / Annonce</h1>
+
+        <div class="reply-box">
+            <div class="box-title">Informations du sujet</div>
+            <form class="reply-form" id="new-topic-form">
+
+                <label for="topic-type">Catégorie :</label>
+                <select id="topic-type" style="padding: 6px; margin-bottom: 12px; width: 100%;">
+                    <option value="planning">📅 Planning des Sorties VF</option>
+                    <option value="licences">📣 Annonce / Nouvelle Licence</option>
+                    <option value="manga">📖 Discussion Manga / Anime</option>
+                </select>
+
+                <label for="topic-title-input">Titre du sujet :</label>
+                <input type="text" id="topic-title-input" placeholder="Ex: [PLANNING] Sorties Septembre..." style="padding: 8px; width: 100%; margin-bottom: 15px; box-sizing: border-box;" required>
+
+                <label for="topic-content">Contenu du message :</label>
+                <textarea id="topic-content" rows="10" placeholder="Rédigez le texte..." required></textarea>
+
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button type="submit" class="btn-submit">Publier le sujet</button>
+                    <a href="topic.html" class="btn-reply" style="background: #e74c3c; text-decoration: none; text-align: center;">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Restriction si non-admin
+        const currentRole = localStorage.getItem('forumUserRole') || 'group-member';
+        if (currentRole !== 'group-admin' && currentRole !== 'group-modo') {
+            alert('Accès réservé au Staff !');
+            window.location.href = 'topic.html';
+        }
+
+        document.getElementById('new-topic-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const key = document.getElementById('topic-type').value;
+            const title = document.getElementById('topic-title-input').value;
+            const content = document.getElementById('topic-content').value;
+            const username = localStorage.getItem('forumUsername') || 'Admin_Otaku';
+
+            let topicsData = JSON.parse(localStorage.getItem('forumTopicsData')) || {};
+
+            topicsData[key] = {
+                title: title,
+                posts: [
+                    {
+                        id: Date.now(),
+                        username: username,
+                        userRank: "Fondateur",
+                        rankClass: "group-admin",
+                        avatar: "https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg",
+                        date: "Posté à l'instant",
+                        text: `<p>${content}</p>`
+                    }
+                ]
+            };
+
+            localStorage.setItem('forumTopicsData', JSON.stringify(topicsData));
+            alert('Sujet publié avec succès !');
+            window.location.href = `topic.html?topic=${key}`;
+        });
+    </script>
+
+</body>
+</html>
