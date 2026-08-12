@@ -5,6 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil - Forum Actu Manga</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .edit-profile-box {
+            background: #fff;
+            border: 1px solid #ffb6c1;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .edit-profile-title {
+            font-weight: bold;
+            color: #d63384;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #ffb6c1;
+            padding-bottom: 5px;
+        }
+        .edit-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .edit-form-grid input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .full-width {
+            grid-column: span 2;
+        }
+        .btn-save-profile {
+            background: #ff80ab;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .btn-save-profile:hover {
+            background: #ff4081;
+        }
+    </style>
 </head>
 <body>
 
@@ -18,7 +62,7 @@
         <div class="profile-container">
             <div class="profile-header">
                 <div class="avatar-box">
-                    <img id="user-avatar" src="" alt="Avatar">
+                    <img id="user-avatar" src="https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg" alt="Avatar">
                 </div>
                 <div class="user-title">
                     <h2 id="user-name">Membre</h2>
@@ -48,6 +92,28 @@
             <div class="mp-box">
                 <a href="#" class="btn-mp">Envoyer un Message Privé (MP)</a>
             </div>
+        </div>
+
+        <!-- BLOC DE MODIFICATION (UNIQUEMENT POUR LE PROPRIÉTAIRE) -->
+        <div id="edit-profile-section" class="edit-profile-box" style="display: none;">
+            <div class="edit-profile-title">✏️ Modifier mes informations de profil</div>
+            <form id="form-edit-profile">
+                <div class="edit-form-grid">
+                    <div>
+                        <label><small>Lien de l'avatar (URL Image) :</small></label>
+                        <input type="url" id="edit-avatar-url" placeholder="https://..." required>
+                    </div>
+                    <div>
+                        <label><small>Manga(s) favori(s) :</small></label>
+                        <input type="text" id="edit-fav-manga" placeholder="Ex: Bleach, Naruto...">
+                    </div>
+                    <div class="full-width">
+                        <label><small>Signature :</small></label>
+                        <input type="text" id="edit-signature" placeholder="Votre phrase de signature...">
+                    </div>
+                </div>
+                <button type="submit" class="btn-save-profile">Enregistrer les modifications</button>
+            </form>
         </div>
 
         <!-- MANGATHÈQUE -->
@@ -81,63 +147,78 @@
         const urlParams = new URLSearchParams(window.location.search);
         const profileUser = urlParams.get('user') || currentUsername;
 
-        // --- BLOQUER L'ACCÈS SI NON CONNECTÉ ET PAS DE PROFIL CIBLÉ ---
         if (!currentUsername && !urlParams.get('user')) {
-            alert("Vous devez être connecté ou inscrit pour consulter un profil !");
+            alert("Vous devez être connecté pour consulter un profil !");
             window.location.href = "register.html";
         }
 
-        const usersInfo = {
-            "Otaku_33": {
-                rank: "Administrateur / Fondateur",
-                joined: "15 Janvier 2026",
-                posts: "1 420 messages",
-                fav: "Monster / Berserk / Nana",
-                sig: "« Je serai le Roi des Pirates ! »",
-                avatar: "https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg"
-            },
-            "Yoru_Chan": {
-                rank: "Membre Habitué",
-                joined: "03 Mars 2026",
-                posts: "89 messages",
-                fav: "Chainsaw Man / Jujutsu Kaisen",
-                sig: "Mangathèque en cours de remplissage...",
-                avatar: "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg"
+        let currentUserId = null;
+
+        // Charger les données de l'utilisateur depuis Supabase
+        async function loadUserProfile() {
+            document.getElementById('bread-username').textContent = profileUser;
+            document.getElementById('user-name').textContent = profileUser;
+            document.getElementById('mangatheque-owner').textContent = profileUser;
+
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('username', profileUser)
+                .single();
+
+            if (profile) {
+                currentUserId = profile.id;
+                document.getElementById('user-rank').textContent = profile.rank || (profile.role === 'admin' ? 'Administrateur' : 'Membre');
+                document.getElementById('user-joined').textContent = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Récemment';
+                document.getElementById('user-fav').textContent = profile.favorite_manga || 'Non spécifié';
+                document.getElementById('user-sig').innerHTML = `<em>${profile.signature || 'Abonné au forum.'}</em>`;
+                
+                if (profile.avatar_url) {
+                    document.getElementById('user-avatar').src = profile.avatar_url;
+                }
+
+                // Si c'est notre propre profil, afficher le formulaire d'édition
+                if (profileUser === currentUsername) {
+                    document.getElementById('edit-profile-section').style.display = 'block';
+                    document.getElementById('edit-avatar-url').value = profile.avatar_url || '';
+                    document.getElementById('edit-fav-manga').value = profile.favorite_manga || '';
+                    document.getElementById('edit-signature').value = profile.signature || '';
+                }
             }
-        };
+        }
 
-        const userData = usersInfo[profileUser] || {
-            rank: "Membre",
-            joined: "Récemment",
-            posts: "1 message",
-            fav: "Non spécifié",
-            sig: "Abonné au forum.",
-            avatar: "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg"
-        };
+        // Sauvegarder les modifications de profil dans Supabase
+        document.getElementById('form-edit-profile').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const avatarUrl = document.getElementById('edit-avatar-url').value;
+            const favManga = document.getElementById('edit-fav-manga').value;
+            const signature = document.getElementById('edit-signature').value;
 
-        document.getElementById('bread-username').textContent = profileUser || 'Inconnu';
-        document.getElementById('user-name').textContent = profileUser || 'Inconnu';
-        document.getElementById('mangatheque-owner').textContent = profileUser || 'Inconnu';
-        document.getElementById('user-rank').textContent = userData.rank;
-        document.getElementById('user-joined').textContent = userData.joined;
-        document.getElementById('user-posts').textContent = userData.posts;
-        document.getElementById('user-fav').textContent = userData.fav;
-        document.getElementById('user-sig').innerHTML = `<em>${userData.sig}</em>`;
-        document.getElementById('user-avatar').src = userData.avatar;
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    avatar_url: avatarUrl,
+                    favorite_manga: favManga,
+                    signature: signature
+                })
+                .eq('username', currentUsername);
 
-        // Cacher le formulaire d'ajout si le profil consulté n'est pas celui de l'utilisateur connecté
+            if (error) {
+                alert("Erreur lors de la mise à jour : " + error.message);
+            } else {
+                alert("Profil mis à jour avec succès !");
+                location.reload();
+            }
+        });
+
+        // Masquer le formulaire d'ajout manga si ce n'est pas le propriétaire
         if (profileUser !== currentUsername) {
             document.getElementById('add-manga-box').style.display = 'none';
         }
 
+        // Gestion de la Mangathèque (Local / Supabase)
         const defaultMangas = {
-            "Otaku_33": [
-                { id: 1, title: "Bleach", count: 636 }
-            ],
-            "Yoru_Chan": [
-                { id: 1, title: "Chainsaw Man", count: 15 },
-                { id: 2, title: "Jujutsu Kaisen", count: 23 }
-            ]
+            "Otaku_33": [{ id: 1, title: "Bleach", count: 636 }]
         };
 
         if (!localStorage.getItem('forumMangatheques')) {
@@ -233,6 +314,7 @@
             renderMangatheque();
         }
 
+        loadUserProfile();
         renderMangatheque();
     </script>
 </body>
