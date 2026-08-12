@@ -96,8 +96,11 @@ body {
 
 .welcome-banner p {
     margin: 0;
-    font-size: 11px;
-    opacity: 0.9;
+    font-size: 14px;
+    white-space: normal;      /* Autorise le texte à aller à la ligne */
+    overflow: visible;        /* Empêche de masquer ce qui dépasse */
+    text-overflow: clip;      /* Supprime les "..." si tu en avais */
+    display: block;           /* Force le bloc à occuper la place nécessaire */
 }
 
 .news-flex {
