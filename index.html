@@ -9,6 +9,8 @@
 <body>
 
     <div id="wrapper">
+
+        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
             <button class="btn-admin-edit" id="btn-toggle-admin">Modifier Titre & Bannière</button>
@@ -18,7 +20,7 @@
             <form id="form-config-header">
                 <label>Titre principal du forum :</label>
                 <input type="text" id="input-forum-title" required>
-                
+
                 <label>Description / Sous-titre :</label>
                 <input type="text" id="input-forum-subtitle" required>
 
@@ -32,44 +34,206 @@
             </form>
         </div>
 
+        <!-- BANNIÈRE EN-TÊTE PRINCIPALE -->
         <div class="main-header">
             <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
         </div>
 
+        <!-- BARRE DE NAVIGATION VINTAGE -->
         <nav class="forum-nav">
             <a href="index.html" class="nav-link">Index</a>
             <a href="community.html" class="nav-link">Fiches & Critiques</a>
             <a href="contest-view.html" class="nav-link">Concours Dessin</a>
             <a href="#" class="nav-link">Rechercher</a>
+
+            <!-- LIEN PROFIL (Masqué si non connecté) -->
             <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
+
+            <!-- BOUTON D'INSCRIPTION OU DÉCONNEXION -->
             <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
             <a href="#" class="nav-link">FAQ</a>
         </nav>
 
+        <!-- ANNONCE & ACTUALITÉS -->
         <div class="news-container">
             <div class="welcome-banner">
                 <h2 id="forum-title-display">Bienvenue sur Actu Manga World</h2>
                 <p id="forum-subtitle-display">Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !</p>
             </div>
+
+            <div class="news-flex">
+                <!-- Staff Box -->
+                <div class="staff-box">
+                    <div class="mini-title">Staff en ligne</div>
+                    <div class="staff-avatars">
+                        <a href="profile.html?user=Admin_Otaku"><img src="https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg" alt="Admin" title="Admin"></a>
+                        <a href="profile.html?user=Yoru_Chan"><img src="https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg" alt="Modo" title="Modo"></a>
+                    </div>
+                </div>
+
+                <!-- News Box Scrollable -->
+                <div class="news-scroll">
+                    <div class="mini-title">Dernières Actualités & Événements</div>
+                    <ul>
+                        <li><span class="date">[11/08]</span> <a href="topic.html?topic=planning">Planning complet des sorties VF du mois</a></li>
+                        <li><span class="date">[10/08]</span> <a href="sheet-view.html?item=elden-ring">Nouvelle fiche : Elden Ring DLC</a></li>
+                        <li><span class="date">[08/08]</span> <a href="topic.html?topic=licences">Annonce adaptation Anime Saison Automne</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
+
+        <!-- CATÉGORIE 1 : ACTUALITÉS & SORTIES -->
+        <table class="forum-table">
+            <thead>
+                <tr>
+                    <th colspan="2" class="cat-title">_ Actualités & Sorties Mangas _</th>
+                    <th class="stat-head">Sujets</th>
+                    <th class="stat-head">Messages</th>
+                    <th class="last-post-head">Dernier Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="icon-cell">
+                        <img src="https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg" alt="Icone" class="forum-icon">
+                    </td>
+                    <td class="forum-desc">
+                        <a href="topic.html?topic=planning" class="forum-title">Planning des Sorties VF</a>
+                        <p>Calendrier mois par mois des éditeurs (Kurokawa, Ki-oon, Pika...).</p>
+                    </td>
+                    <td class="stat-cell">124</td>
+                    <td class="stat-cell">1580</td>
+                    <td class="last-post-cell">
+                        <a href="topic.html?topic=planning">Planning Août 2026</a><br>
+                        <small>Aujourd'hui à 14:10 par <a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a></small>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="icon-cell">
+                        <img src="https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg" alt="Icone" class="forum-icon">
+                    </td>
+                    <td class="forum-desc">
+                        <a href="topic.html?topic=licences" class="forum-title">Annonces & Licences</a>
+                        <p>Toutes les nouvelles acquisitions d'éditeurs et annonces d'animes.</p>
+                    </td>
+                    <td class="stat-cell">89</td>
+                    <td class="stat-cell">940</td>
+                    <td class="last-post-cell">
+                        <a href="topic.html?topic=licences">Nouvelle licence Akata</a><br>
+                        <small>Hier à 21:45 par <a href="profile.html?user=Yoru_Chan" class="group-member">Yoru_Chan</a></small>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- CATÉGORIE 2 : DISCUSSIONS & CRITIQUES -->
+        <table class="forum-table">
+            <thead>
+                <tr>
+                    <th colspan="2" class="cat-title">_ Espace Communauté & Créations _</th>
+                    <th class="stat-head">Sujets</th>
+                    <th class="stat-head">Messages</th>
+                    <th class="last-post-head">Dernier Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="icon-cell">
+                        <span class="category-emoji">📝</span>
+                    </td>
+                    <td class="forum-desc">
+                        <a href="community.html" class="forum-title">Fiches & Critiques (Mangas & Animes)</a>
+                        <p>Découvre et crée des fiches sur tes Mangas et Animes préférés !</p>
+                    </td>
+                    <td class="stat-cell">310</td>
+                    <td class="stat-cell">4200</td>
+                    <td class="last-post-cell">
+                        <a href="sheet-view.html?item=chainsaw-man">[MANGA] Chainsaw Man</a><br>
+                        <small>10/08 à 14:15 par <a href="profile.html?user=Yoru_Chan" class="group-member">Yoru_Chan</a></small>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="icon-cell">
+                        <span class="category-emoji">🎨</span>
+                    </td>
+                    <td class="forum-desc">
+                        <a href="contest-view.html" class="forum-title">Concours & Fan-Arts (100% SANS IA)</a>
+                        <p>Participe aux concours de dessin et partage tes créations traditionnelles ou digitales.</p>
+                    </td>
+                    <td class="stat-cell">45</td>
+                    <td class="stat-cell">620</td>
+                    <td class="last-post-cell">
+                        <a href="contest-view.html">Affiche du Forum #01</a><br>
+                        <small>Aujourd'hui à 11:30 par <a href="profile.html?user=Yoru_Chan" class="group-member">Yoru_Chan</a></small>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- CATÉGORIE 3 : ZONE GAMING & JEUX VIDÉO -->
+        <table class="forum-table">
+            <thead>
+                <tr>
+                    <th colspan="2" class="cat-title">_ Zone Gaming & Jeux Vidéo _</th>
+                    <th class="stat-head">Sujets</th>
+                    <th class="stat-head">Messages</th>
+                    <th class="last-post-head">Dernier Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="icon-cell">
+                        <span class="category-emoji">🎮</span>
+                    </td>
+                    <td class="forum-desc">
+                        <a href="community.html" class="forum-title">Jeux Vidéo Manga & VS Fighting</a>
+                        <p>Discussions, fiches et avis sur les jeux vidéo, RPGs et Versus Fighting.</p>
+                    </td>
+                    <td class="stat-cell">156</td>
+                    <td class="stat-cell">1890</td>
+                    <td class="last-post-cell">
+                        <a href="sheet-view.html?item=elden-ring">[JEU] Elden Ring DLC</a><br>
+                        <small>Hier à 18:20 par <a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a></small>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- WIDGET QUI EST EN LIGNE -->
+        <div class="online-box">
+            <div class="box-title">Qui est en ligne ?</div>
+            <div class="box-content">
+                <p>Il y a actuellement <strong>2</strong> membres connectés sur le forum.</p>
+                <hr class="box-hr">
+                <p><small>Membres connectés :
+                    <a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a>,
+                    <a href="profile.html?user=Yoru_Chan" class="group-member">Yoru_Chan</a>
+                </small></p>
+            </div>
+        </div>
+
     </div>
 
+    <!-- SCRIPT AVEC INTEGRATION SUPABASE -->
     <script type="module">
         import { supabase } from './supabase.js';
 
         const currentUsername = localStorage.getItem('forumUsername');
         const currentUserRole = localStorage.getItem('forumUserRole');
 
+        // --- GESTION DU PROFIL ET BOUTON CONNEXION ---
         const profileLink = document.getElementById('nav-profile-link');
         const authLink = document.getElementById('nav-auth-link');
 
         if (currentUsername) {
             profileLink.classList.remove('hidden');
             profileLink.href = `profile.html?user=${encodeURIComponent(currentUsername)}`;
-            
+
             authLink.textContent = "Déconnexion";
             authLink.href = "#";
-            authLink.onclick = async function() {
+            authLink.onclick = async function(e) {
+                e.preventDefault();
                 await supabase.auth.signOut();
                 localStorage.removeItem('forumUsername');
                 localStorage.removeItem('forumUserRole');
@@ -80,17 +244,60 @@
             profileLink.classList.add('hidden');
         }
 
+        // --- GESTION DU PANNEAU D'ADMINISTRATION ---
         const adminBar = document.getElementById('admin-bar-container');
-        if (currentUsername && currentUserRole === "admin") {
+
+        if (currentUsername && (currentUsername === "Admin_Otaku" || currentUserRole === "admin")) {
             adminBar.classList.remove('hidden');
+        } else {
+            adminBar.classList.add('hidden');
         }
 
-        document.getElementById('btn-toggle-admin')?.addEventListener('click', toggleAdminPanel);
-        document.getElementById('btn-cancel-admin')?.addEventListener('click', toggleAdminPanel);
+        const toggleBtn = document.getElementById('btn-toggle-admin');
+        const cancelBtn = document.getElementById('btn-cancel-admin');
+
+        if (toggleBtn) toggleBtn.onclick = toggleAdminPanel;
+        if (cancelBtn) cancelBtn.onclick = toggleAdminPanel;
 
         function toggleAdminPanel() {
-            document.getElementById('admin-panel-form').classList.toggle('hidden');
+            const panel = document.getElementById('admin-panel-form');
+            panel.classList.toggle('hidden');
         }
+
+        function loadHeaderConfig() {
+            const defaultConfig = {
+                title: "Bienvenue sur Actu Manga World",
+                subtitle: "Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !",
+                banner: "https://images.alphacoders.com/605/605592.png"
+            };
+
+            const savedConfig = JSON.parse(localStorage.getItem('forumHeaderConfig')) || defaultConfig;
+
+            document.getElementById('forum-title-display').textContent = savedConfig.title;
+            document.getElementById('forum-subtitle-display').textContent = savedConfig.subtitle;
+            document.getElementById('forum-banner-img').src = savedConfig.banner;
+
+            document.getElementById('input-forum-title').value = savedConfig.title;
+            document.getElementById('input-forum-subtitle').value = savedConfig.subtitle;
+            document.getElementById('input-forum-banner').value = savedConfig.banner;
+        }
+
+        document.getElementById('form-config-header').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const newConfig = {
+                title: document.getElementById('input-forum-title').value,
+                subtitle: document.getElementById('input-forum-subtitle').value,
+                banner: document.getElementById('input-forum-banner').value
+            };
+
+            localStorage.setItem('forumHeaderConfig', JSON.stringify(newConfig));
+            loadHeaderConfig();
+            toggleAdminPanel();
+            alert("L'en-tête du forum a été mis à jour !");
+        });
+
+        loadHeaderConfig();
     </script>
 </body>
 </html>
