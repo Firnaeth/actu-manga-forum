@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S'enregistrer - Forum Actu Manga</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="wrapper">
+        <div class="breadcrumb">
+            <a href="index.html">Index du Forum</a> &raquo; <span>Inscription</span>
+        </div>
+
+        <div class="form-box">
+            <div class="box-title">Formulaire d'inscription</div>
+            <form class="retro-form">
+                <p class="form-intro">Bienvenue ! Remplis les informations ci-dessous pour rejoindre la communauté.</p>
+
+                <div class="form-group">
+                    <label for="username">Nom d'utilisateur :</label>
+                    <input type="text" id="username" placeholder="Ex: Otaku_99" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Adresse E-mail :</label>
+                    <input type="email" id="email" placeholder="ton.email@exemple.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Mot de passe :</label>
+                    <input type="password" id="password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="avatar_url">URL de ton Avatar (100x100) :</label>
+                    <input type="url" id="avatar_url" placeholder="https://lien-de-ton-image.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="signature">Signature (Texte ou GIF) :</label>
+                    <textarea id="signature" rows="3" placeholder="Ex: « Mon manga préféré est One Piece ! »"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-submit">Valider mon inscription</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

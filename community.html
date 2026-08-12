@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiches & Critiques - Forum Actu Manga</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="wrapper">
+        <!-- BREADCRUMB / NAVIGATION -->
+        <div class="breadcrumb">
+            <a href="index.html">Index du Forum</a> &raquo; <span>Fiches & Critiques</span>
+        </div>
+
+        <h1 class="topic-main-title">Espace Fiches : Mangas, Animes & Jeux Vidéo</h1>
+
+        <!-- ACTION & FILTRES -->
+        <div class="topic-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <a href="create-sheet.html" class="btn-reply">+ Créer une Fiche</a>
+            <div class="filter-tags">
+                <span class="tag active">Tous</span>
+                <span class="tag">📖 Mangas</span>
+                <span class="tag">📺 Animes</span>
+                <span class="tag">🎮 Jeux Vidéo</span>
+            </div>
+        </div>
+
+        <!-- BANNIÈRE CONCOURS EN VIGUEUR -->
+        <div class="contest-banner-box">
+            <div class="box-title">🏆 CONCOURS DU MOIS : DESSIN & AFFICHE (NON-IA)</div>
+            <div style="padding: 12px; font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                 <strong>Thème :</strong> Dessine la mascotte du forum ou une affiche manga !<br>
+                  <small style="color: #e74c3c; font-weight: bold;">⚠️ 100% Fait main (Digital ou Traditionnel) — Zéro IA toléré</small>
+               </div>
+              <a href="contest-view.html" class="btn-submit" style="text-decoration: none; padding: 6px 12px;">Voir & Participer &raquo;</a>
+             </div>
+        </div>
+
+      
+
+        <!-- TABLEAU DES FICHES -->
+        <table class="forum-table">
+            <thead>
+                <tr>
+                    <th colspan="2" class="cat-title">_ Fiches de la communauté _</th>
+                    <th class="stat-head">Note</th>
+                    <th class="stat-head">Réponses</th>
+                    <th class="last-post-head">Auteur</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Fiche 1 : Jeu Vidéo -->
+                <tr>
+                    <td class="icon-cell">
+                        <span style="font-size: 24px;">🎮</span>
+                    </td>
+                    <td class="forum-desc">
+                        <a href="sheet-view.html?item=elden-ring" class="forum-title">[JEU] Elden Ring : Shadow of the Erdtree</a>
+                        <p>Action-RPG / FromSoftware — Un DLC magistral et exigeant.</p>
+                    </td>
+                    <td class="stat-cell" style="color: #f1c40f;">⭐⭐⭐⭐⭐</td>
+                    <td class="stat-cell">42</td>
+                    <td class="last-post-cell">
+                        Par <a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a><br>
+                        <small>Hier à 18:20</small>
+                    </td>
+                </tr>
+
+                <!-- Fiche 2 : Manga -->
+                <tr>
+                    <td class="icon-cell">
+                        <span style="font-size: 24px;">📖</span>
+                    </td>
+                    <td class="forum-desc">
+                        <a href="sheet-view.html?item=chainsaw-man" class="forum-title">[MANGA] Chainsaw Man - Tome 1 à 15</a>
+                        <p>Shonen / Tatsuki Fujimoto — Une folie visuelle et un rythme effréné.</p>
+                    </td>
+                    <td class="stat-cell" style="color: #f1c40f;">⭐⭐⭐⭐☆</td>
+                    <td class="stat-cell">89</td>
+                    <td class="last-post-cell">
+                        Par <a href="profile.html?user=Yoru_Chan" class="group-member">Yoru_Chan</a><br>
+                        <small>10/08 à 14:15</small>
+                    </td>
+                </tr>
+
+                <!-- Fiche 3 : Anime -->
+                <tr>
+                    <td class="icon-cell">
+                        <span style="font-size: 24px;">📺</span>
+                    </td>
+                    <td class="forum-desc">
+                        <a href="sheet-view.html?item=demon-slayer" class="forum-title">[ANIME] Demon Slayer : Kimetsu no Yaiba</a>
+                        <p>Anime / Ufotable — Une animation à couper le souffle.</p>
+                    </td>
+                    <td class="stat-cell" style="color: #f1c40f;">⭐⭐⭐⭐⭐</td>
+                    <td class="stat-cell">112</td>
+                    <td class="last-post-cell">
+                        Par <a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a><br>
+                        <small>09/08 à 22:30</small>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</body>
+</html>

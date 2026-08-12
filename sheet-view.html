@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiche - Forum Actu Manga</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="wrapper">
+        <div class="breadcrumb">
+            <a href="index.html">Index du Forum</a> &raquo; <a href="community.html">Fiches & Critiques</a> &raquo; <span id="bread-title">Fiche</span>
+        </div>
+
+        <div class="sheet-container">
+            <!-- EN-TÊTE DE LA FICHE -->
+            <div class="sheet-header">
+                <img id="sheet-cover" src="" alt="Affiche" class="sheet-cover">
+                <div class="sheet-info">
+                    <span id="sheet-badge" class="badge">TYPE</span>
+                    <h1 id="sheet-title">Chargement...</h1>
+                    <p><strong>Auteur / Studio :</strong> <span id="sheet-author">-</span></p>
+                    <p><strong>Genre :</strong> <span id="sheet-genre">-</span></p>
+                    <p><strong>Note globale :</strong> <span id="sheet-rating" style="color: #f1c40f;">-</span></p>
+                    <p><strong>Fiche créée par :</strong> <span id="sheet-creator">-</span></p>
+                </div>
+            </div>
+
+            <!-- CONTENU DE LA FICHE -->
+            <div class="sheet-body">
+                <div class="sheet-section">
+                    <h3>📖 Synopsis / Résumé</h3>
+                    <p id="sheet-synopsis">-</p>
+                </div>
+
+                <div class="sheet-section">
+                    <h3>💬 Avis personnel de l'auteur</h3>
+                    <p id="sheet-review">-</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMMENTAIRES -->
+        <h2 style="font-size: 14px; margin-top: 25px; color: #2c3e50;">Avis des membres</h2>
+
+        <div class="post-box">
+            <div class="post-user">
+                <a href="profile.html?user=Admin_Otaku" class="username group-admin">Admin_Otaku</a>
+                <div class="user-rank">Fondateur</div>
+                <a href="profile.html?user=Admin_Otaku">
+                    <img src="https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg" alt="Avatar" class="user-avatar">
+                </a>
+            </div>
+            <div class="post-content">
+                <div class="post-date">Posté hier à 20:15</div>
+                <div class="post-text">
+                    <p>Merci pour cette super fiche ! Une œuvre indispensable à avoir dans sa collection.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORMULAIRE POUR RÉPONDRE -->
+        <div class="reply-box">
+            <div class="box-title">Donner ton avis</div>
+            <form class="reply-form">
+                <textarea rows="4" placeholder="Qu'as-tu pensé de cette œuvre ?"></textarea>
+                <button type="button" class="btn-submit">Poster mon avis</button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DYNAMIQUE DE LA FICHE -->
+    <script>
+        const sheets = {
+            "elden-ring": {
+                title: "Elden Ring : Shadow of the Erdtree",
+                type: "🎮 JEU VIDÉO",
+                badgeClass: "badge game",
+                cover: "https://images.alphacoders.com/605/605592.png",
+                author: "FromSoftware / Bandai Namco",
+                genre: "Action-RPG / Dark Fantasy",
+                rating: "⭐⭐⭐⭐⭐ (5/5)",
+                creator: '<a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a>',
+                synopsis: "Guidé par Miquella le Débonnaire, traversez le Royaume des Ombres et découvrez les secrets les plus sombres de l'Entre-Terre. Affrontez des boss légendaires et explorez une toute nouvelle carte.",
+                review: "Une extension monumentale qui surpasse une fois de plus toutes les attentes. La direction artistique est à couper le souffle et la difficulté est au rendez-vous. Un must-have absolu !"
+            },
+            "chainsaw-man": {
+                title: "Chainsaw Man - Tome 1 à 15",
+                type: "📖 MANGA",
+                badgeClass: "badge manga",
+                cover: "https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg",
+                author: "Tatsuki Fujimoto (Kurokawa)",
+                genre: "Shonen / Action / Horreur",
+                rating: "⭐⭐⭐⭐☆ (4/5)",
+                creator: '<a href="profile.html?user=Yoru_Chan" class="group-member">Yoru_Chan</a>',
+                synopsis: "Pour payer ses dettes, Denji vit dans la misère en chassant des démons avec Pochita. Après une trahison, il renaît en fusionnant avec son chien-démon pour devenir Chainsaw Man !",
+                review: "Un manga complètement déjanté avec un découpage d'action incroyable. On ne sait jamais ce qui va se passer au chapitre suivant."
+            },
+            "demon-slayer": {
+                title: "Demon Slayer : Kimetsu no Yaiba",
+                type: "📺 ANIME",
+                badgeClass: "badge anime",
+                cover: "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg",
+                author: "Studio ufotable",
+                genre: "Animation / Action / Historique",
+                rating: "⭐⭐⭐⭐⭐ (5/5)",
+                creator: '<a href="profile.html?user=Admin_Otaku" class="group-admin">Admin_Otaku</a>',
+                synopsis: "Dans le Japon de l'ère Taisho, Tanjiro cherche un moyen de rendre à sa sœur Nezuko sa forme humaine après qu'elle a été transformée en démon.",
+                review: "L'animation du studio Ufotable est purement visuelle et magistrale. Les combats à l'épée sont parmi les plus beaux de l'histoire de l'animation !"
+            }
+        };
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const itemParam = urlParams.get('item') || 'elden-ring';
+        const data = sheets[itemParam] || sheets["elden-ring"];
+
+        document.getElementById('sheet-title').textContent = data.title;
+        document.getElementById('bread-title').textContent = data.title;
+        document.getElementById('sheet-cover').src = data.cover;
+        document.getElementById('sheet-author').textContent = data.author;
+        document.getElementById('sheet-genre').textContent = data.genre;
+        document.getElementById('sheet-rating').textContent = data.rating;
+        document.getElementById('sheet-creator').innerHTML = data.creator;
+        document.getElementById('sheet-synopsis').textContent = data.synopsis;
+        document.getElementById('sheet-review').textContent = data.review;
+
+        const badge = document.getElementById('sheet-badge');
+        badge.textContent = data.type;
+        badge.className = data.badgeClass;
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,947 @@
+/* ==========================================
+   STYLE GÉNÉRAL & FOND RETRO 2010
+   ========================================== */
+body {
+    background-color: #dce7f0;
+    background-image: url('https://images.alphacoders.com/832/83266.jpg');
+    background-attachment: fixed;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-size: cover;
+    font-family: Verdana, Tahoma, sans-serif;
+    font-size: 11px;
+    color: #333;
+    margin: 0;
+    padding: 25px 0;
+}
+
+/* CONTAINER PRINCIPAL CENTRÉ */
+#wrapper {
+    width: 900px;
+    margin: 0 auto;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 2px solid #f78fb3;
+    padding: 15px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+}
+
+/* ==========================================
+   EN-TÊTE & NAVIGATION
+   ========================================== */
+.header-banner {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border: 1px solid #f8a5c2;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.forum-nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 15px 0;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    border: 1px dashed #f78fb3;
+}
+
+.nav-link {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #f78fb3;
+    text-decoration: none;
+    text-shadow: 1px 1px 0px #fff;
+    transition: all 0.2s;
+}
+
+.nav-link:hover {
+    color: #74b9ff;
+    transform: scale(1.1);
+}
+
+.nav-link.highlight {
+    color: #ff6b6b;
+}
+
+/* ==========================================
+   BLOC ANNONCES / NEWS
+   ========================================== */
+.news-container {
+    border: 1px solid #b2c8d9;
+    background: #fff;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.welcome-banner {
+    background: linear-gradient(135deg, #a8c0ff, #3f2b96);
+    color: white;
+    text-align: center;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.welcome-banner h2 {
+    margin: 0 0 4px 0;
+    font-size: 15px;
+    letter-spacing: 1px;
+}
+
+.welcome-banner p {
+    margin: 0;
+    font-size: 11px;
+    opacity: 0.9;
+}
+
+.news-flex {
+    display: flex;
+    gap: 10px;
+}
+
+.staff-box {
+    width: 35%;
+    border: 1px solid #ffeaa7;
+    background: #fffdf9;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.news-scroll {
+    width: 65%;
+    border: 1px solid #ffeaa7;
+    background: #fffdf9;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.mini-title {
+    font-weight: bold;
+    color: #d35400;
+    font-size: 10px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #ffeaa7;
+    padding-bottom: 3px;
+    margin-bottom: 8px;
+}
+
+.staff-avatars img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 2px solid #ff7675;
+    margin-right: 5px;
+}
+
+.news-scroll ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 50px;
+    overflow-y: auto;
+}
+
+.news-scroll li {
+    margin-bottom: 5px;
+    font-size: 11px;
+}
+
+.news-scroll a {
+    color: #2980b9;
+    text-decoration: none;
+}
+
+.news-scroll a:hover {
+    text-decoration: underline;
+}
+
+.news-scroll .date {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* ==========================================
+   TABLEAUX PHPBB2 (STYLE CATEGORIES)
+   ========================================== */
+.forum-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    border: 1px solid #f78fb3;
+}
+
+.cat-title {
+    background: linear-gradient(to bottom, #ffb6c1, #f78fb3);
+    color: white;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 12px;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #f8a5c2;
+}
+
+.stat-head, .last-post-head {
+    background: #f78fb3;
+    color: white;
+    font-size: 10px;
+    text-transform: uppercase;
+    padding: 6px;
+}
+
+.forum-table td {
+    padding: 8px;
+    border: 1px dashed #f8a5c2;
+    background-color: #fafafa;
+}
+
+.icon-cell {
+    width: 50px;
+    text-align: center;
+}
+
+.forum-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 4px;
+    border: 1px solid #f8a5c2;
+    object-fit: cover;
+}
+
+.forum-desc p {
+    margin: 3px 0 0 0;
+    color: #666;
+    font-size: 10px;
+}
+
+.forum-title {
+    font-weight: bold;
+    color: #4a69bd;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.forum-title:hover {
+    color: #e84118;
+    text-decoration: underline;
+}
+
+.stat-cell {
+    text-align: center;
+    font-weight: bold;
+    color: #555;
+    width: 70px;
+}
+
+.last-post-cell {
+    width: 180px;
+    font-size: 10px;
+}
+
+.last-post-cell a {
+    color: #273c75;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* ==========================================
+   STATISTIQUES & QUI EST EN LIGNE
+   ========================================== */
+.online-box {
+    border: 1px solid #74b9ff;
+    background: #fff;
+    margin-top: 15px;
+    border-radius: 4px;
+}
+
+.box-title {
+    background: linear-gradient(to bottom, #81ecec, #74b9ff);
+    color: #fff;
+    font-weight: bold;
+    padding: 6px 10px;
+    font-size: 11px;
+    border-radius: 3px 3px 0 0;
+}
+
+.box-content {
+    padding: 12px;
+    line-height: 1.5;
+}
+
+.box-content p {
+    margin: 4px 0;
+}
+
+.box-hr {
+    border: 0;
+    border-top: 1px dashed #74b9ff;
+    margin: 8px 0;
+}
+
+.group-admin { color: #e84118; font-weight: bold; }
+.group-member { color: #009432; font-weight: bold; }
+
+/* ==========================================
+   PAGE SUJET / DISCUSSION (TOPIC)
+   ========================================== */
+.breadcrumb {
+    font-size: 11px;
+    margin-bottom: 15px;
+    background: #f5f6fa;
+    padding: 8px 12px;
+    border: 1px dashed #b2c8d9;
+}
+
+.breadcrumb a {
+    color: #4a69bd;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.topic-main-title {
+    font-size: 16px;
+    color: #2c3e50;
+    border-bottom: 2px solid #f78fb3;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+.topic-actions {
+    margin-bottom: 15px;
+}
+
+.btn-reply {
+    display: inline-block;
+    background: linear-gradient(to bottom, #ffb6c1, #f78fb3);
+    color: white;
+    padding: 6px 15px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 3px;
+    border: 1px solid #f8a5c2;
+}
+
+/* Boîte de Message (Style Forum 2010) */
+.post-box {
+    display: flex;
+    border: 1px solid #f78fb3;
+    background: #fff;
+    margin-bottom: 15px;
+}
+
+.post-user {
+    width: 160px;
+    background: #fbf0f5;
+    border-right: 1px solid #f8a5c2;
+    padding: 10px;
+    text-align: center;
+}
+
+.username {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 3px;
+}
+
+.user-rank {
+    font-size: 9px;
+    color: #7f8c8d;
+    margin-bottom: 8px;
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 0 4px rgba(0,0,0,0.2);
+    margin-bottom: 8px;
+}
+
+.user-stats {
+    font-size: 9px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.post-content {
+    flex: 1;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.post-date {
+    font-size: 9px;
+    color: #95a5a6;
+    border-bottom: 1px dashed #ddd;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.post-text {
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.post-attached-image {
+    max-width: 100%;
+    max-height: 250px;
+    border: 1px solid #ccc;
+    margin-top: 10px;
+}
+
+.post-signature {
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px dashed #f8a5c2;
+    font-size: 10px;
+    color: #7f8c8d;
+}
+
+/* Formulaire de Réponse */
+.reply-box {
+    border: 1px solid #74b9ff;
+    background: #fff;
+    margin-top: 25px;
+}
+
+.reply-form {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.reply-form textarea {
+    width: 98%;
+    font-family: Verdana, sans-serif;
+    font-size: 11px;
+    padding: 8px;
+    border: 1px solid #ccc;
+}
+
+.file-upload-zone {
+    background: #f8f9fa;
+    padding: 8px;
+    border: 1px dashed #74b9ff;
+}
+
+.btn-submit {
+    align-self: flex-start;
+    background: linear-gradient(to bottom, #81ecec, #74b9ff);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+/* ==========================================
+   PAGES FORMULAIRE & PROFIL
+   ========================================== */
+.form-box, .profile-card {
+    border: 1px solid #f78fb3;
+    background: #fff;
+    margin-top: 15px;
+    border-radius: 4px;
+}
+
+.retro-form {
+    padding: 15px;
+}
+
+.form-intro {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: #4a69bd;
+    font-size: 11px;
+}
+
+.form-group input, .form-group textarea {
+    padding: 6px;
+    border: 1px solid #ccc;
+    font-family: Verdana, sans-serif;
+    font-size: 11px;
+    border-radius: 3px;
+}
+
+.form-actions {
+    margin-top: 15px;
+}
+
+/* Profil Member */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #fbf0f5;
+    border-bottom: 1px solid #f8a5c2;
+}
+
+.profile-avatar {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+
+.profile-title h2 {
+    margin: 0 0 5px 0;
+    color: #2c3e50;
+    font-size: 18px;
+}
+
+.profile-table {
+    width: 100%;
+    border-collapse: collapse;
+    padding: 10px;
+}
+
+.profile-table td {
+    padding: 10px;
+    border-bottom: 1px dashed #f8a5c2;
+    font-size: 11px;
+}
+
+.profile-label {
+    width: 30%;
+    font-weight: bold;
+    color: #7f8c8d;
+    background: #fafafa;
+}
+
+.profile-actions {
+    padding: 15px;
+    text-align: center;
+}
+
+/* Garder la couleur originale des rôles même si c'est un lien */
+a.group-admin { color: #e84118; text-decoration: none; font-weight: bold; }
+a.group-member { color: #009432; text-decoration: none; font-weight: bold; }
+
+a.group-admin:hover, a.group-member:hover {
+    text-decoration: underline;
+}
+
+/* Style du formulaire de sélection et filtres fiches */
+.retro-form select {
+    padding: 6px;
+    border: 1px solid #ccc;
+    font-family: Verdana, sans-serif;
+    font-size: 11px;
+    border-radius: 3px;
+    background: #fff;
+}
+
+.filter-tags {
+    display: flex;
+    gap: 8px;
+}
+
+.tag {
+    background: #f1f2f6;
+    border: 1px solid #ced6e0;
+    padding: 4px 10px;
+    font-size: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #57606f;
+}
+
+.tag.active, .tag:hover {
+    background: #f78fb3;
+    color: white;
+    border-color: #f8a5c2;
+}
+
+/* ==========================================
+   PAGE D'AFFICHAGE DE FICHE (SHEET VIEW)
+   ========================================== */
+.sheet-container {
+    border: 1px solid #f78fb3;
+    background: #fff;
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.sheet-header {
+    display: flex;
+    gap: 20px;
+    border-bottom: 1px dashed #f8a5c2;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.sheet-cover {
+    width: 140px;
+    height: 180px;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+
+.sheet-info h1 {
+    font-size: 18px;
+    margin: 8px 0;
+    color: #2c3e50;
+}
+
+.badge.game {
+    background: #74b9ff;
+    color: white;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 3px;
+}
+
+.sheet-body {
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.sheet-section {
+    margin-bottom: 15px;
+}
+
+.sheet-section h3 {
+    font-size: 12px;
+    color: #4a69bd;
+    border-bottom: 1px solid #f8a5c2;
+    padding-bottom: 4px;
+}
+
+.badge.manga { background: #e67e22; color: white; padding: 3px 8px; font-size: 10px; font-weight: bold; border-radius: 3px; }
+.badge.anime { background: #9b59b6; color: white; padding: 3px 8px; font-size: 10px; font-weight: bold; border-radius: 3px; }
+.badge.game  { background: #74b9ff; color: white; padding: 3px 8px; font-size: 10px; font-weight: bold; border-radius: 3px; }
+
+/* ==========================================
+   SECTION CONCOURS & FAN-ARTS
+   ========================================== */
+.contest-card, .contest-banner-box {
+    border: 1px solid #f78fb3;
+    background: #fff;
+    margin-top: 15px;
+    border-radius: 4px;
+}
+
+.contest-rules {
+    padding: 15px;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.contest-rules h3 {
+    color: #4a69bd;
+    margin-top: 0;
+    border-bottom: 1px dashed #f8a5c2;
+    padding-bottom: 5px;
+}
+
+.contest-rules ul {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.contest-rules li {
+    margin-bottom: 6px;
+}
+
+/* --- REGLES D'ADMINISTRATION & UTILITAIRES --- */
+.hidden {
+    display: none !important;
+}
+
+.admin-edit-bar {
+    background: #fff0f5;
+    border: 1px dotted #ffb6c1;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-title-badge {
+    font-size: 11px;
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.btn-admin-edit {
+    background: #f3a6b8;
+    color: white;
+    border: 1px solid #e2899d;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.btn-admin-edit:hover {
+    background: #e2899d;
+}
+
+.btn-admin-edit.btn-cancel {
+    background: #7f8c8d;
+    border-color: #666;
+}
+
+.admin-panel-inputs {
+    background: #fff0f5;
+    border: 1px dotted #ffb6c1;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.admin-panel-inputs form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.admin-panel-inputs label {
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.admin-panel-inputs input {
+    padding: 6px;
+    border: 1px solid #ccc;
+    font-size: 12px;
+}
+
+.admin-form-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.category-emoji {
+    font-size: 24px;
+}
+
+/* --- PROFIL & MANGATHÈQUE --- */
+.breadcrumb {
+    background: #f8f9fa;
+    border: 1px dotted #a3b8cc;
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    font-size: 12px;
+    color: #444;
+}
+.breadcrumb a {
+    color: #2b547e;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.profile-container {
+    border: 1px solid #ffb6c1;
+    background: #fff0f5;
+    padding: 2px;
+    margin-bottom: 20px;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    gap: 20px;
+    background: #fcf0f5;
+    border-bottom: 1px dotted #ffb6c1;
+}
+
+.avatar-box {
+    width: 90px;
+    height: 100px;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #666;
+    overflow: hidden;
+}
+.avatar-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-title h2 {
+    margin: 0;
+    color: #2b3e50;
+    font-size: 20px;
+}
+.user-title .rank {
+    color: #d9534f;
+    font-weight: bold;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+}
+.info-table td {
+    padding: 10px 15px;
+    border-bottom: 1px dotted #ffb6c1;
+}
+.info-table tr:last-child td {
+    border-bottom: none;
+}
+.label-col {
+    width: 30%;
+    font-weight: bold;
+    color: #555;
+}
+
+.mp-box {
+    text-align: center;
+    padding: 15px;
+    background: #ffffff;
+    border-top: 1px dotted #ffb6c1;
+}
+.btn-mp {
+    background: #f3a6b8;
+    color: white;
+    border: 1px solid #e2899d;
+    padding: 8px 20px;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: inline-block;
+    text-decoration: none;
+}
+.btn-mp:hover {
+    background: #e2899d;
+}
+
+.manga-section {
+    border: 1px solid #a3b8cc;
+    background: #ffffff;
+}
+.manga-header {
+    background: #e2eaf2;
+    padding: 8px 12px;
+    font-weight: bold;
+    color: #2b547e;
+    border-bottom: 1px solid #a3b8cc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.manga-content {
+    padding: 15px;
+}
+
+.add-manga-form {
+    background: #f8f9fa;
+    border: 1px dotted #a3b8cc;
+    padding: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+}
+.add-manga-form input {
+    padding: 6px;
+    border: 1px solid #ccc;
+    font-size: 12px;
+}
+
+.input-flex-2 { flex: 2; }
+.input-flex-1 { flex: 1; }
+.btn-add-padding { padding: 6px 12px; }
+
+.manga-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+}
+.manga-item {
+    border: 1px dotted #ffb6c1;
+    background: #fff0f5;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.manga-info strong {
+    color: #222;
+    font-size: 13px;
+}
+.volume-counter {
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #d9534f;
+    font-size: 12px;
+}
+
+.btn-qty {
+    background: #ffffff;
+    border: 1px solid #e2899d;
+    color: #d9534f;
+    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    line-height: 18px;
+    text-align: center;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+}
+.btn-qty:hover {
+    background: #f3a6b8;
+    color: white;
+}
+
+.btn-del {
+    background: #d9534f;
+    color: white;
+    border: none;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.empty-manga-msg {
+    color: #888;
+}

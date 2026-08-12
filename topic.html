@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sujet - Forum Actu Manga</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-bar { background: #2c3e50; color: #fff; padding: 8px 12px; margin-bottom: 15px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; }
+        .btn-mod { background: #e74c3c; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; margin-left: 5px; }
+        .btn-edit { background: #f39c12; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="wrapper">
+        <!-- BARRE DE SIMULATION ADMIN / MEMBRE -->
+        <div class="admin-bar">
+            <span>Connecté en tant que : <strong id="current-user-display">---</strong></span>
+            <div>
+                <button type="button" onclick="switchRole('group-admin')" style="cursor:pointer;">Mode Admin</button>
+                <button type="button" onclick="switchRole('group-member')" style="cursor:pointer;">Mode Membre</button>
+            </div>
+        </div>
+
+        <!-- BREADCRUMB -->
+        <div class="breadcrumb">
+            <a href="index.html">Index du Forum</a> &raquo; <a href="index.html">Actualités & Sorties</a> &raquo; <span id="bread-topic-title">Chargement...</span>
+        </div>
+
+        <h1 class="topic-main-title" id="topic-title">Chargement du sujet...</h1>
+
+        <!-- BOUTONS D'ACTION DU SUJET -->
+        <div class="topic-actions" style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <a href="create-topic.html" id="btn-create-topic" class="btn-submit" style="text-decoration: none; font-weight: bold;">+ Créer un Sujet / Planning</a>
+            <a href="#reply-form" class="btn-reply">Répondre à ce sujet</a>
+        </div>
+
+        <!-- ZONE D'AFFICHAGE DES POSTS -->
+        <div id="posts-container"></div>
+
+        <!-- FORMULAIRE POUR RÉPONDRE -->
+        <div class="reply-box" id="reply-form">
+            <div class="box-title">Poster une réponse</div>
+            <form class="reply-form" id="form-add-reply">
+                <label for="message">Votre message :</label>
+                <textarea id="message" rows="6" placeholder="Écrivez votre réponse ici..." required></textarea>
+                <button type="submit" class="btn-submit" style="margin-top: 10px;">Envoyer le message</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. GESTION DU RÔLE DANS LOCALSTORAGE ---
+        if (!localStorage.getItem('forumUserRole')) {
+            localStorage.setItem('forumUserRole', 'group-admin');
+            localStorage.setItem('forumUsername', 'Admin_Otaku');
+        }
+
+        function switchRole(role) {
+            if (role === 'group-admin') {
+                localStorage.setItem('forumUserRole', 'group-admin');
+                localStorage.setItem('forumUsername', 'Admin_Otaku');
+            } else {
+                localStorage.setItem('forumUserRole', 'group-member');
+                localStorage.setItem('forumUsername', 'Yoru_Chan');
+            }
+            location.reload();
+        }
+
+        const currentRole = localStorage.getItem('forumUserRole');
+        const currentUsername = localStorage.getItem('forumUsername');
+        const isStaff = (currentRole === 'group-admin' || currentRole === 'group-modo');
+
+        document.getElementById('current-user-display').textContent = `${currentUsername} (${isStaff ? 'Staff/Admin' : 'Membre'})`;
+
+        const btnCreate = document.getElementById('btn-create-topic');
+        if (!isStaff && btnCreate) {
+            btnCreate.style.display = 'none';
+        }
+
+        // --- 2. DONNÉES PAR DÉFAUT & LOCALSTORAGE ---
+        const defaultTopics = {
+            "planning": {
+                title: "[PLANNING] Sorties Manga VF - Août 2026",
+                posts: [
+                    {
+                        id: 1,
+                        username: "Admin_Otaku",
+                        userRank: "Fondateur",
+                        rankClass: "group-admin",
+                        avatar: "https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg",
+                        date: "Posté aujourd'hui à 14:10",
+                        text: "<p>Voici les principales sorties prévues ce mois-ci : Chainsaw Man T16, Kaiju N°8 T12.</p>"
+                    }
+                ]
+            }
+        };
+
+        if (!localStorage.getItem('forumTopicsData')) {
+            localStorage.setItem('forumTopicsData', JSON.stringify(defaultTopics));
+        }
+
+        const topicsData = JSON.parse(localStorage.getItem('forumTopicsData'));
+        const urlParams = new URLSearchParams(window.location.search);
+        const topicParam = urlParams.get('topic') || 'planning';
+        const currentTopic = topicsData[topicParam] || topicsData["planning"];
+
+        document.getElementById('topic-title').textContent = currentTopic.title;
+        document.getElementById('bread-topic-title').textContent = currentTopic.title;
+
+        // --- 3. RENDU DES POSTS ET BOUTONS DE MODÉRATION ---
+        function renderPosts() {
+            const postsContainer = document.getElementById('posts-container');
+            postsContainer.innerHTML = currentTopic.posts.map(post => `
+                <div class="post-box" id="post-${post.id}">
+                    <div class="post-user">
+                        <a href="#" class="username ${post.rankClass}">${post.username}</a>
+                        <div class="user-rank">${post.userRank}</div>
+                        <img src="${post.avatar}" alt="Avatar" class="user-avatar">
+                    </div>
+                    <div class="post-content">
+                        <div class="post-date" style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>${post.date}</span>
+                            ${isStaff ? `
+                                <div>
+                                    <button class="btn-edit" onclick="editPost(${post.id})">Éditer</button>
+                                    <button class="btn-mod" onclick="deletePost(${post.id})">Supprimer</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="post-text" id="post-text-${post.id}">${post.text}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        renderPosts();
+
+        // --- 4. RÉPONSE DYNAMIQUE ---
+        document.getElementById('form-add-reply').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const msg = document.getElementById('message').value;
+
+            currentTopic.posts.push({
+                id: Date.now(),
+                username: currentUsername,
+                userRank: isStaff ? "Fondateur" : "Membre",
+                rankClass: currentRole,
+                avatar: isStaff ? "https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg" : "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg",
+                date: "À l'instant",
+                text: `<p>${msg}</p>`
+            });
+
+            topicsData[topicParam] = currentTopic;
+            localStorage.setItem('forumTopicsData', JSON.stringify(topicsData));
+            document.getElementById('message').value = '';
+            renderPosts();
+        });
+
+        // --- 5. FONCTIONS DE MODÉRATION ---
+        function deletePost(id) {
+            if (confirm("Supprimer ce message ?")) {
+                currentTopic.posts = currentTopic.posts.filter(p => p.id !== id);
+                topicsData[topicParam] = currentTopic;
+                localStorage.setItem('forumTopicsData', JSON.stringify(topicsData));
+                renderPosts();
+            }
+        }
+
+        function editPost(id) {
+            const post = currentTopic.posts.find(p => p.id === id);
+            const newText = prompt("Modifier le message :", post.text.replace(/<[^>]*>/g, ''));
+            if (newText !== null) {
+                post.text = `<p>${newText}</p>`;
+                topicsData[topicParam] = currentTopic;
+                localStorage.setItem('forumTopicsData', JSON.stringify(topicsData));
+                renderPosts();
+            }
+        }
+    </script>
+</body>
+</html>
