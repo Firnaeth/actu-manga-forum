@@ -3,103 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S'enregistrer / Connexion - Forum Actu Manga</title>
+    <title>Profil - Forum Actu Manga</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="wrapper">
         <div class="breadcrumb">
-            <a href="index.html">Index du Forum</a> &raquo; Authentification
+            <a href="index.html">Index du Forum</a> &raquo; Profil de <span id="bread-username">Chargement...</span>
         </div>
 
         <div class="profile-container">
             <div class="profile-header">
-                <h2>Rejoindre la Communauté / Se connecter</h2>
+                <div class="avatar-box">
+                    <img id="user-avatar" src="" alt="Avatar">
+                </div>
+                <div class="user-title">
+                    <h2 id="user-name">-</h2>
+                    <div class="rank" id="user-rank">-</div>
+                </div>
             </div>
-            
-            <div class="manga-content">
-                <form id="form-auth" class="admin-panel-inputs">
-                    <label>Adresse E-mail :</label>
-                    <input type="email" id="auth-email" required placeholder="votre@email.com">
 
-                    <label>Mot de passe :</label>
-                    <input type="password" id="auth-password" required placeholder="******">
-
-                    <label>Pseudo Forum (nécessaire pour l'inscription) :</label>
-                    <input type="text" id="auth-username" placeholder="Ex: Otaku_99">
-
-                    <div class="admin-form-actions" style="margin-top: 15px;">
-                        <button type="button" id="btn-login" class="btn-mp">Se connecter</button>
-                        <button type="button" id="btn-register" class="btn-admin-edit">S'inscrire</button>
-                    </div>
-                </form>
-            </div>
+            <table class="info-table">
+                <tr>
+                    <td class="label-col">Date d'inscription :</td>
+                    <td id="user-joined">-</td>
+                </tr>
+                <tr>
+                    <td class="label-col">Manga favori :</td>
+                    <td id="user-fav">-</td>
+                </tr>
+                <tr>
+                    <td class="label-col">Signature :</td>
+                    <td id="user-sig"><em>-</em></td>
+                </tr>
+            </table>
         </div>
     </div>
 
     <script type="module">
         import { supabase } from './supabase.js';
 
-        const emailInput = document.getElementById('auth-email');
-        const passwordInput = document.getElementById('auth-password');
-        const usernameInput = document.getElementById('auth-username');
+        const currentUsername = localStorage.getItem('forumUsername');
+        const urlParams = new URLSearchParams(window.location.search);
+        const profileUser = urlParams.get('user') || currentUsername;
 
-        // INSCRIPTION
-        document.getElementById('btn-register').addEventListener('click', async () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            const username = usernameInput.value.trim();
+        if (!profileUser) {
+            alert("Veuillez vous connecter pour voir votre profil.");
+            window.location.href = "register.html";
+        }
 
-            if (!email || !password || !username) {
-                alert("Veuillez remplir tous les champs !");
+        async function loadProfile() {
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('username', profileUser)
+                .single();
+
+            if (error || !profile) {
+                document.getElementById('user-name').textContent = "Utilisateur introuvable";
                 return;
             }
 
-            const { data, error } = await supabase.auth.signUp({ email, password });
+            document.getElementById('bread-username').textContent = profile.username;
+            document.getElementById('user-name').textContent = profile.username;
+            document.getElementById('user-rank').textContent = profile.role === 'admin' ? 'Administrateur' : 'Membre';
+            document.getElementById('user-joined').textContent = new Date(profile.created_at).toLocaleDateString('fr-FR');
+            document.getElementById('user-fav').textContent = profile.favorite_manga || 'Non renseigné';
+            document.getElementById('user-sig').innerHTML = `<em>${profile.signature || ''}</em>`;
+            document.getElementById('user-avatar').src = profile.avatar_url;
+        }
 
-            if (error) {
-                alert("Erreur lors de l'inscription : " + error.message);
-                return;
-            }
-
-            if (data.user) {
-                const { error: profileError } = await supabase.from('profiles').insert([
-                    { id: data.user.id, username: username, role: 'membre' }
-                ]);
-
-                if (profileError) {
-                    alert("Compte créé mais erreur sur le profil : " + profileError.message);
-                } else {
-                    localStorage.setItem('forumUsername', username);
-                    localStorage.setItem('forumUserRole', 'membre');
-                    alert("Inscription réussie !");
-                    window.location.href = "index.html";
-                }
-            }
-        });
-
-        // CONNEXION
-        document.getElementById('btn-login').addEventListener('click', async () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-            if (error) {
-                alert("Erreur de connexion : " + error.message);
-                return;
-            }
-
-            const { data: profile } = await supabase.from('profiles').select('username, role').eq('id', data.user.id).single();
-
-            if (profile) {
-                localStorage.setItem('forumUsername', profile.username);
-                localStorage.setItem('forumUserRole', profile.role);
-                alert("Connexion réussie !");
-                window.location.href = "index.html";
-            }
-        });
+        loadProfile();
     </script>
 </body>
 </html>
