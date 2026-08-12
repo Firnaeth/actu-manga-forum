@@ -63,7 +63,6 @@
                 id: "elden-ring",
                 type: "game",
                 icon: "🎮",
-                badgeClass: "badge game",
                 title: "[JEU] Elden Ring : Shadow of the Erdtree",
                 description: "Action-RPG / FromSoftware — Un DLC magistral et exigeant.",
                 ageRating: "18 ans et +",
@@ -77,7 +76,6 @@
                 id: "chainsaw-man",
                 type: "manga",
                 icon: "📖",
-                badgeClass: "badge manga",
                 title: "[MANGA] Chainsaw Man - Tome 1 à 15",
                 description: "Shonen / Tatsuki Fujimoto — Une folie visuelle et un rythme effréné.",
                 ageRating: "16 ans et +",
@@ -91,7 +89,6 @@
                 id: "demon-slayer",
                 type: "anime",
                 icon: "📺",
-                badgeClass: "badge anime",
                 title: "[ANIME] Demon Slayer : Kimetsu no Yaiba",
                 description: "Anime / Ufotable — Une animation à couper le souffle.",
                 ageRating: "12 ans et +",
@@ -103,11 +100,10 @@
             }
         };
 
-        // 2. Fusion avec le localStorage (pour inclure les nouvelles fiches comme Bleach)
-        let customSheets = JSON.parse(localStorage.getItem('forumSheetsMapData')) || {};
-        
-        // Si le localStorage contient un tableau (venant du formulaire de création), on l'intègre proprement dans l'objet global
+        // 2. Récupération des fiches personnalisées stockées dans le localStorage
+        let customSheets = {};
         let rawList = JSON.parse(localStorage.getItem('forumSheetsData')) || [];
+        
         rawList.forEach(item => {
             let iconMap = { manga: "📖", anime: "📺", game: "🎮" };
             let prefixMap = { manga: "[MANGA]", anime: "[ANIME]", game: "[JEU]" };
@@ -131,7 +127,6 @@
             };
         });
 
-        // Fusion finale
         const allSheets = { ...defaultSheets, ...customSheets };
 
         // 3. Fonction d'affichage des fiches dans le tableau
@@ -174,10 +169,9 @@
             }
         }
 
-        // Affichage initial
         renderSheets('all');
 
-        // 4. Gestion interactive des clics sur les filtres
+        // 4. Gestion des filtres
         const tags = document.querySelectorAll('#filter-container .tag');
         tags.forEach(tag => {
             tag.addEventListener('click', function() {
