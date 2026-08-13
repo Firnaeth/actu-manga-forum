@@ -102,33 +102,26 @@
             modal.classList.add('hidden');
         });
 
-        // CHARGEMENT DES SUJETS GAMING DEPUIS SUPABASE
+        // CHARGEMENT UNIQUEMENT DES SUJETS "GAMING" DEPUIS SUPABASE
         async function loadGamingTopics() {
             const tbody = document.getElementById('gaming-topics-list');
             
-            // On récupère les sujets filtrés par la catégorie "gaming" (ou tu peux adapter selon ta base de données)
             const { data: topics, error } = await supabase
                 .from('topics')
                 .select('*')
-                .eq('category', 'gaming')
+                .eq('category', 'gaming') // Filtre strict sur la catégorie gaming
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                // Si la table ou la catégorie n'est pas encore remplie, on affiche un message propre
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun sujet pour le moment. Soyez le premier à en créer un !</td></tr>`;
-                return;
-            }
-
-            if (!topics || topics.length === 0) {
+            if (error || !topics || topics.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun sujet pour le moment. Soyez le premier à en créer un !</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = topics.map(topic => `
                 <tr>
-                    <td class="icon-cell"><span class="category-emoji">💬</span></td>
+                    <td class="icon-cell"><span class="category-emoji">🎮</span></td>
                     <td class="forum-desc">
-                        <a href="topic-view.html?id=${topic.id}" class="forum-title">${topic.title}</a>
+                        <a href="topic.html?id=${topic.id}" class="forum-title">${topic.title}</a>
                         <p>${topic.content ? topic.content.substring(0, 80) + '...' : ''}</p>
                     </td>
                     <td class="stat-cell">${topic.author || 'Anonyme'}</td>
@@ -138,14 +131,14 @@
             `).join('');
         }
 
-        // SOUMISSION D'UN NOUVEAU SUJET
+        // SOUMISSION D'UN NOUVEAU SUJET EN CATEGORIE "GAMING"
         document.getElementById('form-create-topic').addEventListener('submit', async (e) => {
             e.preventDefault();
             const title = document.getElementById('input-topic-title').value;
             const content = document.getElementById('input-topic-content').value;
 
             const { error } = await supabase.from('topics').insert([
-                { title, content, category: 'gaming', author: currentUsername }
+                { title, content, category: 'gaming', author: currentUsername } // Force la catégorie à gaming
             ]);
 
             if (error) {
