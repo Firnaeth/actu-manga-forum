@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lecture de Sujet - Jeux Vidéo</title>
+    <title>Lecture de Sujet - Zone Gaming</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,13 +17,13 @@
         </div>
 
         <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em; background: #f9f9f9; padding: 8px 12px; border: 1px solid #ddd;">
-            <a href="index.html">Index du Forum</a> &raquo; <a href="gaming.html">Jeux Vidéo Manga & VS Fighting</a> &raquo; <span id="breadcrumb-title">Chargement...</span>
+            <a href="index.html">Index du Forum</a> &raquo; <a href="gaming.html">Zone Gaming</a> &raquo; <span id="breadcrumb-title">Chargement...</span>
         </div>
 
         <h2 id="topic-title-header" style="color: #333; font-size: 1.3em; margin: 15px 0; border-bottom: 2px solid #f2d9de; padding-bottom: 8px;">Chargement du sujet...</h2>
 
         <div style="margin: 15px 0; display: flex; gap: 10px;">
-            <a href="gaming.html" style="background: linear-gradient(to bottom, #7ac1eb, #4196d2); color: white; padding: 6px 14px; text-decoration: none; font-size: 0.9em; font-weight: bold; border-radius: 3px; display: inline-block; border: 1px solid #327cb5;">+ Créer un Sujet / Gaming</a>
+            <a href="gaming.html" style="background: linear-gradient(to bottom, #7ac1eb, #4196d2); color: white; padding: 6px 14px; text-decoration: none; font-size: 0.9em; font-weight: bold; border-radius: 3px; display: inline-block; border: 1px solid #327cb5;">+ Créer un Sujet</a>
             <a href="#reply-section" style="background: linear-gradient(to bottom, #ff99bb, #ff6699); color: white; padding: 6px 14px; text-decoration: none; font-size: 0.9em; font-weight: bold; border-radius: 3px; display: inline-block; border: 1px solid #e65c8a;">Répondre à ce sujet</a>
         </div>
 
@@ -48,6 +48,7 @@
             </div>
         </div>
 
+        <!-- CONTENEUR DES RÉPONSES ENCADRÉES -->
         <div id="replies-container"></div>
 
         <!-- ZONE POUR POSTER UNE RÉPONSE -->
@@ -59,7 +60,7 @@
                 <p style="margin-bottom: 5px; font-size: 0.9em; font-weight: bold; color: #333;">Votre message :</p>
                 <textarea id="reply-content" rows="6" style="width: 100%; border: 1px solid #ccc; padding: 8px; font-family: inherit; font-size: 0.9em; resize: vertical;" placeholder="Écrivez votre réponse ici..."></textarea>
                 <div style="margin-top: 10px;">
-                    <button id="submit-reply" style="background: linear-gradient(to bottom, #7ac1eb, #4196d2); color: white; border: 1px solid #327cb5; padding: 8px 15px; font-weight: bold; border-radius: 3px; cursor: pointer;">Envoyer le message</button>
+                    <button id="submit-reply" type="button" style="background: linear-gradient(to bottom, #7ac1eb, #4196d2); color: white; border: 1px solid #327cb5; padding: 8px 15px; font-weight: bold; border-radius: 3px; cursor: pointer;">Envoyer le message</button>
                 </div>
             </div>
         </div>
