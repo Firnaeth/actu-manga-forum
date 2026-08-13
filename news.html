@@ -1,66 +1,68 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Actualités & Conventions - Forum Actu Manga</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<script type="module">
+    import { supabase } from './supabase.js';
 
-    <div id="wrapper">
-        <div class="breadcrumb">
-            <a href="index.html">Index du Forum</a> &raquo; <span>Actualités & Sorties</span>
-        </div>
+    async function loadConventions() {
+        // On récupère tout, trié par date (du plus récent au plus ancien)
+        const { data, error } = await supabase
+            .from('conventions')
+            .select('*')
+            .order('date', { ascending: false });
 
-        <div style="font-size: 16px; font-weight: bold; color: #c2185b; margin-bottom: 15px; border-bottom: 2px solid #f8bbd0; padding-bottom: 5px;">
-            📅 Calendrier des Conventions & Salons
-        </div>
-
-        <table class="forum-table">
-            <thead>
-                <tr>
-                    <th>Nom de la Convention</th>
-                    <th style="width: 120px; text-align: center;">Début</th>
-                    <th style="width: 120px; text-align: center;">Fin</th>
-                    <th style="width: 250px;">Lieu</th>
-                </tr>
-            </thead>
-            <tbody id="conventions-body">
-                <tr>
-                    <td colspan="4" style="text-align: center; color: #7f8c8d;">Chargement des conventions...</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <script type="module">
-        import { supabase } from './supabase.js';
-
-        async function loadConventions() {
-            const { data, error } = await supabase
-                .from('conventions')
-                .select('*')
-                .order('date', { ascending: false }); // <-- Changé de true à false pour inverser l'ordre
-
-            const tbody = document.getElementById('conventions-body');
-            
-            if (error || !data || data.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; color: #7f8c8d;'>Aucune convention programmée pour le moment. Pense à exécuter le script SQL dans Supabase !</td></tr>";
-                return;
-            }
-
-            tbody.innerHTML = data.map(conv => `
-                <tr>
-                    <td style="font-weight: bold; color: #c2185b;">${conv.name}</td>
-                    <td style="text-align: center; font-size: 12px;">${new Date(conv.date).toLocaleDateString('fr-FR')}</td>
-                    <td style="text-align: center; font-size: 12px;">${conv.end_date ? new Date(conv.end_date).toLocaleDateString('fr-FR') : '-'}</td>
-                    <td style="font-size: 12px; color: #555;">${conv.location || 'Lieu non spécifié'}</td>
-                </tr>
-            `).join('');
+        const container = document.getElementById('conventions-container');
+        
+        if (error || !data || data.length === 0) {
+            container.innerHTML = "<p style='text-align: center; color: #7f8c8d;'>Aucune convention.</p>";
+            return;
         }
 
-        loadConventions();
-    </script>
-</body>
-</html>
+        // Regroupement par année
+        const grouped = {};
+        data.forEach(conv => {
+            const year = new Date(conv.date).getFullYear();
+            if (!grouped[year]) grouped[year] = [];
+            grouped[year].push(conv);
+        });
+
+        // Tri des années : 2027, puis 2026 (descendant)
+        const sortedYears = Object.keys(grouped).sort((a, b) => b - a);
+
+        let htmlContent = '';
+
+        sortedYears.forEach(year => {
+            // Titre de l'année
+            htmlContent += `
+                <div style="margin-top: 25px; margin-bottom: 10px; font-weight: bold; font-size: 16px; color: #c2185b; border-bottom: 2px solid #c2185b; padding-bottom: 5px;">
+                    📅 Conventions ${year}
+                </div>
+                <table class="forum-table" style="margin-bottom: 20px;">
+                    <thead>
+                        <tr>
+                            <th>Nom de la Convention</th>
+                            <th style="width: 120px; text-align: center;">Début</th>
+                            <th style="width: 120px; text-align: center;">Fin</th>
+                            <th style="width: 250px;">Lieu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            // Liste des conventions pour cette année
+            grouped[year].forEach(conv => {
+                htmlContent += `
+                    <tr>
+                        <td style="font-weight: bold;">${conv.name}</td>
+                        <td style="text-align: center; font-size: 12px;">${new Date(conv.date).toLocaleDateString('fr-FR')}</td>
+                        <td style="text-align: center; font-size: 12px;">${conv.end_date ? new Date(conv.end_date).toLocaleDateString('fr-FR') : '-'}</td>
+                        <td style="font-size: 12px; color: #555;">${conv.location || 'Lieu non spécifié'}</td>
+                    </tr>
+                `;
+            });
+
+            htmlContent += `</tbody></table>`;
+        });
+
+        container.innerHTML = htmlContent;
+    }
+
+    loadConventions();
+</script>
