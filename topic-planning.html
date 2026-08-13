@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture de Sujet - Planning des Sorties</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="wrapper">
+        <div class="main-header">
+            <img src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner">
+        </div>
+        <nav class="forum-nav">
+            <a href="index.html" class="nav-link">Index</a>
+            <a href="community.html" class="nav-link">Fiches & Critiques</a>
+            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
+            <a href="#" class="nav-link">Rechercher</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
+            <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
+            <a href="#" class="nav-link">FAQ</a>
+        </nav>
+
+        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
+            <a href="index.html">Accueil</a> &raquo; <a href="planning.html">Planning des Sorties VF</a> &raquo; <span id="breadcrumb-title">Chargement...</span>
+        </div>
+
+        <div class="welcome-banner" style="text-align: center; padding: 15px;">
+            <h2 id="topic-title-header">🗓️ Chargement du sujet...</h2>
+        </div>
+
+        <div id="topic-content-container" style="background: white; border: 1px solid #f2d9de; padding: 20px; margin-bottom: 20px; border-radius: 4px;">
+            <p style="text-align: center; color: #666;">Chargement du message...</p>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <a href="planning.html" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em;">&larr; Retour à la liste</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+        
+        const currentUsername = localStorage.getItem('forumUsername');
+        if (currentUsername) {
+            document.getElementById('nav-profile-link').classList.remove('hidden');
+            const authLink = document.getElementById('nav-auth-link');
+            authLink.textContent = "Déconnexion";
+            authLink.onclick = async () => { await supabase.auth.signOut(); localStorage.clear(); window.location.reload(); };
+        }
+
+        async function loadTopic() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const topicId = urlParams.get('id');
+
+            if (!topicId) {
+                document.getElementById('topic-content-container').innerHTML = `<p style="color: red; text-align: center;">Sujet introuvable.</p>`;
+                return;
+            }
+
+            const { data: topic, error } = await supabase
+                .from('planning_topics')
+                .select('*')
+                .eq('id', topicId)
+                .single();
+
+            if (error || !topic) {
+                document.getElementById('topic-content-container').innerHTML = `<p style="color: red; text-align: center;">Impossible de charger ce sujet.</p>`;
+                return;
+            }
+
+            document.getElementById('breadcrumb-title').textContent = topic.title;
+            document.getElementById('topic-title-header').textContent = `🗓️ ${topic.title}`;
+            
+            const dateFormatted = new Date(topic.created_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'});
+
+            document.getElementById('topic-content-container').innerHTML = `
+                <div style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; font-size: 0.85em; color: #7f8c8d;">
+                    Par <strong>${topic.author || 'Inconnu'}</strong> le ${dateFormatted}
+                </div>
+                <div style="line-height: 1.6; font-size: 1em; white-space: pre-wrap;">${topic.content || 'Aucun contenu.'}</div>
+            `;
+        }
+
+        loadTopic();
+    </script>
+</body>
+</html>
