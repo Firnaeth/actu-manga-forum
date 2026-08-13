@@ -3,296 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fiches & Critiques - Forum Actu Manga</title>
+    <title>Zone Gaming - Forum Actu Manga</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .badge {
-            background: #f39c12; color: white; padding: 2px 6px; font-size: 10px;
-            border-radius: 3px; font-weight: bold; text-transform: uppercase;
-        }
-        .badge.manga { background: #e84393; }
-        .badge.anime { background: #0984e3; }
-        .badge.game { background: #00b894; }
-        
-        .form-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        .form-group {
-            flex: 1;
-        }
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 3px;
-        }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            font-size: 12px;
-        }
-    </style>
 </head>
 <body>
 
     <div id="wrapper">
-        <div class="breadcrumb">
-            <a href="index.html">Index du Forum</a> &raquo; <span>Fiches & Critiques</span>
+
+        <!-- BANNIÈRE EN-TÊTE -->
+        <div class="main-header">
+            <img src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
         </div>
 
-        <!-- EN-TÊTE ESPACE FICHES -->
-        <div style="font-size: 16px; font-weight: bold; color: #c2185b; margin-bottom: 15px; border-bottom: 2px solid #f8bbd0; padding-bottom: 5px;">
-            Espace Fiches : Mangas, Animes & Jeux Vidéo
-        </div>
+        <!-- BARRE DE NAVIGATION VINTAGE -->
+        <nav class="forum-nav">
+            <a href="index.html" class="nav-link">Index</a>
+            <a href="community.html" class="nav-link">Fiches & Critiques</a>
+            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
+            <a href="#" class="nav-link">Rechercher</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil</a>
+            <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
+        </nav>
 
-        <!-- BARRE D'ACTIONS ET FILTRES (STYLE D'ORIGINE) -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <button id="btn-toggle-form" style="background: #f8bbd0; color: #c2185b; border: 1px solid #c2185b; padding: 6px 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 12px;">+ Créer une Fiche</button>
-            
-            <div style="display: flex; gap: 5px; align-items: center;">
-                <button onclick="filterSheets('all')" style="background: #f48fb1; color: white; border: none; padding: 4px 12px; font-size: 11px; border-radius: 12px; cursor: pointer; font-weight: bold;">Tous</button>
-                <button onclick="filterSheets('manga')" style="background: #fff; color: #e84393; border: 1px solid #e84393; padding: 4px 12px; font-size: 11px; border-radius: 12px; cursor: pointer; font-weight: bold;">📖 Mangas</button>
-                <button onclick="filterSheets('anime')" style="background: #fff; color: #0984e3; border: 1px solid #0984e3; padding: 4px 12px; font-size: 11px; border-radius: 12px; cursor: pointer; font-weight: bold;">📺 Animes</button>
-                <button onclick="filterSheets('game')" style="background: #fff; color: #00b894; border: 1px solid #00b894; padding: 4px 12px; font-size: 11px; border-radius: 12px; cursor: pointer; font-weight: bold;">🎮 Jeux Vidéo</button>
+        <!-- CONTENU PRINCIPAL GAMING -->
+        <div class="news-container">
+            <div class="welcome-banner">
+                <h2>🎮 Zone Gaming & Jeux Vidéo Manga / VS Fighting</h2>
+                <p>Discutez des adaptations en jeux vidéo, des derniers titres du genre et partagez vos avis !</p>
             </div>
+
+            <!-- BOUTON CRÉER UN SUJET -->
+            <div style="margin-bottom: 20px;">
+                <button id="btn-open-topic-modal" class="btn-admin-edit" style="padding: 10px 15px; cursor: pointer;">+ Créer un nouveau sujet Gaming</button>
+            </div>
+
+            <!-- LISTE DES SUJETS GAMING -->
+            <table class="forum-table">
+                <thead>
+                    <tr>
+                        <th colspan="2" class="cat-title">_ Sujets de la section Gaming _</th>
+                        <th class="stat-head">Auteur</th>
+                        <th class="stat-head">Réponses</th>
+                        <th class="last-post-head">Date</th>
+                    </tr>
+                </thead>
+                <tbody id="gaming-topics-list">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 20px;">Chargement des sujets...</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <!-- CONCOURS DU MOIS (STYLE D'ORIGINE) -->
-        <div style="border: 1px solid #3498db; border-radius: 4px; overflow: hidden; margin-bottom: 20px;">
-            <div style="background: #3498db; color: white; padding: 6px 10px; font-weight: bold; font-size: 12px;">
-                🏆 CONCOURS DU MOIS : DESSIN & AFFICHE (NON-IA)
-            </div>
-            <div style="background: #ebf5fb; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
-                <div style="font-size: 12px;">
-                    <strong>Thème :</strong> Dessine la mascotte du forum ou une affiche manga !<br>
-                    <span style="color: #e74c3c; font-size: 11px;">⚠️ 100% Fait main (Digital ou Traditionnel) — Zéro IA toléré</span>
-                </div>
-                <button onclick="alert('Les participations sont ouvertes via le Discord ou le topic dédié !')" style="background: #3498db; color: white; border: none; padding: 5px 12px; border-radius: 3px; font-size: 11px; font-weight: bold; cursor: pointer;">Voir & Participer »</button>
-            </div>
-        </div>
+        <!-- MODALE CRÉATION DE SUJET -->
+        <div id="topic-modal" class="admin-panel-inputs hidden" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; background: #fff;">
+            <h3>Créer un nouveau sujet dans la Zone Gaming</h3>
+            <form id="form-create-topic">
+                <label>Titre du sujet :</label>
+                <input type="text" id="input-topic-title" required style="width: 100%; margin-bottom: 10px;">
 
-        <!-- FORMULAIRE DE CRÉATION DE FICHE (CACHÉ PAR DÉFAUT) -->
-        <div id="form-container" style="display: none; background: #fff; border: 1px solid #f8bbd0; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-            <div style="background: #c2185b; color: white; padding: 8px; font-weight: bold; margin-bottom: 15px; border-radius: 3px;">Créer une nouvelle Fiche ou Critique</div>
-            
-            <form id="form-create-sheet">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Type de contenu :</label>
-                        <select id="sheet-type" required>
-                            <option value="manga">Manga</option>
-                            <option value="anime">Anime</option>
-                            <option value="game">Jeu Vidéo</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Titre de l'œuvre :</label>
-                        <input type="text" id="sheet-title" placeholder="Ex: Chainsaw Man - Tome 1" required>
-                    </div>
-                </div>
+                <label>Message / Contenu :</label>
+                <textarea id="input-topic-content" rows="5" required style="width: 100%; margin-bottom: 10px;"></textarea>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>URL de l'affiche / image :</label>
-                        <input type="url" id="sheet-cover" placeholder="https://exemple.com/image.jpg" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Auteur / Studio :</label>
-                        <input type="text" id="sheet-author-detail" placeholder="Ex: Tatsuki Fujimoto" required>
-                    </div>
+                <div class="admin-form-actions">
+                    <button type="submit" class="btn-admin-edit">Publier</button>
+                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-close-topic-modal">Annuler</button>
                 </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Genre :</label>
-                        <input type="text" id="sheet-genre" placeholder="Ex: Shonen, Action, Gore" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Tranche d'âge :</label>
-                        <select id="sheet-age" required>
-                            <option value="Tous publics">Tous publics</option>
-                            <option value="10 ans et +">10 ans et +</option>
-                            <option value="12 ans et +">12 ans et +</option>
-                            <option value="16 ans et +">16 ans et +</option>
-                            <option value="18 ans et +">18 ans et +</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Note globale :</label>
-                        <select id="sheet-rating">
-                            <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
-                            <option value="4">⭐⭐⭐⭐ (4/5)</option>
-                            <option value="3">⭐⭐⭐ (3/5)</option>
-                            <option value="2">⭐⭐ (2/5)</option>
-                            <option value="1">⭐ (1/5)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label>Synopsis / Résumé :</label>
-                    <textarea id="sheet-synopsis" rows="3" placeholder="Résumé de l'œuvre..." required></textarea>
-                </div>
-
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label>Avis personnel :</label>
-                    <textarea id="sheet-review" rows="2" placeholder="Ton avis personnel sur l'œuvre..." required></textarea>
-                </div>
-
-                <button type="submit" style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">Publier la fiche</button>
             </form>
         </div>
 
-        <!-- TABLEAU DES FICHES -->
-        <table class="forum-table">
-            <thead>
-                <tr>
-                    <th>_ Fiches de la communauté _</th>
-                    <th style="width: 100px; text-align: center;">NOTE</th>
-                    <th style="width: 80px; text-align: center;">RÉPONSES</th>
-                    <th style="width: 130px; text-align: right;">AUTEUR</th>
-                </tr>
-            </thead>
-            <tbody id="sheets-table-body">
-                <tr>
-                    <td colspan="4" style="text-align: center; color: #7f8c8d;">Chargement des fiches...</td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 
-    <!-- SCRIPT SUPABASE -->
     <script type="module">
         import { supabase } from './supabase.js';
 
         const currentUsername = localStorage.getItem('forumUsername');
-        let allSheets = [];
 
-        // Gestion de l'affichage du formulaire
-        const toggleBtn = document.getElementById('btn-toggle-form');
-        const formContainer = document.getElementById('form-container');
-        
-        toggleBtn.addEventListener('click', () => {
+        // GESTION CONNEXION NAVBAR
+        const profileLink = document.getElementById('nav-profile-link');
+        const authLink = document.getElementById('nav-auth-link');
+        if (currentUsername) {
+            profileLink.classList.remove('hidden');
+            authLink.textContent = "Déconnexion";
+            authLink.onclick = async () => { await supabase.auth.signOut(); localStorage.clear(); window.location.reload(); };
+        }
+
+        // GESTION MODALE CRÉATION
+        const modal = document.getElementById('topic-modal');
+        document.getElementById('btn-open-topic-modal').addEventListener('click', () => {
             if (!currentUsername) {
-                alert("Vous devez être connecté pour créer une fiche !");
+                alert("Vous devez être connecté pour créer un sujet !");
                 window.location.href = "register.html";
                 return;
             }
-            formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+            modal.classList.toggle('hidden');
+        });
+        document.getElementById('btn-close-topic-modal').addEventListener('click', () => {
+            modal.classList.add('hidden');
         });
 
-        async function loadSheets() {
-            const { data, error } = await supabase
+        // CHARGEMENT DES SUJETS GAMING DEPUIS SUPABASE
+        async function loadGamingTopics() {
+            const tbody = document.getElementById('gaming-topics-list');
+            
+            // On récupère les sujets filtrés par la catégorie "gaming" (ou tu peux adapter selon ta base de données)
+            const { data: topics, error } = await supabase
                 .from('topics')
                 .select('*')
+                .eq('category', 'gaming')
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.error("Erreur chargement fiches:", error);
+                // Si la table ou la catégorie n'est pas encore remplie, on affiche un message propre
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun sujet pour le moment. Soyez le premier à en créer un !</td></tr>`;
                 return;
             }
 
-            allSheets = data || [];
-            renderSheets(allSheets);
-        }
-
-        function renderSheets(sheets) {
-            const tbody = document.getElementById('sheets-table-body');
-
-            if (sheets.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #7f8c8d;">Aucune fiche pour le moment. Soyez le premier à en créer une !</td></tr>`;
+            if (!topics || topics.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun sujet pour le moment. Soyez le premier à en créer un !</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = sheets.map(sheet => {
-                let type = sheet.sheet_type || 'manga';
-                let iconMap = { manga: "📖", anime: "📺", game: "🎮" };
-                let typeTextMap = { manga: "MANGA", anime: "ANIME", game: "JEU" };
-                let ratingNum = sheet.rating || 5;
-                let stars = "⭐".repeat(ratingNum);
-                let author = sheet.author || 'Anonyme';
-                let isAdm = (author === 'Admin_Otaku' || author === 'Otaku_33');
-                let aClass = isAdm ? 'group-admin' : 'group-member';
-
-                let dateFormatted = new Date(sheet.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-
-                return `
-                    <tr>
-                        <td>
-                            <div style="font-weight: bold; font-size: 13px;">
-                                <span style="margin-right: 5px;">${iconMap[type] || '📖'}</span>
-                                <a href="sheet-view.html?id=${sheet.id}" style="color: #c2185b; text-decoration: none;">[${typeTextMap[type]}] ${sheet.title}</a>
-                            </div>
-                            <div style="font-size: 11px; color: #7f8c8d; margin-top: 2px; margin-left: 20px;">
-                                ${sheet.genre || ''} / ${sheet.details || ''} — <span style="color: #e74c3c; font-weight: bold;">${sheet.age_rating || 'Tous publics'}</span>
-                            </div>
-                        </td>
-                        <td style="text-align: center; font-size: 11px; color: #f1c40f;">
-                            ${stars}
-                        </td>
-                        <td style="text-align: center; font-size: 12px; color: #555;">
-                            ${sheet.replies_count || 0}
-                        </td>
-                        <td style="text-align: right; font-size: 11px;">
-                            Par <a href="profile.html?user=${encodeURIComponent(author)}" class="${aClass}">${author}</a>
-                            <div style="color: #95a5a6; font-size: 10px;">${dateFormatted}</div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            tbody.innerHTML = topics.map(topic => `
+                <tr>
+                    <td class="icon-cell"><span class="category-emoji">💬</span></td>
+                    <td class="forum-desc">
+                        <a href="topic-view.html?id=${topic.id}" class="forum-title">${topic.title}</a>
+                        <p>${topic.content ? topic.content.substring(0, 80) + '...' : ''}</p>
+                    </td>
+                    <td class="stat-cell">${topic.author || 'Anonyme'}</td>
+                    <td class="stat-cell">${topic.replies_count || 0}</td>
+                    <td class="last-post-cell">${new Date(topic.created_at).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
         }
 
-        window.filterSheets = function(type) {
-            if (type === 'all') {
-                renderSheets(allSheets);
-            } else {
-                const filtered = allSheets.filter(s => (s.sheet_type || 'manga') === type);
-                renderSheets(filtered);
-            }
-        }
-
-        // Soumission du formulaire de création
-        document.getElementById('form-create-sheet').addEventListener('submit', async (e) => {
+        // SOUMISSION D'UN NOUVEAU SUJET
+        document.getElementById('form-create-topic').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const title = document.getElementById('input-topic-title').value;
+            const content = document.getElementById('input-topic-content').value;
 
-            if (!currentUsername) {
-                alert("Session expirée, veuillez vous reconnecter.");
-                window.location.href = "register.html";
-                return;
-            }
-
-            const newSheet = {
-                title: document.getElementById('sheet-title').value,
-                sheet_type: document.getElementById('sheet-type').value,
-                cover_url: document.getElementById('sheet-cover').value,
-                details: document.getElementById('sheet-author-detail').value,
-                genre: document.getElementById('sheet-genre').value,
-                age_rating: document.getElementById('sheet-age').value,
-                rating: parseInt(document.getElementById('sheet-rating').value),
-                content: document.getElementById('sheet-synopsis').value,
-                review: document.getElementById('sheet-review').value,
-                author: currentUsername,
-                category: 'community'
-            };
-
-            const { data, error } = await supabase.from('topics').insert([newSheet]).select();
+            const { error } = await supabase.from('topics').insert([
+                { title, content, category: 'gaming', author: currentUsername }
+            ]);
 
             if (error) {
-                alert("Erreur lors de la création de la fiche : " + error.message);
+                alert("Erreur lors de la création du sujet : " + error.message);
             } else {
-                alert("Fiche créée avec succès !");
-                document.getElementById('form-create-sheet').reset();
-                formContainer.style.display = 'none';
-                loadSheets();
+                alert("Sujet créé avec succès !");
+                window.location.reload();
             }
         });
 
-        loadSheets();
+        loadGamingTopics();
     </script>
 </body>
 </html>
