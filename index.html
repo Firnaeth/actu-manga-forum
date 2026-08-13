@@ -14,7 +14,6 @@
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
             <button class="btn-admin-edit" id="btn-toggle-admin">Modifier Titre & Bannière</button>
-            <a href="create-topic.html" class="btn-admin-edit" style="background:#27ae60; text-decoration:none; margin-left:10px;">+ Créer un Sujet / Planning</a>
         </div>
 
         <div id="admin-panel-form" class="admin-panel-inputs hidden">
@@ -95,7 +94,7 @@
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">🗓️</span></td>
                     <td class="forum-desc">
-                        <a href="#" id="link-latest-planning" class="forum-title">Planning des Sorties VF</a>
+                        <a href="planning.html" id="link-latest-planning" class="forum-title">Planning des Sorties VF</a>
                         <p>Calendrier mois par mois des éditeurs géré depuis Supabase.</p>
                     </td>
                     <td class="stat-cell" id="count-planning">--</td>
@@ -105,7 +104,7 @@
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">📣</span></td>
                     <td class="forum-desc">
-                        <a href="#" id="link-latest-licences" class="forum-title">Annonce / Nouvelle Licence</a>
+                        <a href="annonces.html" id="link-latest-licences" class="forum-title">Annonce / Nouvelle Licence</a>
                         <p>Toutes les nouveautés annoncées par les éditeurs.</p>
                     </td>
                     <td class="stat-cell" id="count-licences">--</td>
@@ -128,7 +127,7 @@
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">📖</span></td>
                     <td class="forum-desc">
-                        <a href="#" id="link-latest-manga" class="forum-title">Discussion Manga / Anime</a>
+                        <a href="manga.html" id="link-latest-manga" class="forum-title">Discussion Manga / Anime</a>
                         <p>Échangez autour de vos lectures et séries préférées.</p>
                     </td>
                     <td class="stat-cell" id="count-manga">--</td>
@@ -158,7 +157,7 @@
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">🎮</span></td>
                     <td class="forum-desc">
-                        <a href="#" id="link-latest-gaming" class="forum-title">Jeux Vidéo Manga & VS Fighting</a>
+                        <a href="gaming.html" id="link-latest-gaming" class="forum-title">Jeux Vidéo Manga & VS Fighting</a>
                         <p>Discussions et avis jeux vidéo.</p>
                     </td>
                     <td class="stat-cell" id="count-gaming">--</td>
@@ -182,7 +181,7 @@
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">☕</span></td>
                     <td class="forum-desc">
-                        <a href="#" id="link-latest-general" class="forum-title">Le QG des Discussions</a>
+                        <a href="general.html" id="link-latest-general" class="forum-title">Le QG des Discussions</a>
                         <p>Pour parler de tout et de rien : ciné, musique, vie quotidienne...</p>
                     </td>
                     <td class="stat-cell" id="count-general">--</td>
@@ -294,21 +293,22 @@
                 const catTopics = topics.filter(t => t.category === cat);
                 const countEl = document.getElementById(`count-${cat}`);
                 const lastCellEl = document.getElementById(`last-${cat}-cell`);
-                const linkEl = document.getElementById(`link-latest-${cat}`);
 
                 if (countEl) countEl.textContent = catTopics.length;
 
                 if (catTopics.length > 0) {
                     const latest = catTopics[0]; // Le sujet le plus récent de CETTE catégorie
                     if (lastCellEl) {
-                        lastCellEl.innerHTML = `<a href="topic.html?id=${latest.id}">${latest.title}</a>`;
-                    }
-                    if (linkEl) {
-                        linkEl.href = `topic.html?id=${latest.id}`;
+                        const dateFormatted = new Date(latest.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit'});
+                        const author = latest.author || 'Otaku_33';
+                        
+                        lastCellEl.innerHTML = `
+                            <a href="topic.html?id=${latest.id}">${latest.title}</a><br>
+                            <span style="font-size: 0.85em; color: #7f8c8d;">Le ${dateFormatted} par <a href="#" style="color: #c0392b;">${author}</a></span>
+                        `;
                     }
                 } else {
                     if (lastCellEl) lastCellEl.textContent = "Aucun sujet";
-                    if (linkEl) linkEl.href = "create-topic.html";
                 }
             });
         }
