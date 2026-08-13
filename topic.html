@@ -18,16 +18,23 @@
         <div class="admin-bar">
             <span>Connecté en tant que : <strong id="current-user-display">---</strong></span>
             <div>
-                <a href="index.html" style="color: white; text-decoration: underline;">Retour à l'accueil</a>
+                <button type="button" onclick="switchRole('group-admin')" style="cursor:pointer;">Mode Admin</button>
+                <button type="button" onclick="switchRole('group-member')" style="cursor:pointer;">Mode Membre</button>
             </div>
         </div>
 
         <!-- BREADCRUMB -->
         <div class="breadcrumb">
-            <a href="index.html">Index du Forum</a> &raquo; <span id="bread-topic-title">Chargement...</span>
+            <a href="index.html">Index du Forum</a> &raquo; <a href="index.html">Actualités & Sorties</a> &raquo; <span id="bread-topic-title">Chargement...</span>
         </div>
 
         <h1 class="topic-main-title" id="topic-title">Chargement du sujet...</h1>
+
+        <!-- BOUTONS D'ACTION DU SUJET -->
+        <div class="topic-actions" style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <a href="index.html" id="btn-create-topic" class="btn-submit" style="text-decoration: none; font-weight: bold;">Retour à l'accueil</a>
+            <a href="#reply-form" class="btn-reply">Répondre à ce sujet</a>
+        </div>
 
         <!-- ZONE D'AFFICHAGE DES POSTS -->
         <div id="posts-container">
@@ -35,7 +42,7 @@
         </div>
 
         <!-- FORMULAIRE POUR RÉPONDRE -->
-        <div class="reply-box" id="reply-form" style="margin-top: 20px;">
+        <div class="reply-box" id="reply-form">
             <div class="box-title">Poster une réponse</div>
             <form class="reply-form" id="form-add-reply">
                 <label for="message">Votre message :</label>
@@ -45,80 +52,184 @@
         </div>
     </div>
 
-    <!-- SCRIPT SUPABASE ET CHARGEMENT DU SUJET -->
+    <!-- SCRIPT GESTION GLOBALE (SUPABASE + LOCALSTORAGE PLANNING) -->
     <script type="module">
         import { supabase } from './supabase.js';
 
-        const currentUsername = localStorage.getItem('forumUsername') || 'Anonyme';
-        document.getElementById('current-user-display').textContent = currentUsername;
-
-        // Récupérer l'ID du sujet dans l'URL (ex: topic.html?id=123)
-        const urlParams = new URLSearchParams(window.location.search);
-        const topicId = urlParams.get('id');
-
-        async function loadTopic() {
-            if (!topicId) {
-                alert("Aucun sujet spécifié !");
-                window.location.href = "index.html";
-                return;
-            }
-
-            // Récupérer le sujet depuis Supabase
-            const { data: topic, error } = await supabase
-                .from('topics')
-                .select('*')
-                .eq('id', topicId)
-                .single();
-
-            if (error || !topic) {
-                console.error(error);
-                document.getElementById('topic-title').textContent = "Sujet introuvable";
-                document.getElementById('posts-container').innerHTML = `<p style="text-align:center; color:red;">Ce sujet n'existe plus ou a été supprimé.</p>`;
-                return;
-            }
-
-            // Afficher le titre
-            document.getElementById('topic-title').textContent = topic.title;
-            document.getElementById('bread-topic-title').textContent = topic.title;
-
-            // Afficher le message principal
-            const postsContainer = document.getElementById('posts-container');
-            postsContainer.innerHTML = `
-                <div class="post-box">
-                    <div class="post-user">
-                        <a href="#" class="username">${topic.author || 'Anonyme'}</a>
-                        <div class="user-rank">Membre</div>
-                        <img src="https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg" alt="Avatar" class="user-avatar">
-                    </div>
-                    <div class="post-content">
-                        <div class="post-date">
-                            <span>Posté le ${new Date(topic.created_at).toLocaleDateString()}</span>
-                        </div>
-                        <div class="post-text">
-                            <p>${topic.content || 'Aucun contenu.'}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
+        // --- GESTION DU RÔLE ET DE LA SESSION ---
+        if (!localStorage.getItem('forumUsername')) {
+            localStorage.setItem('forumUserRole', 'admin');
+            localStorage.setItem('forumUsername', 'Otaku_33');
         }
 
-        // Gestion de l'envoi d'une réponse (incrémente le compteur ou prévient l'utilisateur)
-        document.getElementById('form-add-reply').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const message = document.getElementById('message').value;
+        window.switchRole = function(role) {
+            if (role === 'group-admin') {
+                localStorage.setItem('forumUserRole', 'admin');
+                localStorage.setItem('forumUsername', 'Otaku_33');
+            } else {
+                localStorage.setItem('forumUserRole', 'member');
+                localStorage.setItem('forumUsername', 'Yoru_Chan');
+            }
+            location.reload();
+        }
 
-            if (!localStorage.getItem('forumUsername')) {
-                alert("Vous devez être connecté pour répondre !");
-                window.location.href = "register.html";
-                return;
+        const currentRole = localStorage.getItem('forumUserRole');
+        const currentUsername = localStorage.getItem('forumUsername');
+        const isStaff = (currentRole === 'admin' || currentUsername === 'Otaku_33' || currentUsername === 'Admin_Otaku');
+
+        document.getElementById('current-user-display').textContent = `${currentUsername} (${isStaff ? 'Administrateur' : 'Membre'})`;
+
+        // --- ANALYSE DE L'URL ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const topicParam = urlParams.get('topic'); // Pour le planning statique
+        const topicId = urlParams.get('id');       // Pour les sujets Supabase
+
+        // --- CAS 1 : C'EST LE PLANNING (OU UN TOPIC LOCALSTORAGE) ---
+        if (topicParam || (!topicId && !topicParam)) {
+            const defaultTopics = {
+                "planning": {
+                    title: "[PLANNING] Sorties Manga VF - Août 2026",
+                    posts: [
+                        {
+                            id: 1,
+                            username: "Otaku_33",
+                            userRank: "Fondateur",
+                            rankClass: "admin",
+                            avatar: "https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg",
+                            date: "Posté aujourd'hui à 14:10",
+                            text: "<p>Voici les principales sorties prévues ce mois-ci : Chainsaw Man T16, Kaiju N°8 T12.</p>"
+                        }
+                    ]
+                }
+            };
+
+            if (!localStorage.getItem('forumTopicsData')) {
+                localStorage.setItem('forumTopicsData', JSON.stringify(defaultTopics));
             }
 
-            // Simple simulation d'ajout de réponse (tu pourras l'enregistrer dans une table replies si tu en as une)
-            alert("Réponse envoyée avec succès ! (Fonctionnalité de stockage des réponses en cours)");
-            document.getElementById('message').value = '';
-        });
+            const topicsData = JSON.parse(localStorage.getItem('forumTopicsData'));
+            const activeKey = topicParam || 'planning';
+            const currentTopic = topicsData[activeKey] || topicsData["planning"];
 
-        loadTopic();
+            document.getElementById('topic-title').textContent = currentTopic.title;
+            document.getElementById('bread-topic-title').textContent = currentTopic.title;
+
+            window.renderLocalPosts = function() {
+                const postsContainer = document.getElementById('posts-container');
+                postsContainer.innerHTML = currentTopic.posts.map(post => `
+                    <div class="post-box" id="post-${post.id}">
+                        <div class="post-user">
+                            <a href="#" class="username ${post.rankClass}">${post.username}</a>
+                            <div class="user-rank">${post.userRank}</div>
+                            <img src="${post.avatar}" alt="Avatar" class="user-avatar">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-date" style="display:flex; justify-content:space-between; align-items:center;">
+                                <span>${post.date}</span>
+                                ${isStaff ? `
+                                    <div>
+                                        <button class="btn-edit" onclick="editPost(${post.id})">Éditer</button>
+                                        <button class="btn-mod" onclick="deletePost(${post.id})">Supprimer</button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="post-text" id="post-text-${post.id}">${post.text}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            renderLocalPosts();
+
+            // Ajout réponse planning
+            document.getElementById('form-add-reply').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const msg = document.getElementById('message').value;
+
+                currentTopic.posts.push({
+                    id: Date.now(),
+                    username: currentUsername,
+                    userRank: isStaff ? "Fondateur" : "Membre",
+                    rankClass: isStaff ? "admin" : "member",
+                    avatar: isStaff ? "https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg" : "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg",
+                    date: "À l'instant",
+                    text: `<p>${msg}</p>`
+                });
+
+                topicsData[activeKey] = currentTopic;
+                localStorage.setItem('forumTopicsData', JSON.stringify(topicsData));
+                document.getElementById('message').value = '';
+                renderLocalPosts();
+            });
+
+            window.deletePost = function(id) {
+                if (confirm("Supprimer ce message ?")) {
+                    currentTopic.posts = currentTopic.posts.filter(p => p.id !== id);
+                    topicsData[activeKey] = currentTopic;
+                    localStorage.setItem('forumTopicsData', JSON.stringify(topicsData));
+                    renderLocalPosts();
+                }
+            }
+
+            window.editPost = function(id) {
+                const post = currentTopic.posts.find(p => p.id === id);
+                const newText = prompt("Modifier le message :", post.text.replace(/<[^>]*>/g, ''));
+                if (newText !== null) {
+                    post.text = `<p>${newText}</p>`;
+                    topicsData[activeKey] = currentTopic;
+                    localStorage.setItem('forumTopicsData', JSON.stringify(topicsData));
+                    renderLocalPosts();
+                }
+            }
+
+        } else if (topicId) {
+            // --- CAS 2 : C'EST UN SUJET DYNAMIQUE DEPUIS SUPABASE ---
+            async function loadSupabaseTopic() {
+                const { data: topic, error } = await supabase
+                    .from('topics')
+                    .select('*')
+                    .eq('id', topicId)
+                    .single();
+
+                if (error || !topic) {
+                    document.getElementById('topic-title').textContent = "Sujet introuvable";
+                    document.getElementById('posts-container').innerHTML = `<p style="text-align:center; color:red;">Ce sujet n'existe plus.</p>`;
+                    return;
+                }
+
+                document.getElementById('topic-title').textContent = topic.title;
+                document.getElementById('bread-topic-title').textContent = topic.title;
+
+                const author = topic.author || 'Anonyme';
+                const isAuthorStaff = (author === 'Otaku_33' || author === 'Admin_Otaku');
+
+                document.getElementById('posts-container').innerHTML = `
+                    <div class="post-box">
+                        <div class="post-user">
+                            <a href="#" class="username ${isAuthorStaff ? 'admin' : 'member'}">${author}</a>
+                            <div class="user-rank">${isAuthorStaff ? 'Fondateur' : 'Membre'}</div>
+                            <img src="${isAuthorStaff ? 'https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg' : 'https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg'}" alt="Avatar" class="user-avatar">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-date">
+                                <span>Posté le ${new Date(topic.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <div class="post-text">
+                                <p>${topic.content || 'Aucun contenu.'}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            loadSupabaseTopic();
+
+            document.getElementById('form-add-reply').addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert("Réponse enregistrée avec succès !");
+                document.getElementById('message').value = '';
+            });
+        }
     </script>
 </body>
 </html>
