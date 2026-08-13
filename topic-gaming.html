@@ -21,23 +21,30 @@
             <a href="#" class="nav-link">FAQ</a>
         </nav>
 
-        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
+        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em; background: #f9f9f9; padding: 6px 10px; border: 1px solid #ddd;">
             <a href="index.html">Accueil</a> &raquo; <a href="gaming.html">Jeux Vidéo Manga & VS Fighting</a> &raquo; <span id="breadcrumb-title">Chargement...</span>
         </div>
 
-        <!-- TITRE DU SUJET INTÉGRÉ DANS LE STYLE DU FORUM -->
-        <h2 id="topic-title-header" style="color: #c0392b; font-size: 1.3em; margin: 15px 0 10px 0; border-bottom: 2px solid #f2d9de; padding-bottom: 5px;">Chargement du sujet...</h2>
+        <h2 id="topic-title-header" style="color: #333; font-size: 1.3em; margin: 15px 0; border-bottom: 2px solid #f2d9de; padding-bottom: 8px;">Chargement du sujet...</h2>
 
-        <!-- MESSAGE PRINCIPAL DU SUJET -->
+        <div style="margin-bottom: 15px;">
+            <a href="gaming.html" style="background: linear-gradient(to bottom, #7ac1eb, #4196d2); color: white; padding: 6px 12px; text-decoration: none; font-size: 0.9em; font-weight: bold; border-radius: 3px; display: inline-block; border: 1px solid #327cb5;">+ Créer un Sujet / Discussion</a>
+        </div>
+
+        <!-- MESSAGE PRINCIPAL -->
         <div id="topic-main-post" style="display: flex; border: 1px solid #f2d9de; background: white; margin-bottom: 20px;">
             <div style="width: 180px; background: #fff5f7; border-right: 1px solid #f2d9de; padding: 15px; text-align: center;">
-                <strong id="author-name" style="color: #c0392b; font-size: 0.95em;">Chargement...</strong>
+                <strong id="author-name" style="color: #004080; font-size: 0.95em;">Chargement...</strong>
                 <div style="font-size: 0.8em; color: #666; margin-top: 2px;">Membre</div>
                 <div style="margin-top: 10px;">
                     <img src="https://via.placeholder.com/80" alt="Avatar" style="width: 70px; height: 70px; border-radius: 4px; border: 1px solid #ccc;">
                 </div>
             </div>
-            <div style="flex-grow: 1; padding: 15px;">
+            <div style="flex-grow: 1; padding: 15px; position: relative;">
+                <div id="topic-actions" style="position: absolute; top: 10px; right: 15px;" class="hidden">
+                    <button onclick="editTopic()" style="background: #f39c12; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; font-weight: bold; margin-right: 4px;">Éditer</button>
+                    <button onclick="deleteTopic()" style="background: #e74c3c; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; font-weight: bold;">Supprimer</button>
+                </div>
                 <div style="font-size: 0.8em; color: #888; border-bottom: 1px dashed #eee; padding-bottom: 5px; margin-bottom: 10px;">
                     Posté le <span id="topic-date">--</span>
                 </div>
@@ -79,6 +86,37 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const topicId = urlParams.get('id');
+        let topicData = null;
+
+        window.editTopic = async function() {
+            const newContent = prompt("Modifier le contenu du sujet :", topicData.content);
+            if (newContent === null) return;
+            const { error } = await supabase.from('gaming_topics').update({ content: newContent }).eq('id', topicId);
+            if (error) alert("Erreur lors de la modification");
+            else { topicData.content = newContent; document.getElementById('topic-content-body').textContent = newContent; }
+        }
+
+        window.deleteTopic = async function() {
+            if (!confirm("Voulez-vous vraiment supprimer ce sujet ?")) return;
+            const { error } = await supabase.from('gaming_topics').delete().eq('id', topicId);
+            if (error) alert("Erreur lors de la suppression");
+            else window.location.href = 'gaming.html';
+        }
+
+        window.editReply = async function(replyId, currentText) {
+            const newText = prompt("Modifier votre réponse :", currentText);
+            if (newText === null) return;
+            const { error } = await supabase.from('topic_replies').update({ content: newText }).eq('id', replyId);
+            if (error) alert("Erreur lors de la modification");
+            else loadReplies();
+        }
+
+        window.deleteReply = async function(replyId) {
+            if (!confirm("Voulez-vous supprimer cette réponse ?")) return;
+            const { error } = await supabase.from('topic_replies').delete().eq('id', replyId);
+            if (error) alert("Erreur lors de la suppression");
+            else loadReplies();
+        }
 
         async function loadTopicAndReplies() {
             if (!topicId) {
@@ -97,11 +135,16 @@
                 return;
             }
 
+            topicData = topic;
             document.getElementById('breadcrumb-title').textContent = topic.title;
             document.getElementById('topic-title-header').textContent = topic.title;
             document.getElementById('author-name').textContent = topic.author || 'Inconnu';
             document.getElementById('topic-date').textContent = new Date(topic.created_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'});
             document.getElementById('topic-content-body').textContent = topic.content || '';
+
+            if (currentUsername && (currentUsername === topic.author || currentUsername === 'Otaku_33')) {
+                document.getElementById('topic-actions').classList.remove('hidden');
+            }
 
             loadReplies();
         }
@@ -122,16 +165,24 @@
 
             container.innerHTML = replies.map(r => {
                 const replyDate = new Date(r.created_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'});
+                const canModify = currentUsername && (currentUsername === r.author || currentUsername === 'Otaku_33');
+                
                 return `
                     <div style="display: flex; border: 1px solid #f2d9de; background: white; margin-bottom: 15px;">
                         <div style="width: 180px; background: #fff5f7; border-right: 1px solid #f2d9de; padding: 15px; text-align: center;">
-                            <strong style="color: #c0392b; font-size: 0.95em;">${r.author || 'Inconnu'}</strong>
+                            <strong style="color: #004080; font-size: 0.95em;">${r.author || 'Inconnu'}</strong>
                             <div style="font-size: 0.8em; color: #666; margin-top: 2px;">Membre</div>
                             <div style="margin-top: 10px;">
                                 <img src="https://via.placeholder.com/80" alt="Avatar" style="width: 70px; height: 70px; border-radius: 4px; border: 1px solid #ccc;">
                             </div>
                         </div>
-                        <div style="flex-grow: 1; padding: 15px;">
+                        <div style="flex-grow: 1; padding: 15px; position: relative;">
+                            ${canModify ? `
+                                <div style="position: absolute; top: 10px; right: 15px;">
+                                    <button onclick="editReply(${r.id}, \`${r.content.replace(/`/g, '\\`')}\`)" style="background: #f39c12; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; font-weight: bold; margin-right: 4px;">Éditer</button>
+                                    <button onclick="deleteReply(${r.id})" style="background: #e74c3c; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; font-weight: bold;">Supprimer</button>
+                                </div>
+                            ` : ''}
                             <div style="font-size: 0.8em; color: #888; border-bottom: 1px dashed #eee; padding-bottom: 5px; margin-bottom: 10px;">
                                 Posté le ${replyDate}
                             </div>
@@ -144,31 +195,18 @@
 
         document.getElementById('submit-reply').onclick = async () => {
             const content = document.getElementById('reply-content').value.trim();
-            if (!content) {
-                alert("Veuillez écrire un message.");
-                return;
-            }
-            if (!currentUsername) {
-                alert("Vous devez être connecté pour répondre.");
-                window.location.href = 'register.html';
-                return;
-            }
+            if (!content) { alert("Veuillez écrire un message."); return; }
+            if (!currentUsername) { alert("Vous devez être connecté pour répondre."); window.location.href = 'register.html'; return; }
 
-            const { error } = await supabase
-                .from('topic_replies')
-                .insert([{
-                    topic_id: topicId,
-                    category: 'gaming',
-                    content: content,
-                    author: currentUsername
-                }]);
+            const { error } = await supabase.from('topic_replies').insert([{
+                topic_id: topicId,
+                category: 'gaming',
+                content: content,
+                author: currentUsername
+            }]);
 
-            if (error) {
-                alert("Erreur lors de l'envoi de la réponse.");
-            } else {
-                document.getElementById('reply-content').value = '';
-                loadReplies();
-            }
+            if (error) { alert("Erreur lors de l'envoi de la réponse."); }
+            else { document.getElementById('reply-content').value = ''; loadReplies(); }
         };
 
         loadTopicAndReplies();
