@@ -6,7 +6,6 @@
     <title>Concours de Dessin - Forum Actu Manga</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Style inspiré de la page d'inscription */
         .contest-container {
             background: #fff;
             border: 1px solid #f8bbd0;
@@ -29,7 +28,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #f0f0f0;
         }
         .submission-row:last-child {
@@ -52,6 +51,64 @@
             border-radius: 4px;
             font-size: 12px;
         }
+        /* Style pour agrandir l'image au clic */
+        .thumb-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .thumb-img:hover {
+            transform: scale(1.05);
+            border-color: #c2185b;
+        }
+        /* Style du bouton de vote */
+        .btn-vote {
+            background: #ffebee;
+            color: #c2185b;
+            border: 1px solid #f8bbd0;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-vote:hover {
+            background: #f8bbd0;
+            color: #fff;
+        }
+        /* Modale pour voir l'image en grand */
+        #imageModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            align-items: center;
+            justify-content: center;
+        }
+        #imageModal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        #imageModal span {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -61,18 +118,17 @@
             <a href="index.html">Index du Forum</a> &raquo; <a href="community.html">Fiches & Critiques</a> &raquo; <span>Concours de Dessin</span>
         </div>
 
-        <!-- BLOC PRINCIPAL STYLE INSCRIPTION -->
         <div class="contest-container">
             <div class="contest-title">
                 🎨 Concours de Dessin : Thème du mois
             </div>
             
             <p style="font-size: 13px; color: #34495e; margin-bottom: 15px;">
-                <strong>Thème :</strong> Dessine ton personnage manga préféré ! Exprime ton talent et partage tes créations avec la communauté.
+                <strong>Thème :</strong> Dessine ton personnage manga préféré ! Clique sur les images pour les agrandir et vote pour ton œuvre favorite.
             </p>
 
             <div id="submissions-list">
-                <!-- Les participations s'afficheront sous forme de liste propre -->
+                <!-- Les participations s'afficheront ici -->
             </div>
 
             <div id="no-art-msg" style="color: #7f8c8d; font-size: 12px; font-style: italic; margin-bottom: 15px; display: none;">
@@ -95,21 +151,30 @@
                 <button type="submit" class="btn-submit" style="background: #e84393; padding: 6px 14px; font-size: 12px; font-weight: bold; border: none; border-radius: 3px; cursor: pointer; color: white;">Envoyer ma participation</button>
             </form>
         </div>
+    </div>
 
+    <!-- Fenêtre modale pour l'agrandissement d'image -->
+    <div id="imageModal" onclick="closeModal()">
+        <span onclick="closeModal()">&times;</span>
+        <img id="modalImg" src="">
     </div>
 
     <!-- SCRIPT DE GESTION -->
     <script>
         let defaultSubmissions = [
             {
+                id: 1,
                 title: "Luffy Gear 5",
                 image: "https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg",
-                author: "Yoru_Chan"
+                author: "Yoru_Chan",
+                votes: 5
             },
             {
+                id: 2,
                 title: "Tanjiro Colère",
                 image: "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg",
-                author: "Admin_Otaku"
+                author: "Admin_Otaku",
+                votes: 3
             }
         ];
 
@@ -132,16 +197,38 @@
                 let row = document.createElement('div');
                 row.className = 'submission-row';
                 row.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <img src="${art.image}" alt="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 3px; border: 1px solid #ccc;" onerror="this.src='https://via.placeholder.com/40'">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <img src="${art.image}" alt="${art.title}" class="thumb-img" onclick="openModal('${art.image}')" onerror="this.src='https://via.placeholder.com/60'">
                         <div>
-                            <span style="font-weight: bold; color: #3498db; font-size: 12px;">${art.title}</span><br>
+                            <span style="font-weight: bold; color: #3498db; font-size: 13px;">${art.title}</span><br>
                             <small style="color: #7f8c8d; font-size: 11px;">Par <a href="profile.html?user=${art.author}" class="${authorClass}">${art.author}</a></small>
                         </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="font-size: 12px; color: #c2185b; font-weight: bold;">🗳️ ${art.votes || 0} vote(s)</span>
+                        <button class="btn-vote" onclick="voteForArt(${art.id})">Voter</button>
                     </div>
                 `;
                 container.appendChild(row);
             });
+        }
+
+        function voteForArt(id) {
+            let art = submissions.find(item => item.id === id);
+            if (art) {
+                art.votes = (art.votes || 0) + 1;
+                localStorage.setItem('forumContestArt', JSON.stringify(submissions));
+                renderSubmissions();
+            }
+        }
+
+        function openModal(imgSrc) {
+            document.getElementById('modalImg').src = imgSrc;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
         }
 
         document.getElementById('contestForm').addEventListener('submit', function(e) {
@@ -150,8 +237,9 @@
             let title = document.getElementById('artTitle').value;
             let image = document.getElementById('artImage').value;
             let username = localStorage.getItem('forumUsername') || 'Otaku_33';
+            let newId = submissions.length > 0 ? submissions[submissions.length - 1].id + 1 : 1;
 
-            submissions.push({ title, image, author: username });
+            submissions.push({ id: newId, title, image, author: username, votes: 0 });
             localStorage.setItem('forumContestArt', JSON.stringify(submissions));
 
             alert("Participation envoyée avec succès !");
