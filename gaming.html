@@ -5,150 +5,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zone Gaming - Forum Actu Manga</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Styles harmonisés sur la charte graphique de la page Fiches */
-        .gaming-container {
-            background: #fff;
-            border: 1px solid #f8bbd0;
-            border-radius: 6px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-        }
-        .gaming-header-box {
-            background: #fdf2f8;
-            border: 1px solid #f8bbd0;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: #c2185b;
-        }
-        .gaming-banner {
-            background: linear-gradient(to right, #8e44ad, #9b59b6);
-            border-radius: 6px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-            border: 1px solid #8e44ad;
-        }
-        .gaming-banner-title {
-            background: rgba(0,0,0,0.15);
-            color: white;
-            padding: 8px 15px;
-            font-weight: bold;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .gaming-banner-body {
-            padding: 15px;
-            background: #fff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .gaming-banner-body p {
-            margin: 0;
-            font-size: 12px;
-            color: #2c3e50;
-        }
-        .btn-gaming-action {
-            background: #8e44ad;
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 12px;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
-        .btn-gaming-action:hover {
-            background: #732d91;
-        }
-    </style>
 </head>
 <body>
 
     <div id="wrapper">
-        <div class="breadcrumb">
-            <a href="index.html">Index du Forum</a> &raquo; <span>Zone Gaming & Actu JV</span>
+
+        <!-- BANNIÈRE EN-TÊTE -->
+        <div class="main-header">
+            <img src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <a href="#" onclick="alert('Ouverture du formulaire de nouveau topic Gaming')" class="btn-submit" style="text-decoration: none; padding: 6px 14px; font-size: 12px; background: #e84393; display: inline-block; border-radius: 4px; font-weight: bold;">+ Créer un Sujet Gaming</a>
-        </div>
+        <!-- BARRE DE NAVIGATION VINTAGE -->
+        <nav class="forum-nav">
+            <a href="index.html" class="nav-link">Index</a>
+            <a href="community.html" class="nav-link">Fiches & Critiques</a>
+            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
+            <a href="#" class="nav-link">Rechercher</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil</a>
+            <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
+        </nav>
 
-        <!-- EN-TÊTE ESPACE GAMING -->
-        <div class="gaming-header-box">
-            Espace Gaming : Actualités, RPG & Jeux Indés
-        </div>
-
-        <!-- BANNIÈRE PRÉSENTATION / ÉVÉNEMENT GAMING -->
-        <div class="gaming-banner">
-            <div class="gaming-banner-title">
-                🎮 SALON DES JOUEURS : ACTU & PARTAGE
+        <!-- CONTENU PRINCIPAL GAMING -->
+        <div class="news-container">
+            <div class="welcome-banner">
+                <h2>🎮 Zone Gaming & Jeux Vidéo Manga / VS Fighting</h2>
+                <p>Discutez des adaptations en jeux vidéo, des derniers titres du genre et partagez vos avis !</p>
             </div>
-            <div class="gaming-banner-body">
-                <div>
-                    <p style="font-weight: bold; font-size: 13px; color: #2c3e50; margin-bottom: 3px;">Partagez vos coups de cœur et astuces jeux vidéo !</p>
-                    <p style="color: #7f8c8d;">Discutez des dernières sorties, des tests et de vos meilleures sessions de jeu.</p>
+
+            <!-- BOUTON CRÉER UN SUJET -->
+            <div style="margin-bottom: 20px;">
+                <button id="btn-open-topic-modal" class="btn-admin-edit" style="padding: 10px 15px; cursor: pointer;">+ Créer un nouveau sujet Gaming</button>
+            </div>
+
+            <!-- LISTE DES SUJETS GAMING -->
+            <table class="forum-table">
+                <thead>
+                    <tr>
+                        <th colspan="2" class="cat-title">_ Sujets de la section Gaming _</th>
+                        <th class="stat-head">Auteur</th>
+                        <th class="stat-head">Réponses</th>
+                        <th class="last-post-head">Date</th>
+                    </tr>
+                </thead>
+                <tbody id="gaming-topics-list">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 20px;">Chargement des sujets...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- MODALE CRÉATION DE SUJET -->
+        <div id="topic-modal" class="admin-panel-inputs hidden" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; background: #fff;">
+            <h3>Créer un nouveau sujet dans la Zone Gaming</h3>
+            <form id="form-create-topic">
+                <label>Titre du sujet :</label>
+                <input type="text" id="input-topic-title" required style="width: 100%; margin-bottom: 10px;">
+
+                <label>Message / Contenu :</label>
+                <textarea id="input-topic-content" rows="5" required style="width: 100%; margin-bottom: 10px;"></textarea>
+
+                <div class="admin-form-actions">
+                    <button type="submit" class="btn-admin-edit">Publier</button>
+                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-close-topic-modal">Annuler</button>
                 </div>
-                <a href="#" onclick="alert('Redirection vers le topic principal')" class="btn-gaming-action">Discuter »</a>
-            </div>
+            </form>
         </div>
-
-        <!-- TABLEAU DES SUJETS GAMING -->
-        <table class="forum-table">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">_</th>
-                    <th style="width: 55%;">_ Sujets de la Zone Gaming _</th>
-                    <th style="width: 20%;">STATUT / GENRE</th>
-                    <th style="width: 10%;">RÉPONSES</th>
-                    <th style="width: 10%;">AUTEUR</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="text-align: center; font-size: 16px;">🎮</td>
-                    <td>
-                        <a href="#" style="font-weight: bold; color: #3498db; font-size: 13px; text-decoration: none;">[TOPIC UNIQUE] Vos attentes sur les prochains jeux de rôle (RPG)</a><br>
-                        <small style="color: #7f8c8d;">Discutez des annonces de l'année et des projets en cours.</small>
-                    </td>
-                    <td>
-                        <span style="color: #27ae60; font-size: 11px; font-weight: bold;">Actif</span><br>
-                        <span style="color: #8e44ad; font-size: 10px; font-weight: bold;">Jeu de Rôle</span>
-                    </td>
-                    <td style="text-align: center; font-weight: bold; color: #2c3e50;">42</td>
-                    <td>
-                        Par <a href="profile.html?user=Admin_Otaku" class="group-admin" style="font-size: 11px;">Admin_Otaku</a><br>
-                        <small style="color: #95a5a6; font-size: 9px;">Il y a 2 heures</small>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="text-align: center; font-size: 16px;">🔥</td>
-                    <td>
-                        <a href="#" style="font-weight: bold; color: #3498db; font-size: 13px; text-decoration: none;">Monstre du moment : Quel est votre boss le plus dur ?</a><br>
-                        <small style="color: #7f8c8d;">Partagez vos galères de joueurs et vos techniques de combat.</small>
-                    </td>
-                    <td>
-                        <span style="color: #e67e22; font-size: 11px; font-weight: bold;">Populaire</span><br>
-                        <span style="color: #8e44ad; font-size: 10px; font-weight: bold;">Défi / Boss</span>
-                    </td>
-                    <td style="text-align: center; font-weight: bold; color: #2c3e50;">18</td>
-                    <td>
-                        Par <a href="profile.html?user=Yoru_Chan" class="group-member" style="font-size: 11px;">Yoru_Chan</a><br>
-                        <small style="color: #95a5a6; font-size: 9px;">Hier à 22:10</small>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
 
     </div>
 
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        const currentUsername = localStorage.getItem('forumUsername');
+
+        // GESTION CONNEXION NAVBAR
+        const profileLink = document.getElementById('nav-profile-link');
+        const authLink = document.getElementById('nav-auth-link');
+        if (currentUsername) {
+            profileLink.classList.remove('hidden');
+            authLink.textContent = "Déconnexion";
+            authLink.onclick = async () => { await supabase.auth.signOut(); localStorage.clear(); window.location.reload(); };
+        }
+
+        // GESTION MODALE CRÉATION
+        const modal = document.getElementById('topic-modal');
+        document.getElementById('btn-open-topic-modal').addEventListener('click', () => {
+            if (!currentUsername) {
+                alert("Vous devez être connecté pour créer un sujet !");
+                window.location.href = "register.html";
+                return;
+            }
+            modal.classList.toggle('hidden');
+        });
+        document.getElementById('btn-close-topic-modal').addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        // CHARGEMENT DES SUJETS GAMING DEPUIS SUPABASE
+        async function loadGamingTopics() {
+            const tbody = document.getElementById('gaming-topics-list');
+            
+            // On récupère les sujets filtrés par la catégorie "gaming" (ou tu peux adapter selon ta base de données)
+            const { data: topics, error } = await supabase
+                .from('topics')
+                .select('*')
+                .eq('category', 'gaming')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                // Si la table ou la catégorie n'est pas encore remplie, on affiche un message propre
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun sujet pour le moment. Soyez le premier à en créer un !</td></tr>`;
+                return;
+            }
+
+            if (!topics || topics.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun sujet pour le moment. Soyez le premier à en créer un !</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = topics.map(topic => `
+                <tr>
+                    <td class="icon-cell"><span class="category-emoji">💬</span></td>
+                    <td class="forum-desc">
+                        <a href="topic-view.html?id=${topic.id}" class="forum-title">${topic.title}</a>
+                        <p>${topic.content ? topic.content.substring(0, 80) + '...' : ''}</p>
+                    </td>
+                    <td class="stat-cell">${topic.author || 'Anonyme'}</td>
+                    <td class="stat-cell">${topic.replies_count || 0}</td>
+                    <td class="last-post-cell">${new Date(topic.created_at).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        // SOUMISSION D'UN NOUVEAU SUJET
+        document.getElementById('form-create-topic').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('input-topic-title').value;
+            const content = document.getElementById('input-topic-content').value;
+
+            const { error } = await supabase.from('topics').insert([
+                { title, content, category: 'gaming', author: currentUsername }
+            ]);
+
+            if (error) {
+                alert("Erreur lors de la création du sujet : " + error.message);
+            } else {
+                alert("Sujet créé avec succès !");
+                window.location.reload();
+            }
+        });
+
+        loadGamingTopics();
+    </script>
 </body>
 </html>
