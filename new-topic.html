@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer un nouveau sujet - Actu Manga World</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="wrapper">
+
+        <!-- BANNIÈRE EN-TÊTE -->
+        <div class="main-header">
+            <img src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner">
+        </div>
+
+        <!-- BARRE DE NAVIGATION VINTAGE -->
+        <nav class="forum-nav">
+            <a href="index.html" class="nav-link">Index</a>
+            <a href="community.html" class="nav-link">Fiches & Critiques</a>
+            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
+            <a href="#" class="nav-link">Rechercher</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
+            <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
+            <a href="#" class="nav-link">FAQ</a>
+        </nav>
+
+        <!-- FIL D'ARIANE -->
+        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
+            <a href="index.html">Accueil</a> &raquo; <span id="breadcrumb-section">Créer un sujet</span>
+        </div>
+
+        <!-- FORMULAIRE DE CRÉATION -->
+        <div class="welcome-banner">
+            <h2 id="form-page-title">✍️ Créer un nouveau sujet</h2>
+            <p>Remplissez le formulaire ci-dessous pour publier votre message.</p>
+        </div>
+
+        <div style="background: #fff; padding: 20px; border: 1px solid #dcdde1; border-radius: 4px;">
+            <form id="form-create-topic">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Titre du sujet :</label>
+                    <input type="text" id="topic-title" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Contenu :</label>
+                    <textarea id="topic-content" rows="6" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                </div>
+
+                <div style="text-align: right;">
+                    <button type="submit" class="btn-admin-edit" style="padding: 10px 20px; background: #c0392b; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Publier le sujet</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DE GESTION DE L'ENREGISTREMENT DANS LA BONNE TABLE -->
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        const currentUsername = localStorage.getItem('forumUsername');
+        
+        // Vérifier si l'utilisateur est connecté
+        if (!currentUsername) {
+            alert("Vous devez être connecté pour créer un sujet.");
+            window.location.href = "register.html";
+        }
+
+        // Récupérer la catégorie depuis l'URL (ex: new-topic.html?cat=gaming ou new-topic.html?cat=general ou new-topic.html?cat=planning)
+        const urlParams = new URLSearchParams(window.location.search);
+        const category = urlParams.get('cat') || 'general';
+
+        // Adapter l'affichage selon la catégorie
+        const titleEl = document.getElementById('form-page-title');
+        const breadcrumbEl = document.getElementById('breadcrumb-section');
+        
+        let targetTable = 'general_topics';
+        let redirectPage = 'general.html';
+
+        if (category === 'gaming') {
+            targetTable = 'gaming_topics';
+            redirectPage = 'gaming.html';
+            titleEl.textContent = "🎮 Créer un sujet Gaming";
+            breadcrumbEl.textContent = "Jeux Vidéo & VS Fighting";
+        } else if (category === 'planning') {
+            targetTable = 'planning_topics';
+            redirectPage = 'planning.html';
+            titleEl.textContent = "🗓️ Créer un planning VF";
+            breadcrumbEl.textContent = "Planning des Sorties VF";
+        } else {
+            titleEl.textContent = "☕ Créer un sujet au QG des Discussions";
+            breadcrumbEl.textContent = "Le QG des Discussions";
+        }
+
+        // Soumission du formulaire
+        document.getElementById('form-create-topic').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('topic-title').value;
+            const content = document.getElementById('topic-content').value;
+
+            const { error } = await supabase
+                .from(targetTable)
+                .insert([{ title, content, author: currentUsername }]);
+
+            if (error) {
+                alert("Erreur lors de la publication : " + error.message);
+            } else {
+                alert("Sujet publié avec succès !");
+                window.location.href = redirectPage;
+            }
+        });
+    </script>
+</body>
+</html>
