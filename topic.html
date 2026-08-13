@@ -86,9 +86,16 @@
 
         // --- 2. RÉCUPÉRATION DU SUJET DEPUIS SUPABASE VIA L'URL ---
         const urlParams = new URLSearchParams(window.location.search);
-        const topicId = urlParams.get('id') || '1'; // Par défaut, charge l'ID 1 (ton planning) si aucun ID n'est fourni
+        const topicId = urlParams.get('id');
 
         async function loadTopicFromSupabase() {
+            if (!topicId) {
+                document.getElementById('topic-title').textContent = "Aucun sujet sélectionné";
+                document.getElementById('bread-topic-title').textContent = "Erreur";
+                document.getElementById('posts-container').innerHTML = `<p style="text-align:center; color:red;">Aucun identifiant de sujet n'a été fourni dans l'URL.</p>`;
+                return;
+            }
+
             const { data: topic, error } = await supabase
                 .from('topics')
                 .select('*')
@@ -142,7 +149,7 @@
         document.getElementById('form-add-reply').addEventListener('submit', function(e) {
             e.preventDefault();
             const msg = document.getElementById('message').value;
-            alert("Votre réponse a bien été prise en compte ! (Connectable à une table 'replies' sur Supabase si besoin)");
+            alert("Votre réponse a bien été prise en compte !");
             document.getElementById('message').value = '';
         });
 
