@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zone Gaming - Forum Actu Manga</title>
+    <title>Zone Détente - Forum Actu Manga</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -25,7 +25,7 @@
             <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
         </nav>
 
-        <!-- CONTENU PRINCIPAL GAMING -->
+        <!-- CONTENU PRINCIPAL DÉTENTE -->
         <div class="news-container">
             <div class="welcome-banner">
                 <h2>_ Zone Détente & Discussions Diverses _</h2>
@@ -37,7 +37,7 @@
                 <button id="btn-open-topic-modal" class="btn-admin-edit" style="padding: 10px 15px; cursor: pointer;">+ Créer un nouveau sujet</button>
             </div>
 
-            <!-- LISTE DES SUJETS GAMING -->
+            <!-- LISTE DES SUJETS DÉTENTE -->
             <table class="forum-table">
                 <thead>
                     <tr>
@@ -47,6 +47,7 @@
                         <th class="last-post-head">Date</th>
                     </tr>
                 </thead>
+                <!-- CORRECTION DE L'ID ICI -->
                 <tbody id="general-topics-list">
                     <tr>
                         <td colspan="5" style="text-align: center; padding: 20px;">Chargement des sujets...</td>
@@ -103,23 +104,16 @@
         });
 
         // CHARGEMENT DES SUJETS DÉTENTE DEPUIS SUPABASE
-        async function loadGamingTopics() {
-            const tbody = document.getElementById('general-topics-list'); // Assure-toi que ton <tbody> dans le HTML a cet ID
+        async function loadGeneralTopics() {
+            const tbody = document.getElementById('general-topics-list');
             
-            // On récupère les sujets filtrés par la catégorie "general"
             const { data: topics, error } = await supabase
                 .from('topics')
                 .select('*')
-                .eq('category', 'general') // On change le filtre pour "general"
+                .eq('category', 'general') // Filtre bien sur 'general'
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                // Si la table ou la catégorie n'est pas encore remplie, on affiche un message propre
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun sujet pour le moment. Soyez le premier à en créer un !</td></tr>`;
-                return;
-            }
-
-            if (!topics || topics.length === 0) {
+            if (error || !topics || topics.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun sujet pour le moment. Soyez le premier à en créer un !</td></tr>`;
                 return;
             }
@@ -145,7 +139,7 @@
             const content = document.getElementById('input-topic-content').value;
 
             const { error } = await supabase.from('topics').insert([
-                { title, content, category: 'gaming', author: currentUsername }
+                { title, content, category: 'general', author: currentUsername } // Enregistre bien en 'general'
             ]);
 
             if (error) {
@@ -156,7 +150,7 @@
             }
         });
 
-        loadGamingTopics();
+        loadGeneralTopics();
     </script>
 </body>
 </html>
