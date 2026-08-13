@@ -31,7 +31,7 @@
                 <p>Calendrier mois par mois des éditeurs.</p>
             </div>
             <div>
-                <a href="new-planning-topic.html" class="btn-admin-edit" style="text-decoration: none; padding: 10px 15px; background: #c0392b; color: white; border-radius: 4px; font-weight: bold;">+ Nouveau Planning</a>
+                <a href="new-topic.html?cat=planning" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">+ Créer un Sujet</a>
             </div>
         </div>
 
@@ -39,9 +39,9 @@
             <thead>
                 <tr>
                     <th colspan="2" class="cat-title">_ Liste des Plannings _</th>
-                    <th class="stat-head">Auteur</th>
-                    <th class="stat-head">Réponses</th>
-                    <th class="last-post-head">Dernier Message</th>
+                    <th class="stat-head" style="text-align: center;">Auteur</th>
+                    <th class="stat-head" style="text-align: center;">Réponses</th>
+                    <th class="last-post-head" style="text-align: center;">Dernier Message</th>
                 </tr>
             </thead>
             <tbody id="planning-topics-container">
@@ -80,7 +80,7 @@
                         </td>
                         <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
                         <td class="stat-cell" style="text-align: center;">--</td>
-                        <td class="last-post-cell" style="font-size: 0.9em;"><span>Par ${t.author || 'Otaku_33'}</span><br><small style="color: #7f8c8d;">${dateFormatted}</small></td>
+                        <td class="last-post-cell" style="text-align: center; font-size: 0.9em;"><span>Par ${t.author || 'Otaku_33'}</span><br><small style="color: #7f8c8d;">${dateFormatted}</small></td>
                     </tr>
                 `;
             }).join('');
