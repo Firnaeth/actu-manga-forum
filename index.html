@@ -287,7 +287,7 @@
                 newsListEl.innerHTML = "<li><em>Aucun sujet publié pour le moment.</em></li>";
             }
 
-            // 2. Traiter par catégorie pour les tableaux du forum
+            // 2. Traiter par catégorie pour les tableaux du forum de manière isolée
             const categories = ['planning', 'licences', 'manga', 'gaming', 'general'];
             
             categories.forEach(cat => {
@@ -299,12 +299,11 @@
                 if (countEl) countEl.textContent = catTopics.length;
 
                 if (catTopics.length > 0) {
-                    const latest = catTopics[0]; // Le plus récent
+                    const latest = catTopics[0]; // Le sujet le plus récent de CETTE catégorie
                     if (lastCellEl) {
                         lastCellEl.innerHTML = `<a href="topic.html?id=${latest.id}">${latest.title}</a>`;
                     }
                     if (linkEl) {
-                        // Fait pointer le titre de la catégorie vers le dernier sujet ou vers une liste si tu préfères
                         linkEl.href = `topic.html?id=${latest.id}`;
                     }
                 } else {
