@@ -50,7 +50,7 @@
             Espace Fiches : Mangas, Animes & Jeux Vidéo
         </div>
 
-        <!-- BARRE D'ACTIONS ET FILTRES (STYLE D'ORIGINE) -->
+        <!-- BARRE D'ACTIONS ET FILTRES -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <button id="btn-toggle-form" style="background: #f8bbd0; color: #c2185b; border: 1px solid #c2185b; padding: 6px 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 12px;">+ Créer une Fiche</button>
             
@@ -62,7 +62,7 @@
             </div>
         </div>
 
-        <!-- CONCOURS DU MOIS (STYLE D'ORIGINE) -->
+        <!-- CONCOURS DU MOIS -->
         <div style="border: 1px solid #3498db; border-radius: 4px; overflow: hidden; margin-bottom: 20px;">
             <div style="background: #3498db; color: white; padding: 6px 10px; font-weight: bold; font-size: 12px;">
                 🏆 CONCOURS DU MOIS : DESSIN & AFFICHE (NON-IA)
@@ -190,7 +190,7 @@
             const { data, error } = await supabase
                 .from('topics')
                 .select('*')
-                .eq('category', 'community') // ✅ Filtre strict pour ne charger que la communauté
+                .eq('category', 'community')
                 .order('created_at', { ascending: false });
 
             if (error) {
