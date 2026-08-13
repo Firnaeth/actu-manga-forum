@@ -27,7 +27,7 @@
 
                 <div class="form-group">
                     <label for="title">Titre de l'œuvre :</label>
-                    <input type="text" id="title" placeholder="Ex: Seikon no Qwazer / Chainsaw Man" required>
+                    <input type="text" id="title" placeholder="Ex: Chainsaw Man" required>
                 </div>
 
                 <div class="form-group">
@@ -37,10 +37,9 @@
 
                 <div class="form-group">
                     <label for="details">Auteur / Studio / Développeur :</label>
-                    <input type="text" id="details" placeholder="Ex: Hiroyuki Yoshino / FromSoftware">
+                    <input type="text" id="details" placeholder="Ex: Tatsuki Fujimoto / FromSoftware">
                 </div>
 
-                <!-- NOUVEAU CHAMP : TRANCHE D'ÂGE -->
                 <div class="form-group">
                     <label for="age-rating">Tranche d'âge conseillée :</label>
                     <select id="age-rating" required>
@@ -75,40 +74,55 @@
 
                 <div class="form-actions">
                     <button type="submit" class="btn-submit">Publier la Fiche</button>
-                    <a href="community.html" class="btn-reply" style="background: #e74c3c; text-decoration: none; text-align: center; margin-left: 10px;">Annuler</a>
+                    <a href="community.html" class="btn-reply" style="background: #e74c3c; text-decoration: none; text-align: center; margin-left: 10px; display: inline-block; padding: 6px 12px; color: white;">Annuler</a>
                 </div>
             </form>
         </div>
     </div>
 
-    <script>
-        document.getElementById('create-sheet-form').addEventListener('submit', function(e) {
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        const currentUsername = localStorage.getItem('forumUsername');
+
+        document.getElementById('create-sheet-form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            // Récupération des valeurs du formulaire
-            const newSheet = {
-                id: Date.now(),
-                type: document.getElementById('type').value,
-                title: document.getElementById('title').value,
-                cover: document.getElementById('cover').value || 'https://via.placeholder.com/150',
-                details: document.getElementById('details').value,
-                ageRating: document.getElementById('age-rating').value,
-                rating: document.getElementById('rating').value,
-                synopsis: document.getElementById('synopsis').value,
-                review: document.getElementById('review').value,
-                author: localStorage.getItem('forumUsername') || 'Otaku_33',
-                date: "À l'instant"
-            };
+            if (!currentUsername) {
+                alert("Vous devez être connecté pour publier une fiche !");
+                window.location.href = "register.html";
+                return;
+            }
 
-            // Récupération des fiches existantes ou tableau vide dans le localStorage
-            let sheetsList = JSON.parse(localStorage.getItem('forumSheetsData')) || [];
-            sheetsList.unshift(newSheet); // Ajoute la nouvelle fiche au début
+            const sheetType = document.getElementById('type').value;
+            const title = document.getElementById('title').value;
+            const cover = document.getElementById('cover').value;
+            const details = document.getElementById('details').value;
+            const ageRating = document.getElementById('age-rating').value;
+            const rating = document.getElementById('rating').value;
+            const synopsis = document.getElementById('synopsis').value;
+            const review = document.getElementById('review').value;
 
-            // Sauvegarde
-            localStorage.setItem('forumSheetsData', JSON.stringify(sheetsList));
+            // On combine les informations dans le contenu (content) ou les colonnes adaptées de Supabase
+            const fullContent = `[${details}] ${synopsis} \n\nAvis : ${review}`;
 
-            alert('Fiche publiée avec succès !');
-            window.location.href = 'community.html'; // Redirection vers l'espace communauté/fiches
+            const { error } = await supabase.from('topics').insert([
+                { 
+                    title: title, 
+                    content: fullContent, 
+                    category: 'community', 
+                    sheet_type: sheetType, 
+                    author: currentUsername,
+                    replies_count: 0 
+                }
+            ]);
+
+            if (error) {
+                alert("Erreur lors de la publication : " + error.message);
+            } else {
+                alert('Fiche publiée avec succès sur le forum !');
+                window.location.href = 'community.html';
+            }
         });
     </script>
 </body>
