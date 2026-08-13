@@ -6,70 +6,35 @@
     <title>Fiches & Critiques - Forum Actu Manga</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Styles spécifiques pour le bloc Concours et les filtres */
-        .contest-banner {
-            background: linear-gradient(to right, #3498db, #2980b9);
-            border-radius: 6px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-            border: 1px solid #2980b9;
+        .badge {
+            background: #f39c12; color: white; padding: 2px 6px; font-size: 10px;
+            border-radius: 3px; font-weight: bold; text-transform: uppercase;
         }
-        .contest-header {
-            background: rgba(0,0,0,0.15);
-            color: white;
-            padding: 8px 15px;
-            font-weight: bold;
-            font-size: 13px;
+        .badge.manga { background: #e84393; }
+        .badge.anime { background: #0984e3; }
+        .badge.game { background: #00b894; }
+        
+        .form-row {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 15px;
+            margin-bottom: 10px;
         }
-        .contest-body {
-            padding: 15px;
-            background: #fff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .form-group {
+            flex: 1;
         }
-        .contest-body p {
-            margin: 0;
+        .form-group label {
+            display: block;
             font-size: 12px;
+            font-weight: bold;
             color: #2c3e50;
+            margin-bottom: 3px;
         }
-        .btn-participate {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
             font-size: 12px;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
-        .btn-participate:hover {
-            background: #2980b9;
-        }
-        .filter-buttons {
-            display: flex;
-            gap: 5px;
-        }
-        .filter-btn {
-            background: #ecf0f1;
-            border: 1px solid #bdc3c7;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            cursor: pointer;
-            font-weight: bold;
-            color: #34495e;
-        }
-        .filter-btn.active, .filter-btn:hover {
-            background: #3498db;
-            color: white;
-            border-color: #2980b9;
         }
     </style>
 </head>
@@ -81,202 +46,222 @@
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <button id="btn-open-topic-modal" class="btn-admin-edit" style="text-decoration: none; padding: 6px 14px; font-size: 12px; background: #e84393; color: white; border: none; display: inline-block; border-radius: 4px; font-weight: bold; cursor: pointer;">+ Créer une Fiche / Sujet</button>
+            <button id="btn-toggle-form" style="background: #e84393; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">+ Créer une Fiche / Sujet</button>
+            <div>
+                <button onclick="filterSheets('all')" style="padding: 5px 10px; cursor: pointer;">Tous</button>
+                <button onclick="filterSheets('manga')" style="padding: 5px 10px; cursor: pointer;">Mangas</button>
+                <button onclick="filterSheets('anime')" style="padding: 5px 10px; cursor: pointer;">Animes</button>
+                <button onclick="filterSheets('game')" style="padding: 5px 10px; cursor: pointer;">Jeux Vidéo</button>
+            </div>
+        </div>
+
+        <!-- FORMULAIRE DE CRÉATION DE FICHE COMPLET -->
+        <div id="form-container" style="display: none; background: #fff; border: 1px solid #e84393; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <div style="background: #e84393; color: white; padding: 8px; font-weight: bold; margin-bottom: 15px; border-radius: 3px;">Créer une nouvelle Fiche ou Critique</div>
             
-            <!-- Filtres rapides -->
-            <div class="filter-buttons">
-                <button class="filter-btn active" onclick="filterSheets('all', event)">Tous</button>
-                <button class="filter-btn" onclick="filterSheets('manga', event)">📖 Mangas</button>
-                <button class="filter-btn" onclick="filterSheets('anime', event)">📺 Animes</button>
-                <button class="filter-btn" onclick="filterSheets('game', event)">🎮 Jeux Vidéo</button>
-            </div>
-        </div>
-
-        <!-- EN-TÊTE ESPACE FICHES -->
-        <div style="background: #fdf2f8; border: 1px solid #f8bbd0; padding: 10px 15px; border-radius: 5px; margin-bottom: 15px; font-weight: bold; color: #c2185b;">
-            Espace Fiches : Mangas, Animes & Jeux Vidéo
-        </div>
-
-        <!-- BANNIÈRE CONCOURS DU MOIS -->
-        <div class="contest-banner">
-            <div class="contest-header">
-                🏆 CONCOURS DU MOIS : DESSIN & FAN-ART
-            </div>
-            <div class="contest-body">
-                <div>
-                    <p style="font-weight: bold; font-size: 13px; color: #2c3e50; margin-bottom: 3px;">Thème : Dessine ton personnage manga préféré !</p>
-                    <p style="color: #7f8c8d;">Exprime ton talent et partage tes créations avec la communauté.</p>
+            <form id="form-create-sheet">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Type de contenu :</label>
+                        <select id="sheet-type" required>
+                            <option value="manga">Manga</option>
+                            <option value="anime">Anime</option>
+                            <option value="game">Jeu Vidéo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Titre de l'œuvre :</label>
+                        <input type="text" id="sheet-title" placeholder="Ex: Chainsaw Man - Tome 1" required>
+                    </div>
                 </div>
-                <a href="contest-view.html" class="btn-participate">Participer »</a>
-            </div>
-        </div>
 
-        <!-- MODALE CRÉATION DE FICHE (Intégrée proprement) -->
-        <div id="topic-modal" class="admin-panel-inputs hidden" style="margin-bottom: 20px; border: 1px solid #f8bbd0; padding: 15px; background: #fff; border-radius: 6px;">
-            <h3 style="color: #c2185b; margin-top: 0;">Créer une nouvelle Fiche ou Critique</h3>
-            <form id="form-create-topic">
-                <label style="font-size: 12px; font-weight: bold;">Type de contenu :</label>
-                <select id="input-sheet-type" style="width: 100%; margin-bottom: 10px; padding: 6px;">
-                    <option value="manga">📖 Manga</option>
-                    <option value="anime">📺 Anime</option>
-                    <option value="game">🎮 Jeu Vidéo</option>
-                </select>
-
-                <label style="font-size: 12px; font-weight: bold;">Titre de la fiche :</label>
-                <input type="text" id="input-topic-title" required placeholder="ex: Chainsaw Man - Tome 1" style="width: 100%; margin-bottom: 10px; padding: 6px;">
-
-                <label style="font-size: 12px; font-weight: bold;">Description / Critique / Synopsis :</label>
-                <textarea id="input-topic-content" rows="4" required placeholder="Partage ton avis ou un résumé..." style="width: 100%; margin-bottom: 10px; padding: 6px;"></textarea>
-
-                <div class="admin-form-actions" style="display: flex; gap: 10px;">
-                    <button type="submit" class="btn-admin-edit" style="background: #e84393; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">Publier</button>
-                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-close-topic-modal" style="background: #95a5a6; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer;">Annuler</button>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>URL de l'affiche / image :</label>
+                        <input type="url" id="sheet-cover" placeholder="https://exemple.com/image.jpg" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Auteur / Studio :</label>
+                        <input type="text" id="sheet-author-detail" placeholder="Ex: Tatsuki Fujimoto" required>
+                    </div>
                 </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Genre :</label>
+                        <input type="text" id="sheet-genre" placeholder="Ex: Shonen, Action, Gore" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tranche d'âge :</label>
+                        <select id="sheet-age">
+                            <option value="Tous publics">Tous publics</option>
+                            <option value="10 ans et +">10 ans et +</option>
+                            <option value="12 ans et +">12 ans et +</option>
+                            <option value="16 ans et +">16 ans et +</option>
+                            <option value="18 ans et +">18 ans et +</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Note globale :</label>
+                        <select id="sheet-rating">
+                            <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                            <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                            <option value="3">⭐⭐⭐ (3/5)</option>
+                            <option value="2">⭐⭐ (2/5)</option>
+                            <option value="1">⭐ (1/5)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label>Synopsis / Résumé :</label>
+                    <textarea id="sheet-synopsis" rows="3" placeholder="Résumé de l'œuvre..." required></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Avis personnel :</label>
+                    <textarea id="sheet-review" rows="2" placeholder="Ton avis personnel sur l'œuvre..." required></textarea>
+                </div>
+
+                <button type="submit" style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">Publier la fiche</button>
             </form>
         </div>
 
-        <!-- TABLEAU DES FICHES DE LA COMMUNAUTÉ -->
+        <!-- TABLEAU DES FICHES -->
         <table class="forum-table">
             <thead>
                 <tr>
-                    <th style="width: 5%;">_</th>
-                    <th style="width: 55%;">_ Fiches de la communauté _</th>
-                    <th style="width: 20%;">NOTE / TYPE</th>
-                    <th style="width: 10%;">RÉPONSES</th>
-                    <th style="width: 10%;">AUTEUR</th>
+                    <th>Fiches de la communauté</th>
+                    <th style="width: 120px; text-align: center;">Note / Type</th>
+                    <th style="width: 80px; text-align: center;">Avis</th>
+                    <th style="width: 130px; text-align: right;">Auteur</th>
                 </tr>
             </thead>
-            <tbody id="sheets-list-body">
+            <tbody id="sheets-table-body">
                 <tr>
-                    <td colspan="5" style="text-align: center; padding: 20px;">Chargement des fiches...</td>
+                    <td colspan="4" style="text-align: center; color: #7f8c8d;">Chargement des fiches...</td>
                 </tr>
             </tbody>
         </table>
-
     </div>
 
-    <!-- SCRIPT DE CHARGEMENT, FILTRAGE ET CONNEXION SUPABASE -->
+    <!-- SCRIPT SUPABASE -->
     <script type="module">
         import { supabase } from './supabase.js';
 
         const currentUsername = localStorage.getItem('forumUsername');
-        let globalTopics = [];
+        let allSheets = [];
 
-        // GESTION MODALE CRÉATION
-        const modal = document.getElementById('topic-modal');
-        document.getElementById('btn-open-topic-modal').addEventListener('click', () => {
+        // Gestion de l'affichage du formulaire
+        const toggleBtn = document.getElementById('btn-toggle-form');
+        const formContainer = document.getElementById('form-container');
+        
+        toggleBtn.addEventListener('click', () => {
             if (!currentUsername) {
                 alert("Vous devez être connecté pour créer une fiche !");
                 window.location.href = "register.html";
                 return;
             }
-            modal.classList.toggle('hidden');
-        });
-        document.getElementById('btn-close-topic-modal').addEventListener('click', () => {
-            modal.classList.add('hidden');
+            formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
         });
 
-        // CHARGEMENT DEPUIS SUPABASE (Table: topics, Category: community)
-        async function loadCommunitySheets() {
-            const tbody = document.getElementById('sheets-list-body');
-            
-            const { data: topics, error } = await supabase
+        async function loadSheets() {
+            const { data, error } = await supabase
                 .from('topics')
                 .select('*')
-                .eq('category', 'community')
                 .order('created_at', { ascending: false });
 
-            if (error || !topics || topics.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucune fiche pour le moment. Soyez le premier à en créer une !</td></tr>`;
+            if (error) {
+                console.error("Erreur chargement fiches:", error);
                 return;
             }
 
-            globalTopics = topics;
-            renderSheets('all');
+            allSheets = data || [];
+            renderSheets(allSheets);
         }
 
-        // AFFICHAGE ET FILTRAGE DES FICHES
-        window.renderSheets = function(filterType = 'all') {
-            let tbody = document.getElementById('sheets-list-body');
-            tbody.innerHTML = "";
+        function renderSheets(sheets) {
+            const tbody = document.getElementById('sheets-table-body');
 
-            let filtered = globalTopics;
-            if (filterType !== 'all') {
-                filtered = globalTopics.filter(t => t.sheet_type === filterType || t.type === filterType);
-            }
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucune fiche trouvée pour cette catégorie.</td></tr>`;
+            if (sheets.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #7f8c8d;">Aucune fiche pour le moment. Soyez le premier à en créer une !</td></tr>`;
                 return;
             }
 
-            filtered.forEach(topic => {
-                let sType = topic.sheet_type || topic.type || 'manga';
-                let iconMap = { manga: "📖", anime: "📺", game: "🎮" };
-                let typePrefix = { manga: "[MANGA]", anime: "[ANIME]", game: "[JEU]" };
-                let icon = iconMap[sType] || "📖";
-                let prefix = typePrefix[sType] || "[MANGA]";
-                
-                let authorClass = (topic.author === 'Admin_Otaku' || topic.author === 'Otaku_33') ? 'group-admin' : 'group-member';
-                let formattedDate = new Date(topic.created_at).toLocaleDateString();
+            tbody.innerHTML = sheets.map(sheet => {
+                let type = sheet.sheet_type || 'manga';
+                let typeLabels = { manga: "📖 MANGA", anime: "📺 ANIME", game: "🎮 JEU" };
+                let ratingNum = sheet.rating || 5;
+                let stars = "⭐".repeat(ratingNum);
+                let author = sheet.author || 'Anonyme';
+                let isAdm = (author === 'Admin_Otaku' || author === 'Otaku_33');
+                let aClass = isAdm ? 'group-admin' : 'group-member';
 
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="text-align: center; font-size: 16px;">${icon}</td>
-                    <td>
-                        <a href="topic-view.html?id=${topic.id}" style="font-weight: bold; color: #3498db; font-size: 13px; text-decoration: none;">${prefix} ${topic.title}</a><br>
-                        <small style="color: #7f8c8d;">${topic.content ? topic.content.substring(0, 60) + '...' : ''}</small>
-                    </td>
-                    <td>
-                        <span style="color: #f1c40f; font-size: 11px;">⭐⭐⭐⭐⭐</span><br>
-                        <span style="color: #e74c3c; font-size: 10px; font-weight: bold; text-transform: uppercase;">${sType}</span>
-                    </td>
-                    <td style="text-align: center; font-weight: bold; color: #2c3e50;">${topic.replies_count || 0}</td>
-                    <td>
-                        Par <a href="profile.html?user=${encodeURIComponent(topic.author || 'Anonyme')}" class="${authorClass}" style="font-size: 11px;">${topic.author || 'Anonyme'}</a><br>
-                        <small style="color: #95a5a6; font-size: 9px;">${formattedDate}</small>
-                    </td>
+                return `
+                    <tr>
+                        <td>
+                            <a href="sheet-view.html?id=${sheet.id}" style="font-weight: bold; color: #c2185b; font-size: 14px; text-decoration: none;">${sheet.title}</a>
+                            <div style="font-size: 11px; color: #7f8c8d; margin-top: 2px;">${sheet.genre || ''} • ${sheet.details || ''}</div>
+                        </td>
+                        <td style="text-align: center;">
+                            <span class="badge ${type}">${typeLabels[type] || 'MANGA'}</span>
+                            <div style="font-size: 10px; margin-top: 3px; color: #f1c40f;">${stars}</div>
+                        </td>
+                        <td style="text-align: center; font-size: 12px; color: #555;">${sheet.replies_count || 0}</td>
+                        <td style="text-align: right;">
+                            <a href="profile.html?user=${encodeURIComponent(author)}" class="${aClass}" style="font-size: 12px;">${author}</a>
+                        </td>
+                    </tr>
                 `;
-                tbody.appendChild(tr);
-            });
+            }).join('');
         }
 
-        window.filterSheets = function(type, event) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            if(event && event.target) {
-                event.target.classList.add('active');
+        window.filterSheets = function(type) {
+            if (type === 'all') {
+                renderSheets(allSheets);
+            } else {
+                const filtered = allSheets.filter(s => (s.sheet_type || 'manga') === type);
+                renderSheets(filtered);
             }
-            renderSheets(type);
         }
 
-        // SOUMISSION D'UNE NOUVELLE FICHE SUR SUPABASE
-        document.getElementById('form-create-topic').addEventListener('submit', async (e) => {
+        // Soumission du formulaire de création
+        document.getElementById('form-create-sheet').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const title = document.getElementById('input-topic-title').value;
-            const content = document.getElementById('input-topic-content').value;
-            const sheetType = document.getElementById('input-sheet-type').value;
 
-            const { error } = await supabase.from('topics').insert([
-                { 
-                    title, 
-                    content, 
-                    category: 'community', 
-                    sheet_type: sheetType, 
-                    author: currentUsername,
-                    replies_count: 0 
-                }
-            ]);
+            if (!currentUsername) {
+                alert("Session expirée, veuillez vous reconnecter.");
+                window.location.href = "register.html";
+                return;
+            }
+
+            const newSheet = {
+                title: document.getElementById('sheet-title').value,
+                sheet_type: document.getElementById('sheet-type').value,
+                cover_url: document.getElementById('sheet-cover').value,
+                details: document.getElementById('sheet-author-detail').value,
+                genre: document.getElementById('sheet-genre').value,
+                age_rating: document.getElementById('sheet-age').value,
+                rating: parseInt(document.getElementById('sheet-rating').value),
+                content: document.getElementById('sheet-synopsis').value,
+                review: document.getElementById('sheet-review').value,
+                author: currentUsername,
+                category: 'community'
+            };
+
+            const { data, error } = await supabase.from('topics').insert([newSheet]).select();
 
             if (error) {
                 alert("Erreur lors de la création de la fiche : " + error.message);
             } else {
                 alert("Fiche créée avec succès !");
-                window.location.reload();
+                document.getElementById('form-create-sheet').reset();
+                formContainer.style.display = 'none';
+                loadSheets();
             }
         });
 
-        loadCommunitySheets();
+        loadSheets();
     </script>
-
 </body>
 </html>
