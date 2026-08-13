@@ -111,6 +111,17 @@
                     <td class="stat-cell">--</td>
                     <td class="last-post-cell" id="last-licences-cell">Aucune annonce</td>
                 </tr>
+                <!-- Planning des Conventions (Rajouté en dessous) -->
+                <tr>
+                    <td class="icon-cell"><span class="category-emoji">📅</span></td>
+                    <td class="forum-desc">
+                        <a href="planning.html" class="forum-title">Planning des Conventions & Projets</a>
+                        <p>Retrouvez le calendrier des conventions et plannings à venir.</p>
+                    </td>
+                    <td class="stat-cell" id="count-conventions">--</td>
+                    <td class="stat-cell">--</td>
+                    <td class="last-post-cell" id="last-conventions-cell">Aucun sujet</td>
+                </tr>
             </tbody>
         </table>
 
@@ -127,7 +138,6 @@
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">📖</span></td>
                     <td class="forum-desc">
-                        <!-- LIEN CORRIGÉ ICI : Pointe bien vers community.html sans id perturbateur -->
                         <a href="community.html" class="forum-title">Discussion Manga / Anime</a>
                         <p>Échangez autour de vos lectures et séries préférées.</p>
                     </td>
@@ -288,7 +298,7 @@
             }
 
             // 2. Traiter par catégorie pour les tableaux du forum de manière isolée
-            const categories = ['planning', 'licences', 'manga', 'gaming', 'general'];
+            const categories = ['planning', 'licences', 'conventions', 'manga', 'gaming', 'general'];
             
             categories.forEach(cat => {
                 const catTopics = topics.filter(t => t.category === cat);
