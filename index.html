@@ -14,6 +14,7 @@
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
             <button class="btn-admin-edit" id="btn-toggle-admin">Modifier Titre & Bannière</button>
+            <a href="create-topic.html" class="btn-admin-edit" style="background:#27ae60; text-decoration:none; margin-left:10px;">+ Créer un Sujet / Planning</a>
         </div>
 
         <div id="admin-panel-form" class="admin-panel-inputs hidden">
@@ -70,13 +71,11 @@
                     </div>
                 </div>
 
-                <!-- News Box Scrollable -->
+                <!-- News Box Scrollable (Connectée dynamiquement aux derniers topics Supabase) -->
                 <div class="news-scroll">
                     <div class="mini-title">Dernières Actualités & Événements</div>
-                    <ul>
-                        <li><span class="date">[11/08]</span> <a href="topic.html?topic=planning">Planning complet des sorties VF du mois</a></li>
-                        <li><span class="date">[10/08]</span> <a href="sheet-view.html?item=elden-ring">Nouvelle fiche : Elden Ring DLC</a></li>
-                        <li><span class="date">[08/08]</span> <a href="topic.html?topic=licences">Annonce adaptation Anime Saison Automne</a></li>
+                    <ul id="latest-news-list">
+                        <li><em>Chargement des actualités...</em></li>
                     </ul>
                 </div>
             </div>
@@ -95,17 +94,23 @@
             <tbody>
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">🗓️</span></td>
-                    <td class="forum-desc"><a href="topic.html?topic=planning" class="forum-title">Planning des Sorties VF</a><p>Calendrier mois par mois des éditeurs.</p></td>
-                    <td class="stat-cell">124</td>
-                    <td class="stat-cell">1580</td>
-                    <td class="last-post-cell"><a href="topic.html?topic=planning">Planning Août 2026</a></td>
+                    <td class="forum-desc">
+                        <a href="#" id="link-latest-planning" class="forum-title">Planning des Sorties VF</a>
+                        <p>Calendrier mois par mois des éditeurs géré depuis Supabase.</p>
+                    </td>
+                    <td class="stat-cell" id="count-planning">--</td>
+                    <td class="stat-cell">--</td>
+                    <td class="last-post-cell" id="last-planning-cell">Aucun planning</td>
                 </tr>
                 <tr>
-                    <td class="icon-cell"><span class="category-emoji">🎟️</span></td>
-                    <td class="forum-desc"><a href="news.html" class="forum-title">Conventions & Salons</a><p>Dates et infos sur Japan Expo, Polymanga, etc.</p></td>
-                    <td class="stat-cell">12</td>
-                    <td class="stat-cell">340</td>
-                    <td class="last-post-cell"><a href="news.html">Japan Expo 2026</a></td>
+                    <td class="icon-cell"><span class="category-emoji">📣</span></td>
+                    <td class="forum-desc">
+                        <a href="#" id="link-latest-licences" class="forum-title">Annonce / Nouvelle Licence</a>
+                        <p>Toutes les nouveautés annoncées par les éditeurs.</p>
+                    </td>
+                    <td class="stat-cell" id="count-licences">--</td>
+                    <td class="stat-cell">--</td>
+                    <td class="last-post-cell" id="last-licences-cell">Aucune annonce</td>
                 </tr>
             </tbody>
         </table>
@@ -121,11 +126,14 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="icon-cell"><span class="category-emoji">📝</span></td>
-                    <td class="forum-desc"><a href="community.html" class="forum-title">Fiches & Critiques</a><p>Découvre et crée des fiches !</p></td>
-                    <td class="stat-cell">310</td>
-                    <td class="stat-cell">4200</td>
-                    <td class="last-post-cell"><a href="sheet-view.html?item=chainsaw-man">Chainsaw Man</a></td>
+                    <td class="icon-cell"><span class="category-emoji">📖</span></td>
+                    <td class="forum-desc">
+                        <a href="#" id="link-latest-manga" class="forum-title">Discussion Manga / Anime</a>
+                        <p>Échangez autour de vos lectures et séries préférées.</p>
+                    </td>
+                    <td class="stat-cell" id="count-manga">--</td>
+                    <td class="stat-cell">--</td>
+                    <td class="last-post-cell" id="last-manga-cell">Aucun sujet</td>
                 </tr>
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">🎨</span></td>
@@ -149,15 +157,18 @@
             <tbody>
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">🎮</span></td>
-                    <td class="forum-desc"><a href="gaming.html" class="forum-title">Jeux Vidéo Manga & VS Fighting</a><p>Discussions et avis jeux vidéo.</p></td>
-                    <td class="stat-cell">156</td>
-                    <td class="stat-cell">1890</td>
-                    <td class="last-post-cell"><a href="sheet-view.html?item=elden-ring">Elden Ring DLC</a></td>
+                    <td class="forum-desc">
+                        <a href="#" id="link-latest-gaming" class="forum-title">Jeux Vidéo Manga & VS Fighting</a>
+                        <p>Discussions et avis jeux vidéo.</p>
+                    </td>
+                    <td class="stat-cell" id="count-gaming">--</td>
+                    <td class="stat-cell">--</td>
+                    <td class="last-post-cell" id="last-gaming-cell">Aucun sujet</td>
                 </tr>
             </tbody>
         </table>
 
-        <!-- NOUVELLE SECTION : ZONE DÉTENTE & DISCUSSIONS DIVERSES -->
+        <!-- ZONE DÉTENTE & DISCUSSIONS DIVERSES -->
         <table class="forum-table">
             <thead>
                 <tr>
@@ -170,10 +181,13 @@
             <tbody>
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">☕</span></td>
-                    <td class="forum-desc"><a href="general-discussion.html" class="forum-title">Le QG des Discussions</a><p>Pour parler de tout et de rien : ciné, musique, vie quotidienne...</p></td>
-                    <td class="stat-cell">45</td>
-                    <td class="stat-cell">620</td>
-                    <td class="last-post-cell"><a href="general-discussion.html">La playlist du moment</a></td>
+                    <td class="forum-desc">
+                        <a href="#" id="link-latest-general" class="forum-title">Le QG des Discussions</a>
+                        <p>Pour parler de tout et de rien : ciné, musique, vie quotidienne...</p>
+                    </td>
+                    <td class="stat-cell" id="count-general">--</td>
+                    <td class="stat-cell">--</td>
+                    <td class="last-post-cell" id="last-general-cell">Aucun sujet</td>
                 </tr>
             </tbody>
         </table>
@@ -190,6 +204,7 @@
 
     </div>
 
+    <!-- SCRIPT GLOBAL SUPABASE POUR L'INDEX -->
     <script type="module">
         import { supabase } from './supabase.js';
 
@@ -252,7 +267,54 @@
             document.getElementById('forum-banner-img').src = config.banner;
         }
 
-        // CHARGEMENT MEMBRES (HAUT ET BAS)
+        // CHARGEMENT DYNAMIQUE DES SUJETS DEPUIS SUPABASE (POUR LES CATÉGORIES ET L'ACTU)
+        async function loadForumData() {
+            const { data: topics, error } = await supabase
+                .from('topics')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error || !topics) return;
+
+            // 1. Remplir la box des dernières actualités en haut
+            const newsListEl = document.getElementById('latest-news-list');
+            if (topics.length > 0) {
+                newsListEl.innerHTML = topics.slice(0, 5).map(t => {
+                    const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit'});
+                    return `<li><span class="date">[${dateFormatted}]</span> <a href="topic.html?id=${t.id}">${t.title}</a></li>`;
+                }).join('');
+            } else {
+                newsListEl.innerHTML = "<li><em>Aucun sujet publié pour le moment.</em></li>";
+            }
+
+            // 2. Traiter par catégorie pour les tableaux du forum
+            const categories = ['planning', 'licences', 'manga', 'gaming', 'general'];
+            
+            categories.forEach(cat => {
+                const catTopics = topics.filter(t => t.category === cat);
+                const countEl = document.getElementById(`count-${cat}`);
+                const lastCellEl = document.getElementById(`last-${cat}-cell`);
+                const linkEl = document.getElementById(`link-latest-${cat}`);
+
+                if (countEl) countEl.textContent = catTopics.length;
+
+                if (catTopics.length > 0) {
+                    const latest = catTopics[0]; // Le plus récent
+                    if (lastCellEl) {
+                        lastCellEl.innerHTML = `<a href="topic.html?id=${latest.id}">${latest.title}</a>`;
+                    }
+                    if (linkEl) {
+                        // Fait pointer le titre de la catégorie vers le dernier sujet ou vers une liste si tu préfères
+                        linkEl.href = `topic.html?id=${latest.id}`;
+                    }
+                } else {
+                    if (lastCellEl) lastCellEl.textContent = "Aucun sujet";
+                    if (linkEl) linkEl.href = "create-topic.html";
+                }
+            });
+        }
+
+        // CHARGEMENT MEMBRES EN LIGNE
         async function loadOnlineUsers() {
             const { data: profiles, error } = await supabase.from('profiles').select('username, role, avatar_url');
             
@@ -268,7 +330,6 @@
                 return;
             }
 
-            // 1. Mise à jour du texte du bas ("Qui est en ligne ?")
             if (countMsg) {
                 countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
             }
@@ -283,13 +344,11 @@
                     } else {
                         roleClass = "group-chroniqueur";
                     }
-
                     return `<a href="profile.html?user=${encodeURIComponent(user.username)}" class="${roleClass}" style="text-decoration: none;">${user.username}</a>`;
                 });
                 usersListContainer.innerHTML = formattedUsers.join(', ');
             }
 
-            // 2. Mise à jour du bloc du haut ("Staff & Membres")
             if (staffContainer) {
                 staffContainer.innerHTML = profiles.map(user => {
                     const avatar = (user.avatar_url && user.avatar_url.trim() !== "") ? user.avatar_url : defaultAvatar;
@@ -305,6 +364,7 @@
         }
 
         loadHeaderConfig();
+        loadForumData();
         loadOnlineUsers();
     </script>
 </body>
