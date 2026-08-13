@@ -3,152 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zone Gaming - Forum Actu Manga</title>
+    <title>Jeux Vidéo Manga & VS Fighting - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div id="wrapper">
-
-        <!-- BANNIÈRE EN-TÊTE -->
         <div class="main-header">
-            <img src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
+            <img src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner">
         </div>
-
-        <!-- BARRE DE NAVIGATION VINTAGE -->
         <nav class="forum-nav">
             <a href="index.html" class="nav-link">Index</a>
             <a href="community.html" class="nav-link">Fiches & Critiques</a>
             <a href="contest-view.html" class="nav-link">Concours Dessin</a>
             <a href="#" class="nav-link">Rechercher</a>
-            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
             <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
+            <a href="#" class="nav-link">FAQ</a>
         </nav>
 
-        <!-- CONTENU PRINCIPAL GAMING -->
-        <div class="news-container">
-            <div class="welcome-banner">
-                <h2>🎮 Zone Gaming & Jeux Vidéo Manga / VS Fighting</h2>
-                <p>Discutez des adaptations en jeux vidéo, des derniers titres du genre et partagez vos avis !</p>
-            </div>
-
-            <!-- BOUTON CRÉER UN SUJET -->
-            <div style="margin-bottom: 20px;">
-                <button id="btn-open-topic-modal" class="btn-admin-edit" style="padding: 10px 15px; cursor: pointer;">+ Créer un nouveau sujet Gaming</button>
-            </div>
-
-            <!-- LISTE DES SUJETS GAMING -->
-            <table class="forum-table">
-                <thead>
-                    <tr>
-                        <th colspan="2" class="cat-title">_ Sujets de la section Gaming _</th>
-                        <th class="stat-head">Auteur</th>
-                        <th class="stat-head">Réponses</th>
-                        <th class="last-post-head">Date</th>
-                    </tr>
-                </thead>
-                <tbody id="gaming-topics-list">
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 20px;">Chargement des sujets...</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
+            <a href="index.html">Accueil</a> &raquo; <span>Jeux Vidéo Manga & VS Fighting</span>
         </div>
 
-        <!-- MODALE CRÉATION DE SUJET -->
-        <div id="topic-modal" class="admin-panel-inputs hidden" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; background: #fff;">
-            <h3>Créer un nouveau sujet dans la Zone Gaming</h3>
-            <form id="form-create-topic">
-                <label>Titre du sujet :</label>
-                <input type="text" id="input-topic-title" required style="width: 100%; margin-bottom: 10px;">
-
-                <label>Message / Contenu :</label>
-                <textarea id="input-topic-content" rows="5" required style="width: 100%; margin-bottom: 10px;"></textarea>
-
-                <div class="admin-form-actions">
-                    <button type="submit" class="btn-admin-edit">Publier</button>
-                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-close-topic-modal">Annuler</button>
-                </div>
-            </form>
+        <div class="welcome-banner" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2>🎮 Jeux Vidéo Manga & VS Fighting</h2>
+                <p>Discussions et avis jeux vidéo, versus fighting et adaptations.</p>
+            </div>
+            <div>
+                <a href="new-gaming-topic.html" class="btn-admin-edit" style="text-decoration: none; padding: 10px 15px; background: #c0392b; color: white; border-radius: 4px; font-weight: bold;">+ Nouveau Sujet Gaming</a>
+            </div>
         </div>
 
+        <table class="forum-table">
+            <thead>
+                <tr>
+                    <th colspan="2" class="cat-title">_ Sujets Gaming _</th>
+                    <th class="stat-head">Auteur</th>
+                    <th class="stat-head">Réponses</th>
+                    <th class="last-post-head">Dernier Message</th>
+                </tr>
+            </thead>
+            <tbody id="gaming-topics-container">
+                <tr><td colspan="5" style="text-align: center; padding: 20px;"><em>Chargement des sujets gaming...</em></td></tr>
+            </tbody>
+        </table>
     </div>
 
     <script type="module">
         import { supabase } from './supabase.js';
-
         const currentUsername = localStorage.getItem('forumUsername');
-
-        // GESTION CONNEXION NAVBAR
-        const profileLink = document.getElementById('nav-profile-link');
-        const authLink = document.getElementById('nav-auth-link');
         if (currentUsername) {
-            profileLink.classList.remove('hidden');
+            document.getElementById('nav-profile-link').classList.remove('hidden');
+            const authLink = document.getElementById('nav-auth-link');
             authLink.textContent = "Déconnexion";
             authLink.onclick = async () => { await supabase.auth.signOut(); localStorage.clear(); window.location.reload(); };
         }
 
-        // GESTION MODALE CRÉATION
-        const modal = document.getElementById('topic-modal');
-        document.getElementById('btn-open-topic-modal').addEventListener('click', () => {
-            if (!currentUsername) {
-                alert("Vous devez être connecté pour créer un sujet !");
-                window.location.href = "register.html";
-                return;
-            }
-            modal.classList.toggle('hidden');
-        });
-        document.getElementById('btn-close-topic-modal').addEventListener('click', () => {
-            modal.classList.add('hidden');
-        });
-
-        // CHARGEMENT UNIQUEMENT DES SUJETS "GAMING" DEPUIS SUPABASE
         async function loadGamingTopics() {
-            const tbody = document.getElementById('gaming-topics-list');
-            
-            const { data: topics, error } = await supabase
-                .from('topics')
-                .select('*')
-                .eq('category', 'gaming') // Filtre strict sur la catégorie gaming
-                .order('created_at', { ascending: false });
+            const container = document.getElementById('gaming-topics-container');
+            const { data: topics, error } = await supabase.from('gaming_topics').select('*').order('created_at', { ascending: false });
 
             if (error || !topics || topics.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun sujet pour le moment. Soyez le premier à en créer un !</td></tr>`;
+                container.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun sujet gaming pour le moment.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = topics.map(topic => `
-                <tr>
-                    <td class="icon-cell"><span class="category-emoji">🎮</span></td>
-                    <td class="forum-desc">
-                        <a href="topic.html?id=${topic.id}" class="forum-title">${topic.title}</a>
-                        <p>${topic.content ? topic.content.substring(0, 80) + '...' : ''}</p>
-                    </td>
-                    <td class="stat-cell">${topic.author || 'Anonyme'}</td>
-                    <td class="stat-cell">${topic.replies_count || 0}</td>
-                    <td class="last-post-cell">${new Date(topic.created_at).toLocaleDateString()}</td>
-                </tr>
-            `).join('');
+            container.innerHTML = topics.map(t => {
+                const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
+                return `
+                    <tr>
+                        <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">🎮</span></td>
+                        <td class="forum-desc">
+                            <a href="topic-gaming.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                            <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
+                        </td>
+                        <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
+                        <td class="stat-cell" style="text-align: center;">--</td>
+                        <td class="last-post-cell" style="font-size: 0.9em;"><span>Par ${t.author || 'Otaku_33'}</span><br><small style="color: #7f8c8d;">${dateFormatted}</small></td>
+                    </tr>
+                `;
+            }).join('');
         }
-
-        // SOUMISSION D'UN NOUVEAU SUJET EN CATEGORIE "GAMING"
-        document.getElementById('form-create-topic').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const title = document.getElementById('input-topic-title').value;
-            const content = document.getElementById('input-topic-content').value;
-
-            const { error } = await supabase.from('topics').insert([
-                { title, content, category: 'gaming', author: currentUsername } // Force la catégorie à gaming
-            ]);
-
-            if (error) {
-                alert("Erreur lors de la création du sujet : " + error.message);
-            } else {
-                alert("Sujet créé avec succès !");
-                window.location.reload();
-            }
-        });
-
         loadGamingTopics();
     </script>
 </body>
