@@ -35,18 +35,20 @@
             border-bottom: none;
         }
         .form-group-custom {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         .form-group-custom label {
             display: block;
             font-size: 12px;
             font-weight: bold;
             color: #2c3e50;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
+        /* Champs réduits et plus propres */
         .form-group-custom input {
             width: 100%;
-            padding: 8px;
+            max-width: 400px; 
+            padding: 6px 8px;
             border: 1px solid #bdc3c7;
             border-radius: 4px;
             font-size: 12px;
@@ -116,7 +118,7 @@
             padding: 15px;
             border-radius: 6px;
             margin-top: 25px;
-            display: none; /* Caché par défaut, affiché si admin */
+            display: none;
         }
         .admin-panel-box h4 {
             margin: 0 0 10px 0;
@@ -151,7 +153,7 @@
 
             <hr style="border: none; border-top: 1px solid #bdc3c7; margin: 20px 0;">
 
-            <h3 style="font-size: 13px; color: #2c3e50; margin-bottom: 15px;">Participer au concours</h3>
+            <h3 style="font-size: 13px; color: #2c3e50; margin-bottom: 12px;">Participer au concours</h3>
             
             <form id="contestForm">
                 <div class="form-group-custom">
@@ -170,11 +172,11 @@
                 <h4>🛠️ Panneau Admin : Modifier le Thème</h4>
                 <div class="form-group-custom">
                     <label>Titre court du thème :</label>
-                    <input type="text" id="inputThemeTitle" placeholder="Ex: Spécial Cyberpunk / Naruto...">
+                    <input type="text" id="inputThemeTitle" placeholder="Ex: Cyberpunk">
                 </div>
                 <div class="form-group-custom">
                     <label>Description / Consignes :</label>
-                    <input type="text" id="inputThemeDesc" placeholder="Ex: Dessinez un personnage dans un univers futuriste...">
+                    <input type="text" id="inputThemeDesc" placeholder="Ex: Dessine ton netrunner">
                 </div>
                 <button type="button" onclick="saveNewTheme()" style="background: #c2185b; color: white; border: none; padding: 6px 12px; font-size: 12px; font-weight: bold; border-radius: 3px; cursor: pointer;">Mettre à jour le thème</button>
             </div>
@@ -189,7 +191,6 @@
 
     <!-- SCRIPT DE GESTION -->
     <script>
-        // --- GESTION DU THÈME DU MOIS (ADMIN) ---
         function loadTheme() {
             let savedTitle = localStorage.getItem('forumContestThemeTitle');
             let savedDesc = localStorage.getItem('forumContestThemeDesc');
@@ -218,15 +219,13 @@
             }
         }
 
-        // Afficher le panneau admin uniquement si l'utilisateur est admin (ex: 'Admin_Otaku' ou 'Otaku_33')
         function checkAdminAccess() {
-            let currentUser = localStorage.getItem('forumUsername') || 'Otaku_33'; // Ajuste selon ton système de connexion
+            let currentUser = localStorage.getItem('forumUsername') || 'Otaku_33';
             if (currentUser === 'Admin_Otaku' || currentUser === 'Otaku_33') {
                 document.getElementById('admin-theme-panel').style.display = 'block';
             }
         }
 
-        // --- GESTION DES PARTICIPATIONS ET VOTES ---
         let defaultSubmissions = [
             {
                 id: 1,
@@ -313,7 +312,6 @@
             renderSubmissions();
         });
 
-        // Lancement au chargement de la page
         loadTheme();
         checkAdminAccess();
         renderSubmissions();
