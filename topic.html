@@ -23,9 +23,9 @@
             </div>
         </div>
 
-        <!-- BREADCRUMB -->
-        <div class="breadcrumb">
-            <a href="index.html">Index du Forum</a> &raquo; <a href="index.html">Actualités & Sorties</a> &raquo; <span id="bread-topic-title">Chargement...</span>
+        <!-- BREADCRUMB DYNAMIQUE -->
+        <div class="breadcrumb" id="topic-breadcrumb">
+            <a href="index.html">Index du Forum</a> &raquo; <span id="bread-category-slot"><a href="index.html">Chargement...</a></span> &raquo; <span id="bread-topic-title">Chargement...</span>
         </div>
 
         <h1 class="topic-main-title" id="topic-title">Chargement du sujet...</h1>
@@ -84,6 +84,15 @@
             btnCreate.style.display = 'none';
         }
 
+        // Dictionnaire pour mapper le code de la catégorie vers son nom lisible et son fichier HTML
+        const categoryMap = {
+            'planning': { name: 'Planning des Sorties VF', url: 'news.html' },
+            'licences': { name: 'Annonce / Nouvelle Licence', url: 'news.html' },
+            'manga': { name: 'Discussion Manga / Anime', url: 'community.html' },
+            'gaming': { name: 'Zone Gaming & Jeux Vidéo', url: 'gaming.html' },
+            'general': { name: 'Le QG des Discussions', url: 'general-discussion.html' }
+        };
+
         // --- 2. RÉCUPÉRATION DU SUJET DEPUIS SUPABASE VIA L'URL ---
         const urlParams = new URLSearchParams(window.location.search);
         const topicId = urlParams.get('id');
@@ -112,6 +121,10 @@
             // Affichage du titre
             document.getElementById('topic-title').textContent = topic.title;
             document.getElementById('bread-topic-title').textContent = topic.title;
+
+            // Mise à jour dynamique du fil d'Ariane selon la catégorie du sujet
+            const catInfo = categoryMap[topic.category] || { name: 'Général', url: 'index.html' };
+            document.getElementById('bread-category-slot').innerHTML = `<a href="${catInfo.url}">${catInfo.name}</a>`;
 
             const authorName = topic.author || 'Admin_Otaku';
             const isAuthorStaff = (authorName.includes('Otaku') || authorName.includes('Admin'));
