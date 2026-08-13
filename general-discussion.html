@@ -28,7 +28,7 @@
         <!-- CONTENU PRINCIPAL DÉTENTE -->
         <div class="news-container">
             <div class="welcome-banner">
-                <h2>_ Zone Détente & Discussions Diverses _</h2>
+                <h2>☕ Zone Détente & Discussions Diverses</h2>
                 <p>Pour parler de tout et de rien entre membres : ciné, musique, vie quotidienne...</p>
             </div>
 
@@ -47,7 +47,6 @@
                         <th class="last-post-head">Date</th>
                     </tr>
                 </thead>
-                <!-- CORRECTION DE L'ID ICI -->
                 <tbody id="general-topics-list">
                     <tr>
                         <td colspan="5" style="text-align: center; padding: 20px;">Chargement des sujets...</td>
@@ -58,7 +57,7 @@
 
         <!-- MODALE CRÉATION DE SUJET -->
         <div id="topic-modal" class="admin-panel-inputs hidden" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; background: #fff;">
-            <h3>Créer un nouveau sujet</h3>
+            <h3>Créer un nouveau sujet dans la Zone Détente</h3>
             <form id="form-create-topic">
                 <label>Titre du sujet :</label>
                 <input type="text" id="input-topic-title" required style="width: 100%; margin-bottom: 10px;">
@@ -103,14 +102,14 @@
             modal.classList.add('hidden');
         });
 
-        // CHARGEMENT DES SUJETS DÉTENTE DEPUIS SUPABASE
+        // CHARGEMENT UNIQUEMENT DES SUJETS "GENERAL" DEPUIS SUPABASE
         async function loadGeneralTopics() {
             const tbody = document.getElementById('general-topics-list');
             
             const { data: topics, error } = await supabase
                 .from('topics')
                 .select('*')
-                .eq('category', 'general') // Filtre bien sur 'general'
+                .eq('category', 'general') // Filtre strict sur la catégorie general
                 .order('created_at', { ascending: false });
 
             if (error || !topics || topics.length === 0) {
@@ -122,7 +121,7 @@
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">💬</span></td>
                     <td class="forum-desc">
-                        <a href="topic-view.html?id=${topic.id}" class="forum-title">${topic.title}</a>
+                        <a href="topic.html?id=${topic.id}" class="forum-title">${topic.title}</a>
                         <p>${topic.content ? topic.content.substring(0, 80) + '...' : ''}</p>
                     </td>
                     <td class="stat-cell">${topic.author || 'Anonyme'}</td>
@@ -132,14 +131,14 @@
             `).join('');
         }
 
-        // SOUMISSION D'UN NOUVEAU SUJET
+        // SOUMISSION D'UN NOUVEAU SUJET EN CATEGORIE "GENERAL"
         document.getElementById('form-create-topic').addEventListener('submit', async (e) => {
             e.preventDefault();
             const title = document.getElementById('input-topic-title').value;
             const content = document.getElementById('input-topic-content').value;
 
             const { error } = await supabase.from('topics').insert([
-                { title, content, category: 'general', author: currentUsername } // Enregistre bien en 'general'
+                { title, content, category: 'general', author: currentUsername } // Force la catégorie à general
             ]);
 
             if (error) {
