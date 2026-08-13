@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Actualités & Conventions - Forum Actu Manga</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="wrapper">
+        <div class="breadcrumb">
+            <a href="index.html">Index du Forum</a> &raquo; <span>Actualités & Sorties</span>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <h2 style="color: #c2185b; border-bottom: 2px solid #f8bbd0;">📅 Calendrier des Conventions</h2>
+            <table class="forum-table">
+                <thead>
+                    <tr>
+                        <th>Nom de la Convention</th>
+                        <th>Date</th>
+                        <th>Lieu</th>
+                    </tr>
+                </thead>
+                <tbody id="conventions-body">
+                    <!-- Les conventions s'afficheront ici -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        async function loadConventions() {
+            const { data, error } = await supabase
+                .from('conventions')
+                .select('*')
+                .order('date', { ascending: true });
+
+            const tbody = document.getElementById('conventions-body');
+            
+            if (error || !data.length) {
+                tbody.innerHTML = "<tr><td colspan='3' style='text-align:center;'>Aucune convention programmée pour le moment.</td></tr>";
+                return;
+            }
+
+            tbody.innerHTML = data.map(conv => `
+                <tr>
+                    <td style="font-weight:bold; color:#3498db;">${conv.name}</td>
+                    <td>${new Date(conv.date).toLocaleDateString('fr-FR')}</td>
+                    <td>${conv.location}</td>
+                </tr>
+            `).join('');
+        }
+        loadConventions();
+    </script>
+</body>
+</html>
