@@ -45,19 +45,40 @@
             <a href="index.html">Index du Forum</a> &raquo; <span>Fiches & Critiques</span>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <button id="btn-toggle-form" style="background: #e84393; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">+ Créer une Fiche / Sujet</button>
-        <div style="display: flex; gap: 5px;">
-            <button onclick="filterSheets('all')" style="background: #95a5a6; color: white; border: none; padding: 6px 12px; font-size: 11px; border-radius: 3px; cursor: pointer; font-weight: bold;">Tous</button>
-            <button onclick="filterSheets('manga')" style="background: #e84393; color: white; border: none; padding: 6px 12px; font-size: 11px; border-radius: 3px; cursor: pointer; font-weight: bold;">Mangas</button>
-             <button onclick="filterSheets('anime')" style="background: #0984e3; color: white; border: none; padding: 6px 12px; font-size: 11px; border-radius: 3px; cursor: pointer; font-weight: bold;">Animes</button>
-            <button onclick="filterSheets('game')" style="background: #00b894; color: white; border: none; padding: 6px 12px; font-size: 11px; border-radius: 3px; cursor: pointer; font-weight: bold;">Jeux Vidéo</button>
+        <!-- EN-TÊTE ESPACE FICHES -->
+        <div style="font-size: 16px; font-weight: bold; color: #c2185b; margin-bottom: 15px; border-bottom: 2px solid #f8bbd0; padding-bottom: 5px;">
+            Espace Fiches : Mangas, Animes & Jeux Vidéo
         </div>
-    </div>
 
-        <!-- FORMULAIRE DE CRÉATION DE FICHE COMPLET -->
-        <div id="form-container" style="display: none; background: #fff; border: 1px solid #e84393; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-            <div style="background: #e84393; color: white; padding: 8px; font-weight: bold; margin-bottom: 15px; border-radius: 3px;">Créer une nouvelle Fiche ou Critique</div>
+        <!-- BARRE D'ACTIONS ET FILTRES (STYLE D'ORIGINE) -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <button id="btn-toggle-form" style="background: #f8bbd0; color: #c2185b; border: 1px solid #c2185b; padding: 6px 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 12px;">+ Créer une Fiche</button>
+            
+            <div style="display: flex; gap: 5px; align-items: center;">
+                <button onclick="filterSheets('all')" style="background: #f48fb1; color: white; border: none; padding: 4px 12px; font-size: 11px; border-radius: 12px; cursor: pointer; font-weight: bold;">Tous</button>
+                <button onclick="filterSheets('manga')" style="background: #fff; color: #e84393; border: 1px solid #e84393; padding: 4px 12px; font-size: 11px; border-radius: 12px; cursor: pointer; font-weight: bold;">📖 Mangas</button>
+                <button onclick="filterSheets('anime')" style="background: #fff; color: #0984e3; border: 1px solid #0984e3; padding: 4px 12px; font-size: 11px; border-radius: 12px; cursor: pointer; font-weight: bold;">📺 Animes</button>
+                <button onclick="filterSheets('game')" style="background: #fff; color: #00b894; border: 1px solid #00b894; padding: 4px 12px; font-size: 11px; border-radius: 12px; cursor: pointer; font-weight: bold;">🎮 Jeux Vidéo</button>
+            </div>
+        </div>
+
+        <!-- CONCOURS DU MOIS (STYLE D'ORIGINE) -->
+        <div style="border: 1px solid #3498db; border-radius: 4px; overflow: hidden; margin-bottom: 20px;">
+            <div style="background: #3498db; color: white; padding: 6px 10px; font-weight: bold; font-size: 12px;">
+                🏆 CONCOURS DU MOIS : DESSIN & AFFICHE (NON-IA)
+            </div>
+            <div style="background: #ebf5fb; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-size: 12px;">
+                    <strong>Thème :</strong> Dessine la mascotte du forum ou une affiche manga !<br>
+                    <span style="color: #e74c3c; font-size: 11px;">⚠️ 100% Fait main (Digital ou Traditionnel) — Zéro IA toléré</span>
+                </div>
+                <button onclick="alert('Les participations sont ouvertes via le Discord ou le topic dédié !')" style="background: #3498db; color: white; border: none; padding: 5px 12px; border-radius: 3px; font-size: 11px; font-weight: bold; cursor: pointer;">Voir & Participer »</button>
+            </div>
+        </div>
+
+        <!-- FORMULAIRE DE CRÉATION DE FICHE (CACHÉ PAR DÉFAUT) -->
+        <div id="form-container" style="display: none; background: #fff; border: 1px solid #f8bbd0; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <div style="background: #c2185b; color: white; padding: 8px; font-weight: bold; margin-bottom: 15px; border-radius: 3px;">Créer une nouvelle Fiche ou Critique</div>
             
             <form id="form-create-sheet">
                 <div class="form-row">
@@ -93,7 +114,7 @@
                     </div>
                     <div class="form-group">
                         <label>Tranche d'âge :</label>
-                        <select id="sheet-age">
+                        <select id="sheet-age" required>
                             <option value="Tous publics">Tous publics</option>
                             <option value="10 ans et +">10 ans et +</option>
                             <option value="12 ans et +">12 ans et +</option>
@@ -131,10 +152,10 @@
         <table class="forum-table">
             <thead>
                 <tr>
-                    <th>Fiches de la communauté</th>
-                    <th style="width: 120px; text-align: center;">Note / Type</th>
-                    <th style="width: 80px; text-align: center;">Avis</th>
-                    <th style="width: 130px; text-align: right;">Auteur</th>
+                    <th>_ Fiches de la communauté _</th>
+                    <th style="width: 100px; text-align: center;">NOTE</th>
+                    <th style="width: 80px; text-align: center;">RÉPONSES</th>
+                    <th style="width: 130px; text-align: right;">AUTEUR</th>
                 </tr>
             </thead>
             <tbody id="sheets-table-body">
@@ -190,26 +211,36 @@
 
             tbody.innerHTML = sheets.map(sheet => {
                 let type = sheet.sheet_type || 'manga';
-                let typeLabels = { manga: "📖 MANGA", anime: "📺 ANIME", game: "🎮 JEU" };
+                let iconMap = { manga: "📖", anime: "📺", game: "🎮" };
+                let typeTextMap = { manga: "MANGA", anime: "ANIME", game: "JEU" };
                 let ratingNum = sheet.rating || 5;
                 let stars = "⭐".repeat(ratingNum);
                 let author = sheet.author || 'Anonyme';
                 let isAdm = (author === 'Admin_Otaku' || author === 'Otaku_33');
                 let aClass = isAdm ? 'group-admin' : 'group-member';
 
+                let dateFormatted = new Date(sheet.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+
                 return `
                     <tr>
                         <td>
-                            <a href="sheet-view.html?id=${sheet.id}" style="font-weight: bold; color: #c2185b; font-size: 14px; text-decoration: none;">${sheet.title}</a>
-                            <div style="font-size: 11px; color: #7f8c8d; margin-top: 2px;">${sheet.genre || ''} • ${sheet.details || ''}</div>
+                            <div style="font-weight: bold; font-size: 13px;">
+                                <span style="margin-right: 5px;">${iconMap[type] || '📖'}</span>
+                                <a href="sheet-view.html?id=${sheet.id}" style="color: #c2185b; text-decoration: none;">[${typeTextMap[type]}] ${sheet.title}</a>
+                            </div>
+                            <div style="font-size: 11px; color: #7f8c8d; margin-top: 2px; margin-left: 20px;">
+                                ${sheet.genre || ''} / ${sheet.details || ''} — <span style="color: #e74c3c; font-weight: bold;">${sheet.age_rating || 'Tous publics'}</span>
+                            </div>
                         </td>
-                        <td style="text-align: center;">
-                            <span class="badge ${type}">${typeLabels[type] || 'MANGA'}</span>
-                            <div style="font-size: 10px; margin-top: 3px; color: #f1c40f;">${stars}</div>
+                        <td style="text-align: center; font-size: 11px; color: #f1c40f;">
+                            ${stars}
                         </td>
-                        <td style="text-align: center; font-size: 12px; color: #555;">${sheet.replies_count || 0}</td>
-                        <td style="text-align: right;">
-                            <a href="profile.html?user=${encodeURIComponent(author)}" class="${aClass}" style="font-size: 12px;">${author}</a>
+                        <td style="text-align: center; font-size: 12px; color: #555;">
+                            ${sheet.replies_count || 0}
+                        </td>
+                        <td style="text-align: right; font-size: 11px;">
+                            Par <a href="profile.html?user=${encodeURIComponent(author)}" class="${aClass}">${author}</a>
+                            <div style="color: #95a5a6; font-size: 10px;">${dateFormatted}</div>
                         </td>
                     </tr>
                 `;
