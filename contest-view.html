@@ -109,6 +109,20 @@
             font-weight: bold;
             cursor: pointer;
         }
+        /* Style du Panneau Admin Intégré */
+        .admin-panel-box {
+            background: #fff5f8;
+            border: 1px dashed #e84393;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 25px;
+            display: none; /* Caché par défaut, affiché si admin */
+        }
+        .admin-panel-box h4 {
+            margin: 0 0 10px 0;
+            font-size: 13px;
+            color: #c2185b;
+        }
     </style>
 </head>
 <body>
@@ -120,11 +134,11 @@
 
         <div class="contest-container">
             <div class="contest-title">
-                🎨 Concours de Dessin : Thème du mois
+                🎨 Concours de Dessin : <span id="display-theme-title">Thème du mois</span>
             </div>
             
             <p style="font-size: 13px; color: #34495e; margin-bottom: 15px;">
-                <strong>Thème :</strong> Dessine ton personnage manga préféré ! Clique sur les images pour les agrandir et vote pour ton œuvre favorite.
+                <strong>Thème :</strong> <span id="display-theme-desc">Dessine ton personnage manga préféré ! Clique sur les images pour les agrandir et vote pour ton œuvre favorite.</span>
             </p>
 
             <div id="submissions-list">
@@ -150,6 +164,20 @@
                 </div>
                 <button type="submit" class="btn-submit" style="background: #e84393; padding: 6px 14px; font-size: 12px; font-weight: bold; border: none; border-radius: 3px; cursor: pointer; color: white;">Envoyer ma participation</button>
             </form>
+
+            <!-- PANNEAU ADMIN POUR MODIFIER LE THÈME DU MOIS EN DIRECT -->
+            <div id="admin-theme-panel" class="admin-panel-box">
+                <h4>🛠️ Panneau Admin : Modifier le Thème</h4>
+                <div class="form-group-custom">
+                    <label>Titre court du thème :</label>
+                    <input type="text" id="inputThemeTitle" placeholder="Ex: Spécial Cyberpunk / Naruto...">
+                </div>
+                <div class="form-group-custom">
+                    <label>Description / Consignes :</label>
+                    <input type="text" id="inputThemeDesc" placeholder="Ex: Dessinez un personnage dans un univers futuriste...">
+                </div>
+                <button type="button" onclick="saveNewTheme()" style="background: #c2185b; color: white; border: none; padding: 6px 12px; font-size: 12px; font-weight: bold; border-radius: 3px; cursor: pointer;">Mettre à jour le thème</button>
+            </div>
         </div>
     </div>
 
@@ -161,6 +189,44 @@
 
     <!-- SCRIPT DE GESTION -->
     <script>
+        // --- GESTION DU THÈME DU MOIS (ADMIN) ---
+        function loadTheme() {
+            let savedTitle = localStorage.getItem('forumContestThemeTitle');
+            let savedDesc = localStorage.getItem('forumContestThemeDesc');
+
+            if (savedTitle) {
+                document.getElementById('display-theme-title').innerText = savedTitle;
+                document.getElementById('inputThemeTitle').value = savedTitle;
+            }
+            if (savedDesc) {
+                document.getElementById('display-theme-desc').innerText = savedDesc;
+                document.getElementById('inputThemeDesc').value = savedDesc;
+            }
+        }
+
+        function saveNewTheme() {
+            let newTitle = document.getElementById('inputThemeTitle').value;
+            let newDesc = document.getElementById('inputThemeDesc').value;
+
+            if (newTitle && newDesc) {
+                localStorage.setItem('forumContestThemeTitle', newTitle);
+                localStorage.setItem('forumContestThemeDesc', newDesc);
+                loadTheme();
+                alert("Thème du mois mis à jour avec succès !");
+            } else {
+                alert("Veuillez remplir tous les champs du thème.");
+            }
+        }
+
+        // Afficher le panneau admin uniquement si l'utilisateur est admin (ex: 'Admin_Otaku' ou 'Otaku_33')
+        function checkAdminAccess() {
+            let currentUser = localStorage.getItem('forumUsername') || 'Otaku_33'; // Ajuste selon ton système de connexion
+            if (currentUser === 'Admin_Otaku' || currentUser === 'Otaku_33') {
+                document.getElementById('admin-theme-panel').style.display = 'block';
+            }
+        }
+
+        // --- GESTION DES PARTICIPATIONS ET VOTES ---
         let defaultSubmissions = [
             {
                 id: 1,
@@ -247,6 +313,9 @@
             renderSubmissions();
         });
 
+        // Lancement au chargement de la page
+        loadTheme();
+        checkAdminAccess();
         renderSubmissions();
     </script>
 
