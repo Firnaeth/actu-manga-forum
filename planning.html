@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning des Sorties VF - Actu Manga World</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="wrapper">
+        <div class="main-header">
+            <img src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner">
+        </div>
+        <nav class="forum-nav">
+            <a href="index.html" class="nav-link">Index</a>
+            <a href="community.html" class="nav-link">Fiches & Critiques</a>
+            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
+            <a href="#" class="nav-link">Rechercher</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
+            <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
+            <a href="#" class="nav-link">FAQ</a>
+        </nav>
+
+        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
+            <a href="index.html">Accueil</a> &raquo; <span>Planning des Sorties VF</span>
+        </div>
+
+        <div class="welcome-banner" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2>🗓️ Planning des Sorties VF</h2>
+                <p>Calendrier mois par mois des éditeurs.</p>
+            </div>
+            <div>
+                <a href="new-planning-topic.html" class="btn-admin-edit" style="text-decoration: none; padding: 10px 15px; background: #c0392b; color: white; border-radius: 4px; font-weight: bold;">+ Nouveau Planning</a>
+            </div>
+        </div>
+
+        <table class="forum-table">
+            <thead>
+                <tr>
+                    <th colspan="2" class="cat-title">_ Liste des Plannings _</th>
+                    <th class="stat-head">Auteur</th>
+                    <th class="stat-head">Réponses</th>
+                    <th class="last-post-head">Dernier Message</th>
+                </tr>
+            </thead>
+            <tbody id="planning-topics-container">
+                <tr><td colspan="5" style="text-align: center; padding: 20px;"><em>Chargement des plannings...</em></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+        const currentUsername = localStorage.getItem('forumUsername');
+        if (currentUsername) {
+            document.getElementById('nav-profile-link').classList.remove('hidden');
+            const authLink = document.getElementById('nav-auth-link');
+            authLink.textContent = "Déconnexion";
+            authLink.onclick = async () => { await supabase.auth.signOut(); localStorage.clear(); window.location.reload(); };
+        }
+
+        async function loadPlanningTopics() {
+            const container = document.getElementById('planning-topics-container');
+            const { data: topics, error } = await supabase.from('planning_topics').select('*').order('created_at', { ascending: false });
+
+            if (error || !topics || topics.length === 0) {
+                container.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun planning pour le moment.</td></tr>`;
+                return;
+            }
+
+            container.innerHTML = topics.map(t => {
+                const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
+                return `
+                    <tr>
+                        <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">🗓️</span></td>
+                        <td class="forum-desc">
+                            <a href="topic-planning.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                            <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
+                        </td>
+                        <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
+                        <td class="stat-cell" style="text-align: center;">--</td>
+                        <td class="last-post-cell" style="font-size: 0.9em;"><span>Par ${t.author || 'Otaku_33'}</span><br><small style="color: #7f8c8d;">${dateFormatted}</small></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        loadPlanningTopics();
+    </script>
+</body>
+</html>
