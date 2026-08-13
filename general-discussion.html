@@ -28,26 +28,26 @@
         <!-- CONTENU PRINCIPAL GAMING -->
         <div class="news-container">
             <div class="welcome-banner">
-                <h2>🎮 Zone Gaming & Jeux Vidéo Manga / VS Fighting</h2>
-                <p>Discutez des adaptations en jeux vidéo, des derniers titres du genre et partagez vos avis !</p>
+                <h2>_ Zone Détente & Discussions Diverses _</h2>
+                <p>Pour parler de tout et de rien entre membres : ciné, musique, vie quotidienne...</p>
             </div>
 
             <!-- BOUTON CRÉER UN SUJET -->
             <div style="margin-bottom: 20px;">
-                <button id="btn-open-topic-modal" class="btn-admin-edit" style="padding: 10px 15px; cursor: pointer;">+ Créer un nouveau sujet Gaming</button>
+                <button id="btn-open-topic-modal" class="btn-admin-edit" style="padding: 10px 15px; cursor: pointer;">+ Créer un nouveau sujet</button>
             </div>
 
             <!-- LISTE DES SUJETS GAMING -->
             <table class="forum-table">
                 <thead>
                     <tr>
-                        <th colspan="2" class="cat-title">_ Sujets de la section Gaming _</th>
+                        <th colspan="2" class="cat-title">_ Sujets de discussion _</th>
                         <th class="stat-head">Auteur</th>
                         <th class="stat-head">Réponses</th>
                         <th class="last-post-head">Date</th>
                     </tr>
                 </thead>
-                <tbody id="gaming-topics-list">
+                <tbody id="general-topics-list">
                     <tr>
                         <td colspan="5" style="text-align: center; padding: 20px;">Chargement des sujets...</td>
                     </tr>
@@ -57,7 +57,7 @@
 
         <!-- MODALE CRÉATION DE SUJET -->
         <div id="topic-modal" class="admin-panel-inputs hidden" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; background: #fff;">
-            <h3>Créer un nouveau sujet dans la Zone Gaming</h3>
+            <h3>Créer un nouveau sujet</h3>
             <form id="form-create-topic">
                 <label>Titre du sujet :</label>
                 <input type="text" id="input-topic-title" required style="width: 100%; margin-bottom: 10px;">
@@ -102,15 +102,15 @@
             modal.classList.add('hidden');
         });
 
-        // CHARGEMENT DES SUJETS GAMING DEPUIS SUPABASE
+        // CHARGEMENT DES SUJETS DÉTENTE DEPUIS SUPABASE
         async function loadGamingTopics() {
-            const tbody = document.getElementById('gaming-topics-list');
+            const tbody = document.getElementById('general-topics-list'); // Assure-toi que ton <tbody> dans le HTML a cet ID
             
-            // On récupère les sujets filtrés par la catégorie "gaming" (ou tu peux adapter selon ta base de données)
+            // On récupère les sujets filtrés par la catégorie "general"
             const { data: topics, error } = await supabase
                 .from('topics')
                 .select('*')
-                .eq('category', 'gaming')
+                .eq('category', 'general') // On change le filtre pour "general"
                 .order('created_at', { ascending: false });
 
             if (error) {
