@@ -47,13 +47,13 @@
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <button id="btn-toggle-form" style="background: #e84393; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">+ Créer une Fiche / Sujet</button>
-            <div>
-                <button onclick="filterSheets('all')" style="padding: 5px 10px; cursor: pointer;">Tous</button>
-                <button onclick="filterSheets('manga')" style="padding: 5px 10px; cursor: pointer;">Mangas</button>
-                <button onclick="filterSheets('anime')" style="padding: 5px 10px; cursor: pointer;">Animes</button>
-                <button onclick="filterSheets('game')" style="padding: 5px 10px; cursor: pointer;">Jeux Vidéo</button>
-            </div>
+        <div style="display: flex; gap: 5px;">
+            <button onclick="filterSheets('all')" style="background: #95a5a6; color: white; border: none; padding: 6px 12px; font-size: 11px; border-radius: 3px; cursor: pointer; font-weight: bold;">Tous</button>
+            <button onclick="filterSheets('manga')" style="background: #e84393; color: white; border: none; padding: 6px 12px; font-size: 11px; border-radius: 3px; cursor: pointer; font-weight: bold;">Mangas</button>
+             <button onclick="filterSheets('anime')" style="background: #0984e3; color: white; border: none; padding: 6px 12px; font-size: 11px; border-radius: 3px; cursor: pointer; font-weight: bold;">Animes</button>
+            <button onclick="filterSheets('game')" style="background: #00b894; color: white; border: none; padding: 6px 12px; font-size: 11px; border-radius: 3px; cursor: pointer; font-weight: bold;">Jeux Vidéo</button>
         </div>
+    </div>
 
         <!-- FORMULAIRE DE CRÉATION DE FICHE COMPLET -->
         <div id="form-container" style="display: none; background: #fff; border: 1px solid #e84393; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
