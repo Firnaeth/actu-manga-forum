@@ -25,17 +25,47 @@
             <a href="index.html">Accueil</a> &raquo; <a href="general.html">Le QG des Discussions</a> &raquo; <span id="breadcrumb-title">Chargement...</span>
         </div>
 
-        <div class="welcome-banner" style="text-align: center; padding: 15px;">
-            <h2 id="topic-title-header">💬 Chargement du sujet...</h2>
+        <!-- BANNIÈRE TITRE DU SUJET -->
+        <div class="welcome-banner" style="text-align: center; padding: 12px; background: #5c419c; color: white; margin-bottom: 15px;">
+            <h2 id="topic-title-header" style="margin: 0; font-size: 1.2em;">💬 Chargement du sujet...</h2>
         </div>
 
-        <!-- CONTENEUR DU MESSAGE PRINCIPAL -->
-        <div id="topic-content-container" style="background: white; border: 1px solid #f2d9de; padding: 20px; margin-bottom: 20px; border-radius: 4px;">
-            <p style="text-align: center; color: #666;">Chargement du message...</p>
+        <!-- MESSAGE PRINCIPAL DU SUJET (STYLE FORUM AVEC PROFIL À GAUCHE) -->
+        <div id="topic-main-post" style="display: flex; border: 1px solid #f2d9de; background: white; margin-bottom: 20px;">
+            <div style="width: 180px; background: #fff5f7; border-right: 1px solid #f2d9de; padding: 15px; text-align: center;">
+                <strong id="author-name" style="color: #c0392b; font-size: 0.95em;">Chargement...</strong>
+                <div style="font-size: 0.8em; color: #666; margin-top: 2px;">Membre</div>
+                <div style="margin-top: 10px;">
+                    <img src="https://via.placeholder.com/80" alt="Avatar" style="width: 70px; height: 70px; border-radius: 4px; border: 1px solid #ccc;">
+                </div>
+            </div>
+            <div style="flex-grow: 1; padding: 15px; position: relative;">
+                <div style="font-size: 0.8em; color: #888; border-bottom: 1px dashed #eee; padding-bottom: 5px; margin-bottom: 10px;">
+                    Posté le <span id="topic-date">--</span>
+                </div>
+                <div id="topic-content-body" style="font-size: 0.95em; line-height: 1.5; white-space: pre-wrap;">Chargement du contenu...</div>
+            </div>
         </div>
 
-        <div style="margin-bottom: 20px;">
-            <a href="general.html" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em;">&larr; Retour à la liste</a>
+        <!-- CONTENEUR DES RÉPONSES EXISTANTES -->
+        <div id="replies-container"></div>
+
+        <!-- ZONE POUR POSTER UNE RÉPONSE -->
+        <div style="border: 1px solid #61b3e8; background: white; margin-bottom: 30px; border-radius: 4px; overflow: hidden;">
+            <div style="background: linear-gradient(to bottom, #7ac1eb, #4196d2); color: white; padding: 8px 15px; font-weight: bold; font-size: 0.95em;">
+                Poster une réponse
+            </div>
+            <div style="padding: 15px;">
+                <p style="margin-bottom: 5px; font-size: 0.9em; font-weight: bold; color: #333;">Votre message :</p>
+                <textarea id="reply-content" rows="6" style="width: 100%; border: 1px solid #ccc; padding: 8px; font-family: inherit; font-size: 0.9em; resize: vertical;" placeholder="Écrivez votre réponse ici..."></textarea>
+                <div style="margin-top: 10px;">
+                    <button id="submit-reply" style="background: linear-gradient(to bottom, #7ac1eb, #4196d2); color: white; border: 1px solid #327cb5; padding: 8px 15px; font-weight: bold; border-radius: 3px; cursor: pointer;">Envoyer le message</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <a href="general.html" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em;">&larr; Retour à la liste</a>
         </div>
     </div>
 
@@ -50,15 +80,16 @@
             authLink.onclick = async () => { await supabase.auth.signOut(); localStorage.clear(); window.location.reload(); };
         }
 
-        async function loadTopic() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const topicId = urlParams.get('id');
+        const urlParams = new URLSearchParams(window.location.search);
+        const topicId = urlParams.get('id');
 
+        async function loadTopicAndReplies() {
             if (!topicId) {
-                document.getElementById('topic-content-container').innerHTML = `<p style="color: red; text-align: center;">Sujet introuvable.</p>`;
+                document.getElementById('topic-content-body.innerHTML').textContent = "Sujet introuvable.";
                 return;
             }
 
+            // 1. Charger le sujet principal
             const { data: topic, error } = await supabase
                 .from('general_topics')
                 .select('*')
@@ -66,24 +97,88 @@
                 .single();
 
             if (error || !topic) {
-                document.getElementById('topic-content-container').innerHTML = `<p style="color: red; text-align: center;">Impossible de charger ce sujet.</p>`;
+                document.getElementById('topic-content-body').textContent = "Impossible de charger ce sujet.";
                 return;
             }
 
             document.getElementById('breadcrumb-title').textContent = topic.title;
             document.getElementById('topic-title-header').textContent = `💬 ${topic.title}`;
-            
-            const dateFormatted = new Date(topic.created_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'});
+            document.getElementById('author-name').textContent = topic.author || 'Inconnu';
+            document.getElementById('topic-date').textContent = new Date(topic.created_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'});
+            document.getElementById('topic-content-body').textContent = topic.content || '';
 
-            document.getElementById('topic-content-container').innerHTML = `
-                <div style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; font-size: 0.85em; color: #7f8c8d;">
-                    Par <strong>${topic.author || 'Inconnu'}</strong> le ${dateFormatted}
-                </div>
-                <div style="line-height: 1.6; font-size: 1em; white-space: pre-wrap;">${topic.content || 'Aucun contenu.'}</div>
-            `;
+            // 2. Charger les réponses associées
+            loadReplies();
         }
 
-        loadTopic();
+        async function loadReplies() {
+            const { data: replies, error } = await supabase
+                .from('topic_replies')
+                .select('*')
+                .eq('topic_id', topicId)
+                .eq('category', 'general')
+                .order('created_at', { ascending: true });
+
+            const container = document.getElementById('replies-container');
+            if (error || !replies || replies.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = replies.map(r => {
+                const replyDate = new Date(r.created_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'});
+                return `
+                    <div style="display: flex; border: 1px solid #f2d9de; background: white; margin-bottom: 15px;">
+                        <div style="width: 180px; background: #fff5f7; border-right: 1px solid #f2d9de; padding: 15px; text-align: center;">
+                            <strong style="color: #c0392b; font-size: 0.95em;">${r.author || 'Inconnu'}</strong>
+                            <div style="font-size: 0.8em; color: #666; margin-top: 2px;">Membre</div>
+                            <div style="margin-top: 10px;">
+                                <img src="https://via.placeholder.com/80" alt="Avatar" style="width: 70px; height: 70px; border-radius: 4px; border: 1px solid #ccc;">
+                            </div>
+                        </div>
+                        <div style="flex-grow: 1; padding: 15px;">
+                            <div style="font-size: 0.8em; color: #888; border-bottom: 1px dashed #eee; padding-bottom: 5px; margin-bottom: 10px;">
+                                Posté le ${replyDate}
+                            </div>
+                            <div style="font-size: 0.95em; line-height: 1.5; white-space: pre-wrap;">${r.content}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 3. Envoyer une réponse
+        document.getElementById('submit-reply').onclick = async () => {
+            const content = document.getElementById('reply-content').value.trim();
+            if (!content) {
+                alert("Veuillez écrire un message.");
+                return;
+            }
+            if (!currentUsername) {
+                alert("Vous devez être connecté pour répondre.");
+                window.location.href = 'register.html';
+                return;
+            }
+
+            const { error } = await supabase
+                .from('topic_replies')
+                .insert([{
+                    topic_id: topicId,
+                    category: 'general',
+                    content: content,
+                    author: currentUsername
+                }]);
+
+            if (error) {
+                alert("Erreur lors de l'envoi de la réponse.");
+                console.error(error);
+            } else {
+                document.getElementById('reply-content').value = '';
+                loadReplies();
+            }
+        };
+
+        loadTopicAndReplies();
     </script>
 </body>
 </html>
