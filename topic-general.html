@@ -27,70 +27,195 @@
             <a href="#reply-section" style="background: linear-gradient(to bottom, #ff99bb, #ff6699); color: white; padding: 6px 14px; text-decoration: none; font-size: 0.9em; font-weight: bold; border-radius: 3px; display: inline-block; border: 1px solid #e65c8a;">Répondre à ce sujet</a>
         </div>
 
+        <!-- MESSAGE PRINCIPAL -->
         <div id="topic-main-post" style="display: flex; border: 1px solid #f2d9de; background: white; margin-bottom: 20px;">
             <div style="width: 180px; background: #fff5f7; border-right: 1px solid #f2d9de; padding: 15px; text-align: center;">
                 <strong id="author-name" style="color: #004080; font-size: 0.95em;">Chargement...</strong>
                 <div style="font-size: 0.8em; color: #666; margin-top: 2px;">Fondateur</div>
+                <div style="margin-top: 10px;">
+                    <div style="width: 80px; height: 80px; margin: 0 auto; background: #eee; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 0.8em; color: #666; border-radius: 4px;">Avatar</div>
+                </div>
             </div>
             <div style="flex-grow: 1; padding: 15px; position: relative;">
                 <div id="topic-actions" style="position: absolute; top: 10px; right: 15px;" class="hidden">
-                    <button onclick="editTopic()" style="background: #f39c12; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer;">Éditer</button>
-                    <button onclick="deleteTopic()" style="background: #e74c3c; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer;">Supprimer</button>
+                    <button onclick="editTopic()" style="background: #f39c12; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; font-weight: bold; margin-right: 4px;">Éditer</button>
+                    <button onclick="deleteTopic()" style="background: #e74c3c; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; font-weight: bold;">Supprimer</button>
                 </div>
-                <div style="font-size: 0.8em; color: #888; border-bottom: 1px dashed #eee; padding-bottom: 5px; margin-bottom: 10px;">Posté le <span id="topic-date">--</span></div>
-                <div id="topic-content-body" style="font-size: 0.95em; line-height: 1.5; white-space: pre-wrap;">Chargement...</div>
+                <div style="font-size: 0.8em; color: #888; border-bottom: 1px dashed #eee; padding-bottom: 5px; margin-bottom: 10px;">
+                    Posté le <span id="topic-date">--</span>
+                </div>
+                <div id="topic-content-body" style="font-size: 0.95em; line-height: 1.5; white-space: pre-wrap;">Chargement du contenu...</div>
             </div>
         </div>
 
+        <!-- CONTENEUR DES RÉPONSES ENCADRÉES -->
         <div id="replies-container"></div>
 
+        <!-- ZONE POUR POSTER UNE RÉPONSE -->
         <div id="reply-section" style="border: 1px solid #61b3e8; background: white; margin-bottom: 30px; border-radius: 4px; overflow: hidden;">
-            <div style="background: linear-gradient(to bottom, #7ac1eb, #4196d2); color: white; padding: 8px 15px; font-weight: bold;">Poster une réponse</div>
+            <div style="background: linear-gradient(to bottom, #7ac1eb, #4196d2); color: white; padding: 8px 15px; font-weight: bold; font-size: 0.95em;">
+                Poster une réponse
+            </div>
             <div style="padding: 15px;">
-                <textarea id="reply-content" rows="6" style="width: 100%; border: 1px solid #ccc; padding: 8px; resize: vertical;"></textarea>
-                <button id="submit-reply" style="margin-top:10px; background: #4196d2; color: white; border: none; padding: 8px 15px; cursor: pointer;">Envoyer</button>
+                <p style="margin-bottom: 5px; font-size: 0.9em; font-weight: bold; color: #333;">Votre message :</p>
+                <textarea id="reply-content" rows="6" style="width: 100%; border: 1px solid #ccc; padding: 8px; font-family: inherit; font-size: 0.9em; resize: vertical;" placeholder="Écrivez votre réponse ici..."></textarea>
+                <div style="margin-top: 10px;">
+                    <button id="submit-reply" type="button" style="background: linear-gradient(to bottom, #7ac1eb, #4196d2); color: white; border: 1px solid #327cb5; padding: 8px 15px; font-weight: bold; border-radius: 3px; cursor: pointer;">Envoyer le message</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { supabase } from './supabase.js';
+        
         let currentUsername = localStorage.getItem('forumUsername') || 'Invité';
         let isAdminMode = localStorage.getItem('forumAdminMode') === 'true';
 
         function updateStatusBar() {
-            document.getElementById('user-status-bar').textContent = `Connecté en tant que : ${currentUsername} ${isAdminMode ? '(Admin)' : '(Membre)'}`;
+            const bar = document.getElementById('user-status-bar');
+            let roleText = isAdminMode ? ' (Staff/Admin)' : ' (Membre)';
+            bar.textContent = `Connecté en tant que : ${currentUsername}${roleText}`;
         }
-        
-        window.setAdminMode = (status) => {
+
+        window.setAdminMode = function(status) {
             isAdminMode = status;
             localStorage.setItem('forumAdminMode', status);
             updateStatusBar();
-            location.reload();
+            loadTopicAndReplies();
         }
-        
+
         updateStatusBar();
-        const topicId = new URLSearchParams(window.location.search).get('id');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const topicId = urlParams.get('id');
+        let topicData = null;
+
+        window.editTopic = async function() {
+            const newContent = prompt("Modifier le contenu du sujet :", topicData.content);
+            if (newContent === null) return;
+            const { error } = await supabase.from('general_topics').update({ content: newContent }).eq('id', topicId);
+            if (error) alert("Erreur : " + error.message);
+            else { topicData.content = newContent; document.getElementById('topic-content-body').textContent = newContent; }
+        }
+
+        window.deleteTopic = async function() {
+            if (!confirm("Voulez-vous vraiment supprimer ce sujet ?")) return;
+            const { error } = await supabase.from('general_topics').delete().eq('id', topicId);
+            if (error) alert("Erreur : " + error.message);
+            else window.location.href = 'general.html';
+        }
+
+        window.editReply = async function(replyId, currentText) {
+            const newText = prompt("Modifier votre réponse :", currentText);
+            if (newText === null) return;
+            const { error } = await supabase.from('topic_replies').update({ content: newText }).eq('id', replyId);
+            if (error) alert("Erreur : " + error.message);
+            else loadReplies();
+        }
+
+        window.deleteReply = async function(replyId) {
+            if (!confirm("Voulez-vous supprimer cette réponse ?")) return;
+            const { error } = await supabase.from('topic_replies').delete().eq('id', replyId);
+            if (error) alert("Erreur : " + error.message);
+            else loadReplies();
+        }
 
         async function loadTopicAndReplies() {
-            const { data: topic } = await supabase.from('general_topics').select('*').eq('id', topicId).single();
-            if (!topic) return;
+            if (!topicId) {
+                document.getElementById('topic-content-body').textContent = "Sujet introuvable.";
+                return;
+            }
+
+            const { data: topic, error } = await supabase
+                .from('general_topics')
+                .select('*')
+                .eq('id', topicId)
+                .single();
+
+            if (error || !topic) {
+                document.getElementById('topic-content-body').textContent = "Impossible de charger ce sujet.";
+                return;
+            }
+
+            topicData = topic;
             document.getElementById('breadcrumb-title').textContent = topic.title;
             document.getElementById('topic-title-header').textContent = topic.title;
-            document.getElementById('author-name').textContent = topic.author;
-            document.getElementById('topic-date').textContent = new Date(topic.created_at).toLocaleDateString();
-            document.getElementById('topic-content-body').textContent = topic.content;
-            
-            if (isAdminMode || currentUsername === topic.author) document.getElementById('topic-actions').classList.remove('hidden');
-            
-            const { data: replies } = await supabase.from('topic_replies').select('*').eq('topic_id', topicId).eq('category', 'general').order('created_at');
-            document.getElementById('replies-container').innerHTML = replies.map(r => `<div>${r.author}: ${r.content}</div>`).join('');
+            document.getElementById('author-name').textContent = topic.author || 'Inconnu';
+            document.getElementById('topic-date').textContent = new Date(topic.created_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'});
+            document.getElementById('topic-content-body').textContent = topic.content || '';
+
+            if (isAdminMode || currentUsername === topic.author || currentUsername === 'Otaku_33') {
+                document.getElementById('topic-actions').classList.remove('hidden');
+            } else {
+                document.getElementById('topic-actions').classList.add('hidden');
+            }
+
+            loadReplies();
+        }
+
+        async function loadReplies() {
+            const { data: replies, error } = await supabase
+                .from('topic_replies')
+                .select('*')
+                .eq('topic_id', topicId)
+                .eq('category', 'general')
+                .order('created_at', { ascending: true });
+
+            const container = document.getElementById('replies-container');
+            if (error || !replies || replies.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = replies.map(r => {
+                const replyDate = new Date(r.created_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'});
+                const canModify = isAdminMode || currentUsername === r.author || currentUsername === 'Otaku_33';
+                
+                return `
+                    <div style="display: flex; border: 1px solid #f2d9de; background: white; margin-bottom: 15px;">
+                        <div style="width: 180px; background: #fff5f7; border-right: 1px solid #f2d9de; padding: 15px; text-align: center;">
+                            <strong style="color: #004080; font-size: 0.95em;">${r.author || 'Inconnu'}</strong>
+                            <div style="font-size: 0.8em; color: #666; margin-top: 2px;">Membre</div>
+                            <div style="margin-top: 10px;">
+                                <div style="width: 80px; height: 80px; margin: 0 auto; background: #eee; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 0.8em; color: #666; border-radius: 4px;">Avatar</div>
+                            </div>
+                        </div>
+                        <div style="flex-grow: 1; padding: 15px; position: relative;">
+                            ${canModify ? `
+                                <div style="position: absolute; top: 10px; right: 15px;">
+                                    <button onclick="editReply(${r.id}, \`${r.content.replace(/`/g, '\\`')}\`)" style="background: #f39c12; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; font-weight: bold; margin-right: 4px;">Éditer</button>
+                                    <button onclick="deleteReply(${r.id})" style="background: #e74c3c; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; font-weight: bold;">Supprimer</button>
+                                </div>
+                            ` : ''}
+                            <div style="font-size: 0.8em; color: #888; border-bottom: 1px dashed #eee; padding-bottom: 5px; margin-bottom: 10px;">
+                                Posté le ${replyDate}
+                            </div>
+                            <div style="font-size: 0.95em; line-height: 1.5; white-space: pre-wrap;">${r.content}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         document.getElementById('submit-reply').onclick = async () => {
-            const content = document.getElementById('reply-content').value;
-            await supabase.from('topic_replies').insert([{ topic_id: topicId, category: 'general', content, author: currentUsername }]);
-            location.reload();
+            const content = document.getElementById('reply-content').value.trim();
+            if (!content) { alert("Veuillez écrire un message."); return; }
+            if (currentUsername === 'Invité') { alert("Vous devez être connecté pour répondre."); window.location.href = 'register.html'; return; }
+
+            const { error } = await supabase.from('topic_replies').insert([{
+                topic_id: topicId,
+                category: 'general',
+                content: content,
+                author: currentUsername
+            }]);
+
+            if (error) { 
+                alert("Erreur Supabase : " + error.message); 
+            } else { 
+                document.getElementById('reply-content').value = ''; 
+                loadReplies(); 
+            }
         };
 
         loadTopicAndReplies();
