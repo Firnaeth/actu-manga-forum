@@ -17,7 +17,6 @@
             📅 Calendrier des Conventions & Salons
         </div>
 
-        <!-- C'est ici que les tableaux par année vont s'injecter -->
         <div id="conventions-container">
             <div style="text-align: center; color: #7f8c8d; padding: 20px;">Chargement des conventions...</div>
         </div>
@@ -60,9 +59,10 @@
                 let htmlContent = '';
 
                 sortedYears.forEach(year => {
+                    // Utilisation du design de catégorie avec les tirets encadrants
                     htmlContent += `
-                        <div style="margin-top: 25px; margin-bottom: 10px; font-weight: bold; font-size: 16px; color: #c2185b; border-bottom: 2px solid #c2185b; padding-bottom: 5px;">
-                            📅 Conventions ${year}
+                        <div style="text-align: center; font-weight: bold; font-size: 14px; color: #c2185b; background-color: #fce4ec; padding: 6px; margin-top: 25px; margin-bottom: 10px; border: 1px solid #f8bbd0;">
+                            _ Conventions ${year} _
                         </div>
                         <table class="forum-table" style="margin-bottom: 20px;">
                             <thead>
