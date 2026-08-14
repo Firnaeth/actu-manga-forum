@@ -6,6 +6,25 @@
     <title>Profil - Forum Actu Manga</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* AJUSTEMENT AUTOMATIQUE DU CADRE D'AVATAR À L'IMAGE */
+        .avatar-box {
+            display: inline-block;
+            width: auto !important;
+            height: auto !important;
+            max-width: 220px; /* Limite maximale pour éviter les images géantes */
+            max-height: 300px;
+            padding: 5px;
+            background: #fff;
+            border: 1px solid #ffb6c1;
+            border-radius: 4px;
+        }
+        .avatar-box img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 2px;
+        }
+
         .edit-profile-box {
             background: #fff;
             border: 1px solid #ffb6c1;
