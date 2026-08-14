@@ -69,7 +69,7 @@
     <script type="module">
         import { supabase } from './supabase.js';
         
-        let currentUsername = localStorage.getItem('forumUsername') || 'Invité';
+        let currentUsername = localStorage.getItem('forumUsername') || 'Otaku_33';
         let isAdminMode = localStorage.getItem('forumAdminMode') === 'true';
 
         function updateStatusBar() {
@@ -79,6 +79,12 @@
         }
 
         window.setAdminMode = function(status) {
+            // Sécurité : Seul Otaku_33 peut activer le mode admin
+            if (status === true && currentUsername !== 'Otaku_33') {
+                alert("Accès refusé : Seul 'Otaku_33' peut passer en mode administrateur !");
+                return;
+            }
+
             isAdminMode = status;
             localStorage.setItem('forumAdminMode', status);
             updateStatusBar();
@@ -101,6 +107,7 @@
 
         window.deleteTopic = async function() {
             if (!confirm("Voulez-vous vraiment supprimer ce sujet ?")) return;
+            await supabase.from('topic_replies').delete().eq('topic_id', topicId);
             const { error } = await supabase.from('general_topics').delete().eq('id', topicId);
             if (error) alert("Erreur : " + error.message);
             else window.location.href = 'general.html';
