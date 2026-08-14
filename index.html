@@ -70,7 +70,7 @@
                     </div>
                 </div>
 
-                <!-- News Box Scrollable (Connectée dynamiquement aux derniers topics Supabase) -->
+                <!-- News Box Scrollable -->
                 <div class="news-scroll">
                     <div class="mini-title">Dernières Actualités & Événements</div>
                     <ul id="latest-news-list">
@@ -80,7 +80,7 @@
             </div>
         </div>
 
-        <!-- CATÉGORIES -->
+        <!-- CATÉGORIE 1 -->
         <table class="forum-table">
             <thead>
                 <tr>
@@ -111,7 +111,6 @@
                     <td class="stat-cell">--</td>
                     <td class="last-post-cell" id="last-licences-cell">Aucune annonce</td>
                 </tr>
-                <!-- Planning des Conventions -->
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">🎟️</span></td>
                     <td class="forum-desc">
@@ -125,6 +124,7 @@
             </tbody>
         </table>
 
+        <!-- CATÉGORIE 2 : ESPACE COMMUNAUTÉ & CRÉATIONS (MIS À JOUR) -->
         <table class="forum-table">
             <thead>
                 <tr>
@@ -148,7 +148,27 @@
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">🎨</span></td>
                     <td class="forum-desc">
-                        <a href="contest-view.html" class="forum-title">    Concours & Fan-Arts (100% SANS IA)</a>
+                        <a href="forum_graphisme.html" class="forum-title">Atelier Graphique & Signatures</a>
+                        <p>Partagez vos créations, demandez des userbars et montrez vos bannières de profil !</p>
+                    </td>
+                    <td class="stat-cell" id="count-graphisme">--</td>
+                    <td class="stat-cell">--</td>
+                    <td class="last-post-cell" id="last-graphisme-cell">Aucun sujet</td>
+                </tr>
+                <tr>
+                    <td class="icon-cell"><span class="category-emoji">⭐</span></td>
+                    <td class="forum-desc">
+                        <a href="forum_fc.html" class="forum-title">Fan Clubs Officiels (Bleach, Inuyasha...)</a>
+                        <p>Rejoignez ou créez votre propre Fan Club et portez fièrement vos bannières.</p>
+                    </td>
+                    <td class="stat-cell" id="count-fc">--</td>
+                    <td class="stat-cell">--</td>
+                    <td class="last-post-cell" id="last-fc-cell">Aucun sujet</td>
+                </tr>
+                <tr>
+                    <td class="icon-cell"><span class="category-emoji">✏️</span></td>
+                    <td class="forum-desc">
+                        <a href="contest-view.html" class="forum-title">Concours & Fan-Arts (100% SANS IA)</a>
                         <p>Participe aux concours de dessin et partage tes créations traditionnelles ou digitales.</p>
                     </td>
                     <td class="stat-cell">45</td>
@@ -158,6 +178,7 @@
             </tbody>
         </table>
 
+        <!-- CATÉGORIE 3 -->
         <table class="forum-table">
             <thead>
                 <tr>
@@ -295,7 +316,7 @@
             document.getElementById('forum-banner-img').src = config.banner;
         }
 
-        // CHARGEMENT DYNAMIQUE DES SUJETS DEPUIS SUPABASE (POUR LES CATÉGORIES ET L'ACTU)
+        // CHARGEMENT DYNAMIQUE DES SUJETS DEPUIS SUPABASE
         async function loadForumData() {
             const { data: topics, error } = await supabase
                 .from('topics')
@@ -315,8 +336,8 @@
                 newsListEl.innerHTML = "<li><em>Aucun sujet publié pour le moment.</em></li>";
             }
 
-            // 2. Traiter par catégorie pour les tableaux du forum de manière isolée
-            const categories = ['planning', 'licences', 'conventions', 'manga', 'gaming', 'general'];
+            // 2. Traiter par catégorie pour les tableaux du forum
+            const categories = ['planning', 'licences', 'conventions', 'manga', 'graphisme', 'fc', 'gaming', 'general'];
             
             categories.forEach(cat => {
                 const catTopics = topics.filter(t => t.category === cat);
@@ -326,7 +347,7 @@
                 if (countEl) countEl.textContent = catTopics.length;
 
                 if (catTopics.length > 0) {
-                    const latest = catTopics[0]; // Le sujet le plus récent de CETTE catégorie
+                    const latest = catTopics[0];
                     if (lastCellEl) {
                         const dateFormatted = new Date(latest.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit'});
                         const author = latest.author || 'Otaku_33';
