@@ -3,62 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Créer un nouveau sujet - Actu Manga World</title>
+    <title>Créer un Nouveau Sujet - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div id="wrapper">
 
-        <!-- BANNIÈRE EN-TÊTE -->
-        <div class="main-header">
-            <img src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner">
-        </div>
-
         <!-- BARRE DE NAVIGATION VINTAGE -->
-        <nav class="forum-nav">
+        <nav class="forum-nav" style="margin-bottom: 20px;">
             <a href="index.html" class="nav-link">Index</a>
             <a href="community.html" class="nav-link">Fiches & Critiques</a>
             <a href="contest-view.html" class="nav-link">Concours Dessin</a>
-            <a href="#" class="nav-link">Rechercher</a>
-            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil</a>
             <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
-            <a href="#" class="nav-link">FAQ</a>
         </nav>
 
-        <!-- FIL D'ARIANE -->
-        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
-            <a href="index.html">Accueil</a> &raquo; <span id="breadcrumb-section">Créer un sujet</span>
-        </div>
+        <h1 class="topic-main-title">📝 Création d'un Nouveau Sujet</h1>
+        
+        <form class="reply-form" id="new-topic-form">
+            <label for="topic-type">Catégorie :</label>
+            <select id="topic-type" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="planning">📅 Planning des Sorties VF</option>
+                <option value="licences">🚧 Annonces</option>
+                <option value="conventions">🎟️ Planning des Conventions & Projets</option>
+                <option value="manga">📄 Fiches & Critiques (Mangas & Animes)</option>
+                <option value="graphisme">🎨 Atelier Graphique & Signatures</option>
+                <option value="fc">⭐ Fan Clubs Officiels</option>
+                <option value="gaming">🕹️ Coin Arcade & Jeux Vidéo</option>
+                <option value="general">☕ Le QG des Discussions</option>
+            </select>
 
-        <!-- FORMULAIRE DE CRÉATION -->
-        <div class="welcome-banner">
-            <h2 id="form-page-title">✍️ Créer un nouveau sujet</h2>
-            <p>Remplissez le formulaire ci-dessous pour publier votre message.</p>
-        </div>
+            <label for="topic-title-input">Titre :</label>
+            <input type="text" id="topic-title-input" style="width: 100%; padding: 8px; margin-bottom: 12px; box-sizing: border-box;" required>
 
-        <div style="background: #fff; padding: 20px; border: 1px solid #dcdde1; border-radius: 4px;">
-            <form id="form-create-topic">
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Titre du sujet :</label>
-                    <input type="text" id="topic-title" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-                </div>
+            <label for="topic-content">Contenu :</label>
+            <textarea id="topic-content" rows="10" style="width: 100%; padding: 8px; box-sizing: border-box;" required></textarea>
 
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Contenu :</label>
-                    <textarea id="topic-content" rows="8" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"></textarea>
-                </div>
-
-                <div style="text-align: right;">
-                    <button type="submit" class="btn-admin-edit" style="padding: 10px 20px; background: #c0392b; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Publier le sujet</button>
-                    <a href="index.html" class="btn-admin-edit btn-cancel" style="padding: 10px 20px; background: #7f8c8d; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block; margin-left: 10px;">Annuler</a>
-                </div>
-            </form>
-        </div>
-
+            <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <button type="submit" class="btn-submit" style="padding: 10px 20px; background: #c0392b; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Publier le sujet</button>
+                <a href="index.html" style="color: #666; text-decoration: none; font-size: 0.9em;">Annuler et retourner à l'index</a>
+            </div>
+        </form>
     </div>
 
-    <!-- SCRIPT DE GESTION DE L'ENREGISTREMENT DANS SUPABASE -->
     <script type="module">
         import { supabase } from './supabase.js';
 
@@ -69,92 +56,55 @@
         if (currentUsername) {
             profileLink.classList.remove('hidden');
             authLink.textContent = "Déconnexion";
-            authLink.onclick = async (e) => { 
+            authLink.onclick = async (e) => {
                 e.preventDefault();
-                await supabase.auth.signOut(); 
-                localStorage.clear(); 
-                window.location.href = 'index.html'; 
+                await supabase.auth.signOut();
+                localStorage.clear();
+                window.location.reload();
             };
         } else {
-            alert("Vous devez être connecté pour créer un sujet.");
+            alert("Vous devez être connecté pour publier un sujet.");
             window.location.href = "register.html";
         }
 
-        // Récupérer la catégorie depuis l'URL (ex: new-topic.html?cat=graphisme, fc, planning, etc.)
+        // Pré-sélectionner la catégorie si elle est passée dans l'URL (ex: new-topic.html?cat=graphisme)
         const urlParams = new URLSearchParams(window.location.search);
-        const category = urlParams.get('cat') || 'general';
-
-        // Personnalisation des titres et redirection selon la catégorie
-        const titleEl = document.getElementById('form-page-title');
-        const breadcrumbEl = document.getElementById('breadcrumb-section');
-        
-        let redirectPage = 'index.html';
-
-        switch (category) {
-            case 'graphisme':
-                redirectPage = 'forum_graphisme.html';
-                titleEl.textContent = "🎨 Atelier Graphique & Signatures";
-                breadcrumbEl.textContent = "Atelier Graphique";
-                break;
-            case 'fc':
-                redirectPage = 'forum_fc.html';
-                titleEl.textContent = "⭐ Créer un Fan Club Officiel";
-                breadcrumbEl.textContent = "Fan Clubs Officiels";
-                break;
-            case 'planning':
-                redirectPage = 'planning.html';
-                titleEl.textContent = "🗓️ Créer un Planning VF";
-                breadcrumbEl.textContent = "Planning des Sorties VF";
-                break;
-            case 'gaming':
-                redirectPage = 'gaming.html';
-                titleEl.textContent = "🕹️ Coin Arcade & Jeux Vidéo";
-                breadcrumbEl.textContent = "Zone Gaming";
-                break;
-            case 'manga':
-                redirectPage = 'community.html';
-                titleEl.textContent = "📄 Fiches & Critiques (Mangas & Animes)";
-                breadcrumbEl.textContent = "Fiches & Critiques";
-                break;
-            case 'conventions':
-                redirectPage = 'news.html';
-                titleEl.textContent = "🎟️ Planning des Conventions & Projets";
-                breadcrumbEl.textContent = "Conventions";
-                break;
-            default:
-                redirectPage = 'general.html';
-                titleEl.textContent = "☕ Le QG des Discussions";
-                breadcrumbEl.textContent = "Discussions Diverses";
-                break;
+        const catParam = urlParams.get('cat');
+        if (catParam) {
+            const selectEl = document.getElementById('topic-type');
+            for (let i = 0; i < selectEl.options.length; i++) {
+                if (selectEl.options[i].value === catParam) {
+                    selectEl.selectedIndex = i;
+                    break;
+                }
+            }
         }
 
-        // Soumission du formulaire
-        document.getElementById('form-create-topic').addEventListener('submit', async (e) => {
+        document.getElementById('new-topic-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            const title = document.getElementById('topic-title').value.trim();
+            const category = document.getElementById('topic-type').value;
+            const title = document.getElementById('topic-title-input').value.trim();
             const content = document.getElementById('topic-content').value.trim();
+            const author = currentUsername || 'Admin_Otaku';
 
-            if (!title || !content) {
-                alert("Veuillez remplir tous les champs.");
-                return;
-            }
-
-            // Insertion dans la table unique 'topics' avec la bonne catégorie
-            const { error } = await supabase
+            const { data, error } = await supabase
                 .from('topics')
-                .insert([{ 
-                    title: title, 
-                    content: content, 
-                    category: category, 
-                    author: currentUsername 
-                }]);
+                .insert([{ title, content, category, author }])
+                .select();
 
             if (error) {
-                alert("Erreur lors de la publication : " + error.message);
+                alert("Erreur : " + error.message);
             } else {
-                alert("Sujet publié avec succès !");
-                window.location.href = redirectPage;
+                // Redirection intelligente selon la catégorie choisie
+                if (category === 'graphisme') {
+                    window.location.href = 'forum_graphisme.html';
+                } else if (category === 'fc') {
+                    window.location.href = 'forum_fc.html';
+                } else if (data && data[0]) {
+                    window.location.href = `topic.html?id=${data[0].id}`;
+                } else {
+                    window.location.href = 'index.html';
+                }
             }
         });
     </script>
