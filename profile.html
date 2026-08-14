@@ -109,7 +109,7 @@
                     </div>
                     <div class="full-width">
                         <label><small>Signature :</small></label>
-                        <input type="text" id="edit-signature" placeholder="Votre phrase de signature...">
+                        <input type="text" id="edit-signature" placeholder="Votre phrase de signature ou bannières...">
                     </div>
                 </div>
                 <button type="submit" class="btn-save-profile">Enregistrer les modifications</button>
@@ -171,7 +171,9 @@
                 document.getElementById('user-rank').textContent = profile.rank || (profile.role === 'admin' ? 'Administrateur' : 'Membre');
                 document.getElementById('user-joined').textContent = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Récemment';
                 document.getElementById('user-fav').textContent = profile.favorite_manga || 'Non spécifié';
-                document.getElementById('user-sig').innerHTML = `<em>${profile.signature || 'Abonné au forum.'}</em>`;
+                
+                // Affichage propre de la signature (permettant le HTML/images rétro si besoin)
+                document.getElementById('user-sig').innerHTML = profile.signature ? `<div>${profile.signature}</div>` : '<em>-</em>';
                 
                 if (profile.avatar_url) {
                     document.getElementById('user-avatar').src = profile.avatar_url;
