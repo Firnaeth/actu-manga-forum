@@ -350,21 +350,6 @@ body {
     margin-bottom: 3px;
 }
 
-/* NOUVEAU STYLE DU GRADE (PLUS LISIBLE) */
-        .rank {
-            display: inline-block;
-            background: #ffe0e9; /* Fond rose très pâle */
-            color: #b02a63;      /* Rose foncé pour le texte */
-            padding: 4px 12px;
-            font-size: 0.8em;
-            font-weight: 800;    /* Texte plus épais */
-            border: 1px solid #ff80ab; /* Petite bordure pour le délimiter */
-            border-radius: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
 .user-avatar {
     width: 80px;
     height: 80px;
@@ -1020,9 +1005,30 @@ a.group-admin:hover, a.group-member:hover {
     height: auto;
     display: block;
 }
-/* Amélioration de la lisibilité du statut */
-.user-status-box {
-    color: #333; /* Texte plus sombre */
-    font-weight: 500; /* Un tout petit peu plus épais */
-    /* ... reste de tes propriétés ... */
-}
+
+/* STYLE DU GRADE ULTRA-LISIBLE */
+        .rank {
+            display: inline-block;
+            background: #d63384; /* Fond rose foncé bien vif */
+            color: #ffffff;      /* Texte en blanc pur */
+            padding: 5px 12px;
+            font-size: 0.85em;
+            font-weight: 800;    /* Texte bien épais */
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            margin-bottom: 8px;
+        }
+
+        /* STYLE DU STATUT ULTRA-LISIBLE */
+        .user-status-box {
+            font-size: 0.90em;
+            color: #222222;      /* Texte presque noir pour une lecture parfaite */
+            background: #fff0f5;
+            border-left: 3px solid #d63384; /* Bordure rose foncé assortie */
+            padding: 6px 10px;
+            border-radius: 0 4px 4px 0;
+            margin-top: 5px;
+            font-weight: 600;
+        }
