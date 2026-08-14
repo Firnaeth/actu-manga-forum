@@ -25,7 +25,7 @@
             <input type="text" id="topic-title-input" style="width: 100%; padding: 8px; margin-bottom: 12px;" required>
 
             <label for="topic-content">Contenu :</label>
-            <textarea id="topic-content" rows="10" style="width: 100%;" required></textarea>
+            <textarea id="topic-content" rows="10" style="width: 100%;" placeholder="Écrivez votre contenu ici. Pour partager une bannière ou une création, collez simplement le lien direct de votre image (http://...)" required></textarea>
 
             <button type="submit" class="btn-submit" style="margin-top: 15px;">Publier le sujet</button>
         </form>
@@ -41,14 +41,16 @@
             const content = document.getElementById('topic-content').value;
             const author = localStorage.getItem('forumUsername') || 'Admin_Otaku';
 
+            // Insertion simple du contenu brut (le formatage en image se fera à l'affichage dans topic.html)
             const { data, error } = await supabase
                 .from('topics')
                 .insert([{ title, content, category, author }])
                 .select();
 
             if (error) {
-                alert("Erreur : " + error.message);
+                alert("Erreur lors de la publication : " + error.message);
             } else {
+                // Redirection vers le sujet créé
                 window.location.href = `topic.html?id=${data[0].id}`;
             }
         });
