@@ -8,9 +8,35 @@
 </head>
 <body>
     <div id="wrapper">
-        <div class="main-header">
-            <img src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner">
+
+        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
+        <div id="admin-bar-container" class="admin-edit-bar hidden">
+            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
+            <button class="btn-admin-edit" id="btn-toggle-admin">Modifier Titre & Bannière</button>
         </div>
+
+        <div id="admin-panel-form" class="admin-panel-inputs hidden">
+            <form id="form-config-header">
+                <label>Titre principal du forum :</label>
+                <input type="text" id="input-forum-title" required>
+
+                <label>Description / Sous-titre :</label>
+                <input type="text" id="input-forum-subtitle" required>
+
+                <label>Lien (URL) de l'image de bannière :</label>
+                <input type="url" id="input-forum-banner" required>
+
+                <div class="admin-form-actions">
+                    <button type="submit" class="btn-admin-edit">Enregistrer</button>
+                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="main-header">
+            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner">
+        </div>
+
         <nav class="forum-nav">
             <a href="index.html" class="nav-link">Index</a>
             <a href="community.html" class="nav-link">Fiches & Critiques</a>
@@ -24,8 +50,8 @@
         </div>
 
         <div class="welcome-banner" style="text-align: center; padding: 15px;">
-            <h2>🎨 Atelier Graphique & Signatures</h2>
-            <p style="margin-top: 5px;">Partagez vos créations, demandez des userbars et montrez vos bannières de profil !</p>
+            <h2 id="forum-title-display">🎨 Atelier Graphique & Signatures</h2>
+            <p id="forum-subtitle-display" style="margin-top: 5px;">Partagez vos créations, demandez des userbars et montrez vos bannières de profil !</p>
         </div>
 
         <table class="forum-table">
@@ -49,16 +75,74 @@
 
     <script type="module">
         import { supabase } from './supabase.js';
+
         const currentUsername = localStorage.getItem('forumUsername');
+        const currentUserRole = localStorage.getItem('forumUserRole');
+
+        // Gestion de l'affichage du profil / authentification
         if (currentUsername) {
             document.getElementById('nav-profile-link').classList.remove('hidden');
             const authLink = document.getElementById('nav-auth-link');
             authLink.textContent = "Déconnexion";
-            authLink.onclick = async () => { await supabase.auth.signOut(); localStorage.clear(); window.location.reload(); };
+            authLink.setAttribute('href', '#');
+            authLink.onclick = async (e) => { 
+                e.preventDefault();
+                try { await supabase.auth.signOut(); } catch(err) { console.error(err); }
+                localStorage.clear(); 
+                window.location.href = 'index.html'; 
+            };
         }
 
+        // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
+        const adminBar = document.getElementById('admin-bar-container');
+        const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
+
+        if (isStaff && adminBar) {
+            adminBar.classList.remove('hidden');
+        }
+        
+        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.toggle('hidden');
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
+                title: "🎨 Atelier Graphique & Signatures", 
+                subtitle: "Partagez vos créations, demandez des userbars...", 
+                banner: "https://images.alphacoders.com/605/605592.png" 
+            };
+            document.getElementById('input-forum-title').value = config.title;
+            document.getElementById('input-forum-subtitle').value = config.subtitle;
+            document.getElementById('input-forum-banner').value = config.banner;
+        });
+
+        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.add('hidden');
+        });
+
+        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newConfig = {
+                title: document.getElementById('input-forum-title').value,
+                subtitle: document.getElementById('input-forum-subtitle').value,
+                banner: document.getElementById('input-forum-banner').value
+            };
+            localStorage.setItem('forumHeaderConfig', JSON.stringify(newConfig));
+            alert("En-tête mis à jour avec succès !");
+            window.location.reload();
+        });
+
+        function loadHeaderConfig() {
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
+            if (config) {
+                document.getElementById('forum-title-display').textContent = config.title;
+                document.getElementById('forum-subtitle-display').textContent = config.subtitle;
+                document.getElementById('forum-banner-img').src = config.banner;
+            }
+        }
+
+        // Chargement des sujets de l'atelier graphique avec comptage dynamique des réponses
         async function loadGraphismeTopics() {
             const container = document.getElementById('graphisme-topics-container');
+            
+            // Récupérer les sujets de la catégorie graphisme
             const { data: topics, error } = await supabase
                 .from('topics')
                 .select('*')
@@ -70,8 +154,15 @@
                 return;
             }
 
+            // Récupérer les réponses pour compter le nombre de messages par topic
+            const { data: replies } = await supabase.from('replies').select('topic_id');
+
             container.innerHTML = topics.map(t => {
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
+                
+                // Calcul du nombre de réponses associées à ce sujet
+                const topicRepliesCount = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
+
                 return `
                     <tr>
                         <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">🎨</span></td>
@@ -80,12 +171,14 @@
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
                         </td>
                         <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
-                        <td class="stat-cell" style="text-align: center;">--</td>
+                        <td class="stat-cell" style="text-align: center;">${topicRepliesCount}</td>
                         <td class="last-post-cell" style="text-align: center; font-size: 0.9em;"><span>Par ${t.author || 'Otaku_33'}</span><br><small style="color: #7f8c8d;">${dateFormatted}</small></td>
                     </tr>
                 `;
             }).join('');
         }
+
+        loadHeaderConfig();
         loadGraphismeTopics();
     </script>
 </body>
