@@ -10,6 +10,30 @@
 
     <div id="wrapper">
 
+        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
+        <div id="admin-bar-container" class="admin-edit-bar hidden">
+            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
+            <button class="btn-admin-edit" id="btn-toggle-admin">Modifier Titre & Bannière</button>
+        </div>
+
+        <div id="admin-panel-form" class="admin-panel-inputs hidden">
+            <form id="form-config-header">
+                <label>Titre principal du forum :</label>
+                <input type="text" id="input-forum-title" required>
+
+                <label>Description / Sous-titre :</label>
+                <input type="text" id="input-forum-subtitle" required>
+
+                <label>Lien (URL) de l'image de bannière :</label>
+                <input type="url" id="input-forum-banner" required>
+
+                <div class="admin-form-actions">
+                    <button type="submit" class="btn-admin-edit">Enregistrer</button>
+                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
+                </div>
+            </form>
+        </div>
+
         <!-- BANNIÈRE EN-TÊTE -->
         <div class="main-header">
             <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
@@ -33,8 +57,8 @@
 
         <!-- EN-TÊTE DE LA SECTION (TEXTE CENTRÉ) -->
         <div class="welcome-banner" style="text-align: center; padding: 15px;">
-            <h2>☕ Le QG des Discussions</h2>
-            <p style="margin-top: 5px;">Pour parler de tout et de rien : ciné, musique, vie quotidienne...</p>
+            <h2 id="forum-title-display">☕ Le QG des Discussions</h2>
+            <p id="forum-subtitle-display" style="margin-top: 5px;">Pour parler de tout et de rien : ciné, musique, vie quotidienne...</p>
         </div>
 
         <!-- TABLEAU DES SUJETS -->
@@ -65,13 +89,65 @@
         import { supabase } from './supabase.js';
 
         const currentUsername = localStorage.getItem('forumUsername');
+        const currentUserRole = localStorage.getItem('forumUserRole');
         const profileLink = document.getElementById('nav-profile-link');
         const authLink = document.getElementById('nav-auth-link');
         
         if (currentUsername) {
             profileLink.classList.remove('hidden');
             authLink.textContent = "Déconnexion";
-            authLink.onclick = async () => { await supabase.auth.signOut(); localStorage.clear(); window.location.reload(); };
+            authLink.setAttribute('href', '#');
+            authLink.onclick = async (e) => { 
+                e.preventDefault();
+                try { await supabase.auth.signOut(); } catch(err) { console.error(err); }
+                localStorage.clear(); 
+                window.location.reload(); 
+            };
+        }
+
+        // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
+        const adminBar = document.getElementById('admin-bar-container');
+        const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
+
+        if (isStaff && adminBar) {
+            adminBar.classList.remove('hidden');
+        }
+        
+        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.toggle('hidden');
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
+                title: "☕ Le QG des Discussions", 
+                subtitle: "Pour parler de tout et de rien : ciné, musique, vie quotidienne...", 
+                banner: "https://images.alphacoders.com/605/605592.png" 
+            };
+            document.getElementById('input-forum-title').value = config.title;
+            document.getElementById('input-forum-subtitle').value = config.subtitle;
+            document.getElementById('input-forum-banner').value = config.banner;
+        });
+
+        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.add('hidden');
+        });
+
+        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newConfig = {
+                title: document.getElementById('input-forum-title').value,
+                subtitle: document.getElementById('input-forum-subtitle').value,
+                banner: document.getElementById('input-forum-banner').value
+            };
+            localStorage.setItem('forumHeaderConfig', JSON.stringify(newConfig));
+            alert("En-tête mis à jour avec succès !");
+            window.location.reload();
+        });
+
+        function loadHeaderConfig() {
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
+            if (config) {
+                document.getElementById('forum-title-display').textContent = config.title;
+                document.getElementById('forum-subtitle-display').textContent = config.subtitle;
+                document.getElementById('forum-banner-img').src = config.banner;
+            }
         }
 
         async function loadGeneralTopics() {
@@ -94,20 +170,23 @@
                 return;
             }
 
+            // Récupérer les réponses pour calculer le nombre de messages
+            const { data: replies } = await supabase.from('replies').select('topic_id');
+
             container.innerHTML = topics.map(t => {
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
                 const author = t.author || 'Inconnu';
+                const topicRepliesCount = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
 
                 return `
                     <tr>
                         <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">💬</span></td>
                         <td class="forum-desc">
-                            <!-- LIEN MIS À JOUR VERS LE TOPIC UNIVERSEL -->
                             <a href="topic.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
                         </td>
                         <td class="stat-cell" style="text-align: center;">${author}</td>
-                        <td class="stat-cell" style="text-align: center;">--</td>
+                        <td class="stat-cell" style="text-align: center;">${topicRepliesCount}</td>
                         <td class="last-post-cell" style="text-align: center; font-size: 0.9em;">
                             <span>Par ${author}</span><br>
                             <small style="color: #7f8c8d;">${dateFormatted}</small>
@@ -117,6 +196,7 @@
             }).join('');
         }
 
+        loadHeaderConfig();
         loadGeneralTopics();
     </script>
 </body>
