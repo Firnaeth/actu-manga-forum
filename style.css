@@ -350,11 +350,20 @@ body {
     margin-bottom: 3px;
 }
 
-.user-rank {
-    font-size: 9px;
-    color: #7f8c8d;
-    margin-bottom: 8px;
-}
+/* NOUVEAU STYLE DU GRADE (PLUS LISIBLE) */
+        .rank {
+            display: inline-block;
+            background: #ffe0e9; /* Fond rose très pâle */
+            color: #b02a63;      /* Rose foncé pour le texte */
+            padding: 4px 12px;
+            font-size: 0.8em;
+            font-weight: 800;    /* Texte plus épais */
+            border: 1px solid #ff80ab; /* Petite bordure pour le délimiter */
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
 
 .user-avatar {
     width: 80px;
