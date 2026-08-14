@@ -100,7 +100,6 @@ body {
     opacity: 0.9;
 }
 
-
 .news-flex {
     display: flex;
     gap: 10px;
@@ -284,9 +283,6 @@ body {
     border-top: 1px dashed #74b9ff;
     margin: 8px 0;
 }
-
-.group-admin { color: #e84118; font-weight: bold; }
-.group-member { color: #009432; font-weight: bold; }
 
 /* ==========================================
    PAGE SUJET / DISCUSSION (TOPIC)
@@ -485,78 +481,16 @@ body {
     margin-top: 15px;
 }
 
-/* Profil Member */
-.profile-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 15px;
-    background: #fbf0f5;
-    border-bottom: 1px solid #f8a5c2;
-}
+/* Styles des groupes et rôles */
+.group-admin { color: #e84118; font-weight: bold; }
+.group-member { color: #009432; font-weight: bold; }
+.group-chroniqueur { color: #3498db; font-weight: bold; }
 
-.profile-avatar {
-    width: 90px;
-    height: 90px;
-    object-fit: cover;
-    border: 2px solid #fff;
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    border-radius: 4px;
-}
-
-.profile-title h2 {
-    margin: 0 0 5px 0;
-    color: #2c3e50;
-    font-size: 18px;
-}
-
-.profile-table {
-    width: 100%;
-    border-collapse: collapse;
-    padding: 10px;
-}
-
-.profile-table td {
-    padding: 10px;
-    border-bottom: 1px dashed #f8a5c2;
-    font-size: 11px;
-}
-
-.profile-label {
-    width: 30%;
-    font-weight: bold;
-    color: #7f8c8d;
-    background: #fafafa;
-}
-
-.profile-actions {
-    padding: 15px;
-    text-align: center;
-}
-
-/* Garder la couleur originale des rôles même si c'est un lien */
 a.group-admin { color: #e84118; text-decoration: none; font-weight: bold; }
 a.group-member { color: #009432; text-decoration: none; font-weight: bold; }
 
 a.group-admin:hover, a.group-member:hover {
     text-decoration: underline;
-}
-
-/* Style pour les administrateurs */
-.group-admin {
-    color: #e74c3c;
-    font-weight: bold;
-}
-
-/* Style pour ton nouveau rôle de membres actifs (ex: Chroniqueur) */
-.group-chroniqueur {
-    color: #3498db;
-    font-weight: bold;
-}
-
-/* Style pour les membres classiques */
-.group-member {
-    color: #2ecc71;
 }
 
 /* Style du formulaire de sélection et filtres fiches */
@@ -625,15 +559,6 @@ a.group-admin:hover, a.group-member:hover {
     color: #2c3e50;
 }
 
-.badge.game {
-    background: #74b9ff;
-    color: white;
-    padding: 3px 8px;
-    font-size: 10px;
-    font-weight: bold;
-    border-radius: 3px;
-}
-
 .sheet-body {
     font-size: 11px;
     line-height: 1.6;
@@ -652,7 +577,7 @@ a.group-admin:hover, a.group-member:hover {
 
 .badge.manga { background: #e67e22; color: white; padding: 3px 8px; font-size: 10px; font-weight: bold; border-radius: 3px; }
 .badge.anime { background: #9b59b6; color: white; padding: 3px 8px; font-size: 10px; font-weight: bold; border-radius: 3px; }
-.badge.game  { background: #74b9ff; color: white; padding: 3px 8px; font-size: 10px; font-weight: bold; border-radius: 3px; }
+.badge.game { background: #74b9ff; color: white; padding: 3px 8px; font-size: 10px; font-weight: bold; border-radius: 3px; }
 
 /* ==========================================
    SECTION CONCOURS & FAN-ARTS
@@ -762,20 +687,6 @@ a.group-admin:hover, a.group-member:hover {
 }
 
 /* --- PROFIL & MANGATHÈQUE --- */
-.breadcrumb {
-    background: #f8f9fa;
-    border: 1px dotted #a3b8cc;
-    padding: 8px 12px;
-    margin-bottom: 15px;
-    font-size: 12px;
-    color: #444;
-}
-.breadcrumb a {
-    color: #2b547e;
-    text-decoration: none;
-    font-weight: bold;
-}
-
 .profile-container {
     border: 1px solid #ffb6c1;
     background: #fff0f5;
@@ -793,33 +704,55 @@ a.group-admin:hover, a.group-member:hover {
 }
 
 .avatar-box {
-    width: 90px;
-    height: 100px;
-    border: 1px solid #ccc;
-    background: #f5f5f5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    color: #666;
-    overflow: hidden;
+    display: inline-block;
+    width: auto !important;
+    height: auto !important;
+    max-width: 220px;
+    max-height: 300px;
+    padding: 5px;
+    background: #fff;
+    border: 1px solid #ffb6c1;
+    border-radius: 4px;
 }
+
 .avatar-box img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    display: block;
+    border-radius: 2px;
 }
 
 .user-title h2 {
-    margin: 0;
-    color: #2b3e50;
+    margin: 0 0 5px 0;
+    color: #333;
     font-size: 20px;
 }
-.user-title .rank {
-    color: #d9534f;
-    font-weight: bold;
-    font-size: 13px;
-    margin-top: 4px;
+
+/* Style du Grade (Rank) - Version moderne et lisible optimisée */
+.rank {
+    display: inline-block !important;
+    background: linear-gradient(135deg, #ff80ab, #ff4081) !important;
+    color: #ffffff !important;
+    padding: 5px 15px !important;
+    font-size: 0.9em !important;
+    font-weight: 900 !important;
+    border-radius: 8px !important;
+    text-transform: uppercase !important;
+    margin-bottom: 8px !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+/* Statut utilisateur */
+.user-status-box {
+    font-size: 0.90em;
+    color: #555;
+    background: #fff0f5;
+    border-left: 3px solid #ff80ab;
+    padding: 6px 10px;
+    border-radius: 0 4px 4px 0;
+    margin-top: 5px;
+    font-weight: 600;
 }
 
 .info-table {
@@ -827,13 +760,16 @@ a.group-admin:hover, a.group-member:hover {
     border-collapse: collapse;
     background: #ffffff;
 }
+
 .info-table td {
     padding: 10px 15px;
     border-bottom: 1px dotted #ffb6c1;
 }
+
 .info-table tr:last-child td {
     border-bottom: none;
 }
+
 .label-col {
     width: 30%;
     font-weight: bold;
@@ -846,6 +782,7 @@ a.group-admin:hover, a.group-member:hover {
     background: #ffffff;
     border-top: 1px dotted #ffb6c1;
 }
+
 .btn-mp {
     background: #f3a6b8;
     color: white;
@@ -858,6 +795,7 @@ a.group-admin:hover, a.group-member:hover {
     display: inline-block;
     text-decoration: none;
 }
+
 .btn-mp:hover {
     background: #e2899d;
 }
@@ -866,6 +804,7 @@ a.group-admin:hover, a.group-member:hover {
     border: 1px solid #a3b8cc;
     background: #ffffff;
 }
+
 .manga-header {
     background: #e2eaf2;
     padding: 8px 12px;
@@ -876,6 +815,7 @@ a.group-admin:hover, a.group-member:hover {
     align-items: center;
     gap: 8px;
 }
+
 .manga-content {
     padding: 15px;
 }
@@ -888,6 +828,7 @@ a.group-admin:hover, a.group-member:hover {
     display: flex;
     gap: 10px;
 }
+
 .add-manga-form input {
     padding: 6px;
     border: 1px solid #ccc;
@@ -903,6 +844,7 @@ a.group-admin:hover, a.group-member:hover {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 10px;
 }
+
 .manga-item {
     border: 1px dotted #ffb6c1;
     background: #fff0f5;
@@ -911,10 +853,12 @@ a.group-admin:hover, a.group-member:hover {
     justify-content: space-between;
     align-items: center;
 }
+
 .manga-info strong {
     color: #222;
     font-size: 13px;
 }
+
 .volume-counter {
     margin-top: 4px;
     display: flex;
@@ -938,6 +882,7 @@ a.group-admin:hover, a.group-member:hover {
     font-size: 12px;
     padding: 0;
 }
+
 .btn-qty:hover {
     background: #f3a6b8;
     color: white;
@@ -983,116 +928,11 @@ a.group-admin:hover, a.group-member:hover {
 }
 
 .fc-badge-item {
-    height: 19px; /* Format classique des mini-banners FC */
+    height: 19px;
     border: 1px solid #333;
 }
 
-/* Le conteneur/cadre s'adapte à la taille de l'image */
-.profile-avatar-box, .post-user img {
-    display: inline-block;
-    width: auto;
-    height: auto;
-    max-width: 200px; /* Optionnel : limite la taille max si l'image est immense */
-    max-height: 250px; /* Optionnel : limite la hauteur max */
-    padding: 4px;     /* Pour garder l'effet de cadre (bordure) */
-    background: #fff; /* Fond du cadre si besoin */
-    border: 1px solid #ffb6c1; /* Ta bordure rose actuelle */
-}
-
-/* L'image prend toute la place naturelle du cadre sans se déformer */
-.profile-avatar-box img {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-/* STYLE DU GRADE ULTRA-LISIBLE */
-        .rank {
-            display: inline-block;
-            background: #d63384; /* Fond rose foncé bien vif */
-            color: #ffffff;      /* Texte en blanc pur */
-            padding: 5px 12px;
-            font-size: 0.85em;
-            font-weight: 800;    /* Texte bien épais */
-            border-radius: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-            margin-bottom: 8px;
-        }
-
-        /* STYLE DU STATUT ULTRA-LISIBLE */
-        .user-status-box {
-            font-size: 0.90em;
-            color: #222222;      /* Texte presque noir pour une lecture parfaite */
-            background: #fff0f5;
-            border-left: 3px solid #d63384; /* Bordure rose foncé assortie */
-            padding: 6px 10px;
-            border-radius: 0 4px 4px 0;
-            margin-top: 5px;
-            font-weight: 600;
-        }
-/* --- COMPOSANTS DU PROFIL --- */
-
-/* Ajustement automatique du cadre d'avatar */
-.avatar-box {
-    display: inline-block;
-    width: auto !important;
-    height: auto !important;
-    max-width: 220px;
-    max-height: 300px;
-    padding: 5px;
-    background: #fff;
-    border: 1px solid #ffb6c1;
-    border-radius: 4px;
-}
-
-.avatar-box img {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 2px;
-}
-
-/* Mise en valeur du header profil */
-.profile-header {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.user-title h2 {
-    margin: 0 0 5px 0;
-    color: #333;
-}
-
-/* Style du Grade (Rank) - Dégradé moderne et lisible */
-.rank {
-    display: inline-block !important;
-    background: linear-gradient(135deg, #ff80ab, #ff4081) !important;
-    color: #ffffff !important;
-    padding: 5px 15px !important;
-    font-size: 0.9em !important;
-    font-weight: 900 !important;
-    border-radius: 8px !important;
-    text-transform: uppercase !important;
-    margin-bottom: 8px !important;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4) !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-}
-
-/* Statut utilisateur */
-.user-status-box {
-    font-size: 0.90em;
-    color: #555;
-    background: #fff0f5;
-    border-left: 3px solid #ff80ab;
-    padding: 6px 10px;
-    border-radius: 0 4px 4px 0;
-    margin-top: 5px;
-}
-
-/* Bloc d'édition profil */
+/* --- BLOC D'ÉDITION PROFIL --- */
 .edit-profile-box {
     background: #fff;
     border: 1px solid #ffb6c1;
