@@ -29,8 +29,9 @@
             <a href="#reply-form" class="btn-reply">Répondre à ce sujet</a>
         </div>
 
+        <!-- CONTENEUR GLOBAL DES POSTS (SUJET + RÉPONSES) -->
         <div id="posts-container">
-            <p style="text-align: center; padding: 20px;">Chargement du message...</p>
+            <p style="text-align: center; padding: 20px;">Chargement du sujet et des réponses...</p>
         </div>
 
         <div class="reply-box" id="reply-form">
@@ -48,11 +49,9 @@
         // --- 1. VÉRIFICATION DE LA VRAIE SESSION ---
         const currentUsername = localStorage.getItem('forumUsername');
         const currentRole = localStorage.getItem('forumUserRole') || 'member';
-        
-        // Le staff est strictement réservé aux rôles 'admin' ou 'modo' enregistrés
         const isStaff = (currentRole === 'admin' || currentRole === 'modo');
 
-        // --- 2. CONFIGURATION DES CATÉGORIES (UNIVERSEL) ---
+        // --- 2. CONFIGURATION DES CATÉGORIES ---
         const categoryMap = {
             'planning': { name: 'Planning des Sorties VF', url: 'news.html' },
             'manga': { name: 'Discussion Manga', url: 'community.html' },
@@ -67,28 +66,39 @@
             if (!text) return '';
             const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif))/gi;
             let formatted = text.replace(urlRegex, (url) => {
-                return `<br><img src="${url}" alt="Création graphique" style="max-width: 100%; border-radius: 4px; margin: 10px 0;"><br>`;
+                return `<br><img src="${url}" alt="Image" style="max-width: 100%; border-radius: 4px; margin: 10px 0;"><br>`;
             });
             return formatted.replace(/\n/g, '<br>');
         }
 
-        // --- 4. CHARGEMENT DU SUJET ET DE LA SIGNATURE DE L'AUTEUR ---
         const topicId = new URLSearchParams(window.location.search).get('id');
 
-        async function loadTopic() {
-            if (!topicId) return;
+        // --- 4. CHARGEMENT DU SUJET ET DES RÉPONSES ---
+        async function loadTopicAndReplies() {
+            if (!topicId) {
+                document.getElementById('posts-container').innerHTML = "<p>Aucun sujet spécifié.</p>";
+                return;
+            }
 
-            const { data: topic, error } = await supabase
+            // A. Charger le sujet principal
+            const { data: topic, error: topicError } = await supabase
                 .from('topics')
                 .select('*')
                 .eq('id', topicId)
                 .single();
 
-            if (error || !topic) {
+            if (topicError || !topic) {
                 document.getElementById('posts-container').innerHTML = "<p>Sujet introuvable.</p>";
                 return;
             }
 
+            document.getElementById('topic-title').textContent = topic.title;
+            document.getElementById('bread-topic-title').textContent = topic.title;
+            
+            const catInfo = categoryMap[topic.category] || { name: topic.category, url: 'index.html' };
+            document.getElementById('bread-category-slot').innerHTML = `<a href="${catInfo.url}">${catInfo.name}</a>`;
+
+            // Récupérer la signature de l'auteur du sujet
             let authorSignatureHtml = '';
             if (topic.author) {
                 const { data: profile } = await supabase
@@ -106,15 +116,10 @@
                 }
             }
 
-            document.getElementById('topic-title').textContent = topic.title;
-            document.getElementById('bread-topic-title').textContent = topic.title;
-            
-            const catInfo = categoryMap[topic.category] || { name: topic.category, url: 'index.html' };
-            document.getElementById('bread-category-slot').innerHTML = `<a href="${catInfo.url}">${catInfo.name}</a>`;
-
             const isAuthorStaff = (topic.author || '').includes('Otaku') || (topic.author || '').includes('Modo');
-            
-            document.getElementById('posts-container').innerHTML = `
+
+            // Construction du HTML du premier message
+            let htmlContent = `
                 <div class="post-box">
                     <div class="post-user">
                         <a href="profile.html?user=${topic.author}" class="username ${isAuthorStaff ? 'admin' : 'member'}">${topic.author || 'Anonyme'}</a>
@@ -132,9 +137,85 @@
                     </div>
                 </div>
             `;
+
+            // B. Charger les réponses (replies) associées à ce sujet
+            const { data: replies, error: repliesError } = await supabase
+                .from('replies')
+                .select('*')
+                .eq('topic_id', topicId)
+                .order('created_at', { ascending: true });
+
+            if (!repliesError && replies && replies.length > 0) {
+                for (const reply of replies) {
+                    const isReplyStaff = (reply.author || '').includes('Otaku') || (reply.author || '').includes('Modo');
+                    
+                    // Optionnel : récupérer la signature de l'auteur de la réponse
+                    let replySigHtml = '';
+                    const { data: replyProfile } = await supabase
+                        .from('profiles')
+                        .select('signature')
+                        .eq('username', reply.author)
+                        .single();
+
+                    if (replyProfile && replyProfile.signature) {
+                        if (replyProfile.signature.startsWith('http://') || replyProfile.signature.startsWith('https://')) {
+                            replySigHtml = `<div class="post-signature"><img src="${replyProfile.signature}" alt="Signature"></div>`;
+                        } else {
+                            replySigHtml = `<div class="post-signature"><small>${replyProfile.signature}</small></div>`;
+                        }
+                    }
+
+                    htmlContent += `
+                        <div class="post-box" style="margin-top: 15px;">
+                            <div class="post-user">
+                                <a href="profile.html?user=${reply.author}" class="username ${isReplyStaff ? 'admin' : 'member'}">${reply.author || 'Anonyme'}</a>
+                                <div class="user-rank">${isReplyStaff ? 'Staff' : 'Membre'}</div>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-date">Répondu le ${new Date(reply.created_at).toLocaleDateString()}
+                                    ${isStaff ? `<button class="btn-mod" onclick="deleteReply(${reply.id})">Supprimer</button>` : ''}
+                                </div>
+                                <div class="post-text" style="margin-top: 10px;">
+                                    ${formatContent(reply.content)}
+                                </div>
+                                ${replySigHtml}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            document.getElementById('posts-container').innerHTML = htmlContent;
         }
 
-        // --- 5. ACTIONS DE MODÉRATION ---
+        // --- 5. ENVOI D'UNE NOUVELLE RÉPONSE ---
+        document.getElementById('form-add-reply').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!currentUsername) {
+                alert("Vous devez être connecté pour répondre.");
+                return;
+            }
+
+            const content = document.getElementById('message').value;
+
+            const { error } = await supabase
+                .from('replies')
+                .insert([{
+                    topic_id: topicId,
+                    author: currentUsername,
+                    content: content
+                }]);
+
+            if (error) {
+                alert("Erreur lors de l'envoi de la réponse : " + error.message);
+            } else {
+                document.getElementById('message').value = '';
+                loadTopicAndReplies(); // Recharger la liste pour afficher la nouvelle réponse instantanément
+            }
+        });
+
+        // --- 6. ACTIONS DE MODÉRATION ---
         window.deleteTopic = async (id) => {
             if(confirm("Supprimer ce sujet ?")) {
                 await supabase.from('topics').delete().eq('id', id);
@@ -150,7 +231,14 @@
             }
         };
 
-        loadTopic();
+        window.deleteReply = async (id) => {
+            if(confirm("Supprimer cette réponse ?")) {
+                await supabase.from('replies').delete().eq('id', id);
+                loadTopicAndReplies();
+            }
+        };
+
+        loadTopicAndReplies();
     </script>
 </body>
 </html>
