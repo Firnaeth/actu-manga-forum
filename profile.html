@@ -25,6 +25,39 @@
             border-radius: 2px;
         }
 
+        /* MISE EN VALEUR DU GRADE ET DU STATUT */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .user-title h2 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        .rank {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff80ab, #ff4081);
+            color: white;
+            padding: 4px 10px;
+            font-size: 0.85em;
+            font-weight: bold;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(255, 64, 129, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .user-status-box {
+            font-size: 0.90em;
+            color: #555;
+            background: #fff0f5;
+            border-left: 3px solid #ff80ab;
+            padding: 6px 10px;
+            border-radius: 0 4px 4px 0;
+            margin-top: 5px;
+        }
+
         .edit-profile-box {
             background: #fff;
             border: 1px solid #ffb6c1;
@@ -85,8 +118,8 @@
                 </div>
                 <div class="user-title">
                     <h2 id="user-name">Membre</h2>
-                    <div class="rank" id="user-rank">Membre</div>
-                    <div style="margin-top: 8px; font-size: 0.9em; color: #666;" id="user-status"><em>Pas de statut particulier...</em></div>
+                    <div><span class="rank" id="user-rank">Membre</span></div>
+                    <div class="user-status-box" id="user-status"><em>Pas de statut particulier...</em></div>
                 </div>
             </div>
 
