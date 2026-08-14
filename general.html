@@ -77,9 +77,11 @@
         async function loadGeneralTopics() {
             const container = document.getElementById('general-topics-container');
 
+            // On récupère depuis la table globale 'topics' filtrée par la catégorie 'general'
             const { data: topics, error } = await supabase
-                .from('general_topics')
+                .from('topics')
                 .select('*')
+                .eq('category', 'general')
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -100,8 +102,8 @@
                     <tr>
                         <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">💬</span></td>
                         <td class="forum-desc">
-                            <!-- LIEN MIS À JOUR VERS LA PAGE DÉDIÉE TOPIC-GENERAL.HTML -->
-                            <a href="topic-general.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                            <!-- LIEN MIS À JOUR VERS LE TOPIC UNIVERSEL -->
+                            <a href="topic.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
                         </td>
                         <td class="stat-cell" style="text-align: center;">${author}</td>
