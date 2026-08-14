@@ -1020,3 +1020,9 @@ a.group-admin:hover, a.group-member:hover {
     height: auto;
     display: block;
 }
+/* Amélioration de la lisibilité du statut */
+.user-status-box {
+    color: #333; /* Texte plus sombre */
+    font-weight: 500; /* Un tout petit peu plus épais */
+    /* ... reste de tes propriétés ... */
+}
