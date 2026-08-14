@@ -16,11 +16,12 @@
 <body>
 
     <div id="wrapper">
-        <!-- BARRE DE CONNEXION -->
+        <!-- BARRE DE CONNEXION AVEC MODE MODO -->
         <div class="admin-bar">
             <span>Connecté en tant que : <strong id="current-user-display">---</strong></span>
             <div>
                 <button type="button" onclick="switchRole('group-admin')">Mode Admin</button>
+                <button type="button" onclick="switchRole('group-modo')">Mode Modo</button>
                 <button type="button" onclick="switchRole('group-member')">Mode Membre</button>
             </div>
         </div>
@@ -55,22 +56,37 @@
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // --- 1. SESSION ET RÔLES ---
+        // --- 1. SESSION ET RÔLES (ADMIN, MODO, MEMBRE) ---
         if (!localStorage.getItem('forumUsername')) {
             localStorage.setItem('forumUserRole', 'admin');
             localStorage.setItem('forumUsername', 'Admin_Otaku');
         }
 
         window.switchRole = function(role) {
-            localStorage.setItem('forumUserRole', role === 'group-admin' ? 'admin' : 'member');
-            localStorage.setItem('forumUsername', role === 'group-admin' ? 'Admin_Otaku' : 'Yoru_Chan');
+            if (role === 'group-admin') {
+                localStorage.setItem('forumUserRole', 'admin');
+                localStorage.setItem('forumUsername', 'Admin_Otaku');
+            } else if (role === 'group-modo') {
+                localStorage.setItem('forumUserRole', 'modo');
+                localStorage.setItem('forumUsername', 'Modo_Test');
+            } else {
+                localStorage.setItem('forumUserRole', 'member');
+                localStorage.setItem('forumUsername', 'Yoru_Chan');
+            }
             location.reload();
         }
 
         const currentRole = localStorage.getItem('forumUserRole');
         const currentUsername = localStorage.getItem('forumUsername');
-        const isStaff = (currentRole === 'admin' || currentUsername.includes('Otaku'));
-        document.getElementById('current-user-display').textContent = `${currentUsername} (${isStaff ? 'Staff' : 'Membre'})`;
+        
+        // Le staff inclut les admins, les modos et les pseudos contenant Otaku
+        const isStaff = (currentRole === 'admin' || currentRole === 'modo' || currentUsername.includes('Otaku'));
+        
+        let displayRankName = 'Membre';
+        if (currentRole === 'admin') displayRankName = 'Fondateur / Admin';
+        else if (currentRole === 'modo') displayRankName = 'Modérateur';
+        
+        document.getElementById('current-user-display').textContent = `${currentUsername} (${displayRankName})`;
 
         // --- 2. CONFIGURATION DES CATÉGORIES (UNIVERSEL) ---
         const categoryMap = {
@@ -85,12 +101,10 @@
         // --- 3. FONCTION DE TRANSFORMATION DES LIENS EN IMAGES ---
         function formatContent(text) {
             if (!text) return '';
-            // Transforme les liens d'images directs en balises <img>
             const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif))/gi;
             let formatted = text.replace(urlRegex, (url) => {
                 return `<br><img src="${url}" alt="Création graphique" style="max-width: 100%; border-radius: 4px; margin: 10px 0;"><br>`;
             });
-            // Conserve les retours à la ligne
             return formatted.replace(/\n/g, '<br>');
         }
 
@@ -136,13 +150,13 @@
             const catInfo = categoryMap[topic.category] || { name: topic.category, url: 'index.html' };
             document.getElementById('bread-category-slot').innerHTML = `<a href="${catInfo.url}">${catInfo.name}</a>`;
 
-            const isAuthorStaff = (topic.author || '').includes('Otaku');
+            const isAuthorStaff = (topic.author || '').includes('Otaku') || (topic.author || '').includes('Modo');
             
             document.getElementById('posts-container').innerHTML = `
                 <div class="post-box">
                     <div class="post-user">
                         <a href="profile.html?user=${topic.author}" class="username ${isAuthorStaff ? 'admin' : 'member'}">${topic.author || 'Anonyme'}</a>
-                        <div class="user-rank">${isAuthorStaff ? 'Fondateur' : 'Membre'}</div>
+                        <div class="user-rank">${isAuthorStaff ? 'Staff' : 'Membre'}</div>
                     </div>
                     <div class="post-content">
                         <div class="post-date">Posté le ${new Date(topic.created_at).toLocaleDateString()}
@@ -158,7 +172,7 @@
             `;
         }
 
-        // --- 5. ACTIONS ADMIN ---
+        // --- 5. ACTIONS DE MODÉRATION ---
         window.deleteTopic = async (id) => {
             if(confirm("Supprimer ce sujet ?")) {
                 await supabase.from('topics').delete().eq('id', id);
