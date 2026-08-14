@@ -963,3 +963,32 @@ a.group-admin:hover, a.group-member:hover {
 .empty-manga-msg {
     color: #888;
 }
+
+/* Style rétro pour les signatures de forum */
+.user-signature {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed #ccc;
+    font-size: 11px;
+    color: #555;
+    text-align: left;
+}
+
+.user-signature img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.fc-badges-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-top: 5px;
+}
+
+.fc-badge-item {
+    height: 19px; /* Format classique des mini-banners FC */
+    border: 1px solid #333;
+}
