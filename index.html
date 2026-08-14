@@ -124,7 +124,7 @@
             </tbody>
         </table>
 
-        <!-- CATÉGORIE 2 : ESPACE COMMUNAUTÉ & CRÉATIONS (MIS À JOUR) -->
+        <!-- CATÉGORIE 2 : ESPACE COMMUNAUTÉ & CRÉATIONS -->
         <table class="forum-table">
             <thead>
                 <tr>
@@ -245,21 +245,13 @@
         const currentUsername = localStorage.getItem('forumUsername');
         const currentUserRole = localStorage.getItem('forumUserRole');
 
-        // Fonction globale de déconnexion avec redirection vers l'index
         window.logout = async function(e) {
             if (e) e.preventDefault();
-            try {
-                await supabase.auth.signOut();
-            } catch (err) {
-                console.error("Erreur déconnexion Supabase:", err);
-            }
-            localStorage.removeItem('forumUsername');
-            localStorage.removeItem('forumUserRole');
-            localStorage.removeItem('forumAdminMode');
+            try { await supabase.auth.signOut(); } catch (err) { console.error(err); }
+            localStorage.clear();
             window.location.href = 'index.html';
         };
 
-        // GESTION CONNEXION
         const profileLink = document.getElementById('nav-profile-link');
         const authLink = document.getElementById('nav-auth-link');
         if (currentUsername) {
@@ -269,7 +261,6 @@
             authLink.onclick = window.logout;
         }
 
-        // GESTION ADMINISTRATION
         const adminBar = document.getElementById('admin-bar-container');
         if (currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku" || currentUserRole === "admin") {
             adminBar.classList.remove('hidden');
@@ -279,7 +270,7 @@
             document.getElementById('admin-panel-form').classList.toggle('hidden');
             const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
                 title: "Bienvenue sur Actu Manga World", 
-                subtitle: "Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !", 
+                subtitle: "Toutes les sorties VF, fiches animes...", 
                 banner: "https://images.alphacoders.com/605/605592.png" 
             };
             document.getElementById('input-forum-title').value = config.title;
@@ -291,7 +282,6 @@
             document.getElementById('admin-panel-form').classList.add('hidden');
         });
 
-        // ENREGISTREMENT CONFIG EN-TÊTE
         document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
             e.preventDefault();
             const newConfig = {
@@ -304,11 +294,10 @@
             window.location.reload();
         });
 
-        // CHARGEMENT CONFIG EN-TÊTE
         function loadHeaderConfig() {
             const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
                 title: "Bienvenue sur Actu Manga World", 
-                subtitle: "Toutes les sorties VF / VOSTFR, fiches animes, concours de dessin Non-IA et espace Gaming !", 
+                subtitle: "Toutes les sorties VF / VOSTFR...", 
                 banner: "https://images.alphacoders.com/605/605592.png" 
             };
             document.getElementById('forum-title-display').textContent = config.title;
@@ -316,7 +305,6 @@
             document.getElementById('forum-banner-img').src = config.banner;
         }
 
-        // CHARGEMENT DYNAMIQUE DES SUJETS DEPUIS SUPABASE
         async function loadForumData() {
             const { data: topics, error } = await supabase
                 .from('topics')
@@ -325,7 +313,6 @@
 
             if (error || !topics) return;
 
-            // 1. Remplir la box des dernières actualités en haut
             const newsListEl = document.getElementById('latest-news-list');
             if (topics.length > 0) {
                 newsListEl.innerHTML = topics.slice(0, 5).map(t => {
@@ -336,7 +323,6 @@
                 newsListEl.innerHTML = "<li><em>Aucun sujet publié pour le moment.</em></li>";
             }
 
-            // 2. Traiter par catégorie pour les tableaux du forum
             const categories = ['planning', 'licences', 'conventions', 'manga', 'graphisme', 'fc', 'gaming', 'general'];
             
             categories.forEach(cat => {
@@ -351,10 +337,9 @@
                     if (lastCellEl) {
                         const dateFormatted = new Date(latest.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit'});
                         const author = latest.author || 'Otaku_33';
-                        
                         lastCellEl.innerHTML = `
                             <a href="topic.html?id=${latest.id}">${latest.title}</a><br>
-                            <span style="font-size: 0.85em; color: #7f8c8d;">Le ${dateFormatted} par <a href="#" style="color: #c0392b;">${author}</a></span>
+                            <span style="font-size: 0.85em; color: #7f8c8d;">Le ${dateFormatted} par <span style="color: #c0392b;">${author}</span></span>
                         `;
                     }
                 } else {
@@ -363,41 +348,19 @@
             });
         }
 
-        // CHARGEMENT MEMBRES EN LIGNE
         async function loadOnlineUsers() {
-            const { data: profiles, error } = await supabase.from('profiles').select('username, role, avatar_url');
-            
+            const { data: profiles } = await supabase.from('profiles').select('username, role, avatar_url');
             const staffContainer = document.getElementById('staff-avatars-container');
             const countMsg = document.getElementById('online-count-msg');
             const usersListContainer = document.getElementById('online-users-list');
             const defaultAvatar = "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg";
 
-            if (error || !profiles || profiles.length === 0) {
-                if (countMsg) countMsg.innerHTML = "Il y a actuellement <strong>0</strong> membre inscrit sur le forum.";
-                if (usersListContainer) usersListContainer.innerHTML = "<em>Aucun membre.</em>";
-                if (staffContainer) staffContainer.innerHTML = "<em>Aucun membre.</em>";
-                return;
-            }
+            if (!profiles || profiles.length === 0) return;
 
-            if (countMsg) {
-                countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
-            }
-
+            if (countMsg) countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
             if (usersListContainer) {
-                const formattedUsers = profiles.map(user => {
-                    let roleClass = "group-member";
-                    if (user.role === 'admin' || user.username === 'Admin_Otaku' || user.username === 'Otaku_33') {
-                        roleClass = "group-admin";
-                    } else if (user.role === 'moderator') {
-                        roleClass = "group-moderator";
-                    } else {
-                        roleClass = "group-chroniqueur";
-                    }
-                    return `<a href="profile.html?user=${encodeURIComponent(user.username)}" class="${roleClass}" style="text-decoration: none;">${user.username}</a>`;
-                });
-                usersListContainer.innerHTML = formattedUsers.join(', ');
+                usersListContainer.innerHTML = profiles.map(u => `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none;">${u.username}</a>`).join(', ');
             }
-
             if (staffContainer) {
                 staffContainer.innerHTML = profiles.map(user => {
                     const avatar = (user.avatar_url && user.avatar_url.trim() !== "") ? user.avatar_url : defaultAvatar;
