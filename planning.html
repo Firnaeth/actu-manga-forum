@@ -63,7 +63,13 @@
 
         async function loadPlanningTopics() {
             const container = document.getElementById('planning-topics-container');
-            const { data: topics, error } = await supabase.from('planning_topics').select('*').order('created_at', { ascending: false });
+            
+            // On récupère depuis la table globale 'topics' filtrée par la catégorie 'planning'
+            const { data: topics, error } = await supabase
+                .from('topics')
+                .select('*')
+                .eq('category', 'planning')
+                .order('created_at', { ascending: false });
 
             if (error || !topics || topics.length === 0) {
                 container.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun planning pour le moment.</td></tr>`;
@@ -76,7 +82,8 @@
                     <tr>
                         <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">🗓️</span></td>
                         <td class="forum-desc">
-                            <a href="topic-planning.html?category=planning&id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                            <!-- LIEN MIS À JOUR VERS LE TOPIC UNIVERSEL -->
+                            <a href="topic.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
                         </td>
                         <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
