@@ -156,7 +156,7 @@
                 // Gestion dynamique du rang et de sa couleur de badge
                 const rankSpan = document.getElementById('user-rank');
                 const userRole = profile.role ? profile.role.toLowerCase() : 'member';
-                const userRankText = profile.rank || (userRole === 'admin' ? 'Administrateur' : userRole === 'moderator' ? 'Modérateur' : 'Membre');
+                const userRankText = profile.rank || (userRole === 'admin' ? 'Administrateur' : (userRole === 'moderator' || userRole === 'modérateur' || userRole === 'mod') ? 'Modérateur' : 'Membre');
                 
                 rankSpan.textContent = userRankText;
                 
@@ -164,7 +164,7 @@
                 rankSpan.className = 'rank';
                 if (userRole === 'admin') {
                     rankSpan.classList.add('rank-admin');
-                } else if (userRole === 'moderator' || userRole === 'modérateur') {
+                } else if (userRole === 'moderator' || userRole === 'modérateur' || userRole === 'mod') {
                     rankSpan.classList.add('rank-mod');
                 } else {
                     rankSpan.classList.add('rank-member');
