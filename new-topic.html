@@ -2,27 +2,15 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Créer un Nouveau Sujet - Actu Manga World</title>
+    <title>Créer un Nouveau Sujet</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="wrapper">
-
-        <!-- BARRE DE NAVIGATION VINTAGE -->
-        <nav class="forum-nav" style="margin-bottom: 20px;">
-            <a href="index.html" class="nav-link">Index</a>
-            <a href="community.html" class="nav-link">Fiches & Critiques</a>
-            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
-            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil</a>
-            <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
-        </nav>
-
         <h1 class="topic-main-title">📝 Création d'un Nouveau Sujet</h1>
-        
         <form class="reply-form" id="new-topic-form">
             <label for="topic-type">Catégorie :</label>
-            <select id="topic-type" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px;">
+            <select id="topic-type" style="width: 100%; padding: 8px; margin-bottom: 12px;">
                 <option value="planning">📅 Planning des Sorties VF</option>
                 <option value="licences">🚧 Annonces</option>
                 <option value="conventions">🎟️ Planning des Conventions & Projets</option>
@@ -34,40 +22,19 @@
             </select>
 
             <label for="topic-title-input">Titre :</label>
-            <input type="text" id="topic-title-input" style="width: 100%; padding: 8px; margin-bottom: 12px; box-sizing: border-box;" required>
+            <input type="text" id="topic-title-input" style="width: 100%; padding: 8px; margin-bottom: 12px;" required>
 
             <label for="topic-content">Contenu :</label>
-            <textarea id="topic-content" rows="10" style="width: 100%; padding: 8px; box-sizing: border-box;" required></textarea>
+            <textarea id="topic-content" rows="10" style="width: 100%;" required></textarea>
 
-            <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
-                <button type="submit" class="btn-submit" style="padding: 10px 20px; background: #c0392b; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Publier le sujet</button>
-                <a href="index.html" style="color: #666; text-decoration: none; font-size: 0.9em;">Annuler et retourner à l'index</a>
-            </div>
+            <button type="submit" class="btn-submit" style="margin-top: 15px;">Publier le sujet</button>
         </form>
     </div>
 
     <script type="module">
         import { supabase } from './supabase.js';
 
-        const currentUsername = localStorage.getItem('forumUsername');
-        const profileLink = document.getElementById('nav-profile-link');
-        const authLink = document.getElementById('nav-auth-link');
-
-        if (currentUsername) {
-            profileLink.classList.remove('hidden');
-            authLink.textContent = "Déconnexion";
-            authLink.onclick = async (e) => {
-                e.preventDefault();
-                await supabase.auth.signOut();
-                localStorage.clear();
-                window.location.reload();
-            };
-        } else {
-            alert("Vous devez être connecté pour publier un sujet.");
-            window.location.href = "register.html";
-        }
-
-        // Pré-sélectionner la catégorie si elle est passée dans l'URL (ex: new-topic.html?cat=graphisme)
+        // Optionnel : Pré-sélectionner la catégorie si elle est passée dans l'URL (ex: new-topic.html?cat=graphisme)
         const urlParams = new URLSearchParams(window.location.search);
         const catParam = urlParams.get('cat');
         if (catParam) {
@@ -83,9 +50,9 @@
         document.getElementById('new-topic-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const category = document.getElementById('topic-type').value;
-            const title = document.getElementById('topic-title-input').value.trim();
-            const content = document.getElementById('topic-content').value.trim();
-            const author = currentUsername || 'Admin_Otaku';
+            const title = document.getElementById('topic-title-input').value;
+            const content = document.getElementById('topic-content').value;
+            const author = localStorage.getItem('forumUsername') || 'Admin_Otaku';
 
             const { data, error } = await supabase
                 .from('topics')
@@ -95,16 +62,7 @@
             if (error) {
                 alert("Erreur : " + error.message);
             } else {
-                // Redirection intelligente selon la catégorie choisie
-                if (category === 'graphisme') {
-                    window.location.href = 'forum_graphisme.html';
-                } else if (category === 'fc') {
-                    window.location.href = 'forum_fc.html';
-                } else if (data && data[0]) {
-                    window.location.href = `topic.html?id=${data[0].id}`;
-                } else {
-                    window.location.href = 'index.html';
-                }
+                window.location.href = `topic.html?id=${data[0].id}`;
             }
         });
     </script>
