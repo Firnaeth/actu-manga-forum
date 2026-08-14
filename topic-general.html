@@ -13,6 +13,7 @@
             <div>
                 <button onclick="setAdminMode(true)" style="background: #ecf0f1; color: #2c3e50; border: none; padding: 4px 8px; font-weight: bold; cursor: pointer; border-radius: 3px; margin-right: 5px;">Mode Admin</button>
                 <button onclick="setAdminMode(false)" style="background: #bdc3c7; color: #2c3e50; border: none; padding: 4px 8px; font-weight: bold; cursor: pointer; border-radius: 3px;">Mode Membre</button>
+                <button onclick="logout()" style="background: #e74c3c; color: white; border: none; padding: 4px 8px; font-weight: bold; cursor: pointer; border-radius: 3px; margin-left: 10px;">Déconnexion</button>
             </div>
         </div>
 
@@ -69,14 +70,33 @@
     <script type="module">
         import { supabase } from './supabase.js';
         
-        let currentUsername = localStorage.getItem('forumUsername') || 'Otaku_33';
+        let currentUsername = localStorage.getItem('forumUsername');
         let isAdminMode = localStorage.getItem('forumAdminMode') === 'true';
+
+        // Fonction globale de déconnexion
+        window.logout = async function() {
+            try {
+                await supabase.auth.signOut();
+            } catch (err) {
+                console.error("Erreur déconnexion Supabase:", err);
+            }
+            localStorage.removeItem('forumUsername');
+            localStorage.removeItem('forumUserRole');
+            localStorage.removeItem('forumAdminMode');
+            window.location.href = 'index.html';
+        };
 
         function updateStatusBar() {
             const bar = document.getElementById('user-status-bar');
             const topBar = document.getElementById('admin-top-bar');
 
-            // Masquer entièrement le bandeau admin pour les simples membres
+            // Si l'utilisateur n'est pas connecté du tout, masquer le bandeau admin/status
+            if (!currentUsername) {
+                if (topBar) topBar.style.display = 'none';
+                return;
+            }
+
+            // Si ce n'est pas Otaku_33, masquer le bandeau admin supérieur également
             if (currentUsername !== 'Otaku_33') {
                 if (topBar) topBar.style.display = 'none';
                 return;
@@ -88,7 +108,6 @@
         }
 
         window.setAdminMode = function(status) {
-            // Sécurité : Seul Otaku_33 peut activer le mode admin
             if (status === true && currentUsername !== 'Otaku_33') {
                 alert("Accès refusé : Seul 'Otaku_33' peut passer en mode administrateur !");
                 return;
@@ -161,7 +180,7 @@
             document.getElementById('topic-date').textContent = new Date(topic.created_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'});
             document.getElementById('topic-content-body').textContent = topic.content || '';
 
-            const isTopicAuthor = (currentUsername === topic.author);
+            const isTopicAuthor = (currentUsername && currentUsername === topic.author);
             const isAdminAuthorized = (isAdminMode && currentUsername === 'Otaku_33');
 
             if (isTopicAuthor || isAdminAuthorized) {
@@ -190,7 +209,7 @@
             container.innerHTML = replies.map(r => {
                 const replyDate = new Date(r.created_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'});
                 
-                const isAuthor = (currentUsername === r.author);
+                const isAuthor = (currentUsername && currentUsername === r.author);
                 const isAdminAuthorized = (isAdminMode && currentUsername === 'Otaku_33');
                 const canModify = isAuthor || isAdminAuthorized;
                 
@@ -223,7 +242,7 @@
         document.getElementById('submit-reply').onclick = async () => {
             const content = document.getElementById('reply-content').value.trim();
             if (!content) { alert("Veuillez écrire un message."); return; }
-            if (currentUsername === 'Invité') { alert("Vous devez être connecté pour répondre."); window.location.href = 'register.html'; return; }
+            if (!currentUsername) { alert("Vous devez être connecté pour répondre."); window.location.href = 'register.html'; return; }
 
             const { error } = await supabase.from('topic_replies').insert([{
                 topic_id: topicId,
