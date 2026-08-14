@@ -11,7 +11,7 @@
             display: inline-block;
             width: auto !important;
             height: auto !important;
-            max-width: 220px; /* Limite maximale pour éviter les images géantes */
+            max-width: 220px;
             max-height: 300px;
             padding: 5px;
             background: #fff;
@@ -86,6 +86,7 @@
                 <div class="user-title">
                     <h2 id="user-name">Membre</h2>
                     <div class="rank" id="user-rank">Membre</div>
+                    <div style="margin-top: 8px; font-size: 0.9em; color: #666;" id="user-status"><em>Pas de statut particulier...</em></div>
                 </div>
             </div>
 
@@ -103,6 +104,18 @@
                     <td id="user-fav">-</td>
                 </tr>
                 <tr>
+                    <td class="label-col">Animé du moment :</td>
+                    <td id="user-anime">-</td>
+                </tr>
+                <tr>
+                    <td class="label-col">Citation favorite :</td>
+                    <td id="user-quote"><em>-</em></td>
+                </tr>
+                <tr>
+                    <td class="label-col">Discord :</td>
+                    <td id="user-discord">-</td>
+                </tr>
+                <tr>
                     <td class="label-col">Signature :</td>
                     <td id="user-sig"><em>-</em></td>
                 </tr>
@@ -118,13 +131,29 @@
             <div class="edit-profile-title">✏️ Modifier mes informations de profil</div>
             <form id="form-edit-profile">
                 <div class="edit-form-grid">
-                    <div>
+                    <div class="full-width">
                         <label><small>Lien de l'avatar (URL Image) :</small></label>
-                        <input type="url" id="edit-avatar-url" placeholder="https://..." required>
+                        <input type="url" id="edit-avatar-url" placeholder="https://...">
+                    </div>
+                    <div class="full-width">
+                        <label><small>Statut / Humeur du moment :</small></label>
+                        <input type="text" id="edit-status" placeholder="Ex: En train de lire le dernier chapitre...">
                     </div>
                     <div>
                         <label><small>Manga(s) favori(s) :</small></label>
                         <input type="text" id="edit-fav-manga" placeholder="Ex: Bleach, Naruto...">
+                    </div>
+                    <div>
+                        <label><small>Animé du moment :</small></label>
+                        <input type="text" id="edit-anime" placeholder="Ex: Solo Leveling...">
+                    </div>
+                    <div>
+                        <label><small>Pseudo Discord :</small></label>
+                        <input type="text" id="edit-discord" placeholder="Ex: Pseudo#0000">
+                    </div>
+                    <div>
+                        <label><small>Citation favorite :</small></label>
+                        <input type="text" id="edit-quote" placeholder="Ex: Je deviendrai Hokage !">
                     </div>
                     <div class="full-width">
                         <label><small>Signature (Lien d'image ou texte) :</small></label>
@@ -173,7 +202,6 @@
 
         let currentUserId = null;
 
-        // Charger les données de l'utilisateur depuis Supabase
         async function loadUserProfile() {
             document.getElementById('bread-username').textContent = profileUser;
             document.getElementById('user-name').textContent = profileUser;
@@ -191,6 +219,12 @@
                 document.getElementById('user-joined').textContent = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Récemment';
                 document.getElementById('user-fav').textContent = profile.favorite_manga || 'Non spécifié';
                 
+                // Remplissage des nouveaux champs
+                document.getElementById('user-status').innerHTML = profile.status ? `<em>"${profile.status}"</em>` : '<em>Pas de statut particulier...</em>';
+                document.getElementById('user-anime').textContent = profile.current_anime || 'Non spécifié';
+                document.getElementById('user-quote').innerHTML = profile.favorite_quote ? `« ${profile.favorite_quote} »` : '<em>-</em>';
+                document.getElementById('user-discord').textContent = profile.discord_tag || 'Non renseigné';
+                
                 // Transformation automatique du lien de signature en image s'il commence par http
                 const sigCell = document.getElementById('user-sig');
                 if (profile.signature) {
@@ -207,11 +241,15 @@
                     document.getElementById('user-avatar').src = profile.avatar_url;
                 }
 
-                // Si c'est notre propre profil, afficher le formulaire d'édition
+                // Si c'est notre propre profil, afficher et remplir le formulaire d'édition
                 if (profileUser === currentUsername) {
                     document.getElementById('edit-profile-section').style.display = 'block';
                     document.getElementById('edit-avatar-url').value = profile.avatar_url || '';
+                    document.getElementById('edit-status').value = profile.status || '';
                     document.getElementById('edit-fav-manga').value = profile.favorite_manga || '';
+                    document.getElementById('edit-anime').value = profile.current_anime || '';
+                    document.getElementById('edit-discord').value = profile.discord_tag || '';
+                    document.getElementById('edit-quote').value = profile.favorite_quote || '';
                     document.getElementById('edit-signature').value = profile.signature || '';
                 }
             }
@@ -221,14 +259,22 @@
         document.getElementById('form-edit-profile').addEventListener('submit', async (e) => {
             e.preventDefault();
             const avatarUrl = document.getElementById('edit-avatar-url').value;
+            const status = document.getElementById('edit-status').value;
             const favManga = document.getElementById('edit-fav-manga').value;
+            const anime = document.getElementById('edit-anime').value;
+            const discord = document.getElementById('edit-discord').value;
+            const quote = document.getElementById('edit-quote').value;
             const signature = document.getElementById('edit-signature').value;
 
             const { error } = await supabase
                 .from('profiles')
                 .update({
                     avatar_url: avatarUrl,
+                    status: status,
                     favorite_manga: favManga,
+                    current_anime: anime,
+                    discord_tag: discord,
+                    favorite_quote: quote,
                     signature: signature
                 })
                 .eq('username', currentUsername);
@@ -241,12 +287,11 @@
             }
         });
 
-        // Masquer le formulaire d'ajout manga si ce n'est pas le propriétaire
         if (profileUser !== currentUsername) {
             document.getElementById('add-manga-box').style.display = 'none';
         }
 
-        // Gestion de la Mangathèque (Local / Supabase)
+        // Gestion de la Mangathèque
         const defaultMangas = {
             "Otaku_33": [{ id: 1, title: "Bleach", count: 636 }]
         };
