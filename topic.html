@@ -6,7 +6,6 @@
     <title>Sujet - Forum Actu Manga</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .admin-bar { background: #2c3e50; color: #fff; padding: 8px 12px; margin-bottom: 15px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; }
         .btn-mod { background: #e74c3c; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; margin-left: 5px; }
         .btn-edit { background: #f39c12; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; }
         .post-signature { margin-top: 20px; padding-top: 10px; border-top: 1px dashed #ffb6c1; }
@@ -16,16 +15,6 @@
 <body>
 
     <div id="wrapper">
-        <!-- BARRE DE CONNEXION AVEC MODE MODO -->
-        <div class="admin-bar">
-            <span>Connecté en tant que : <strong id="current-user-display">---</strong></span>
-            <div>
-                <button type="button" onclick="switchRole('group-admin')">Mode Admin</button>
-                <button type="button" onclick="switchRole('group-modo')">Mode Modo</button>
-                <button type="button" onclick="switchRole('group-member')">Mode Membre</button>
-            </div>
-        </div>
-
         <!-- BREADCRUMB DYNAMIQUE -->
         <div class="breadcrumb" id="topic-breadcrumb">
             <a href="index.html">Index du Forum</a> &raquo; 
@@ -56,36 +45,12 @@
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // --- 1. SESSION ET RÔLES SÉCURISÉS ---
+        // --- 1. VÉRIFICATION DE LA VRAIE SESSION ---
         const currentUsername = localStorage.getItem('forumUsername');
         const currentRole = localStorage.getItem('forumUserRole') || 'member';
         
-        if (!currentUsername) {
-            document.getElementById('current-user-display').textContent = "Déconnecté (Invité)";
-        } else {
-            let displayRankName = 'Membre';
-            if (currentRole === 'admin') displayRankName = 'Fondateur / Admin';
-            else if (currentRole === 'modo') displayRankName = 'Modérateur';
-            
-            document.getElementById('current-user-display').textContent = `${currentUsername} (${displayRankName})`;
-        }
-
         // Le staff est strictement réservé aux rôles 'admin' ou 'modo' enregistrés
         const isStaff = (currentRole === 'admin' || currentRole === 'modo');
-        
-        window.switchRole = function(role) {
-            if (role === 'group-admin') {
-                localStorage.setItem('forumUserRole', 'admin');
-                localStorage.setItem('forumUsername', 'Admin_Otaku');
-            } else if (role === 'group-modo') {
-                localStorage.setItem('forumUserRole', 'modo');
-                localStorage.setItem('forumUsername', 'Nanguille40');
-            } else {
-                localStorage.setItem('forumUserRole', 'member');
-                localStorage.setItem('forumUsername', 'Yoru_Chan');
-            }
-            location.reload();
-        }
 
         // --- 2. CONFIGURATION DES CATÉGORIES (UNIVERSEL) ---
         const categoryMap = {
