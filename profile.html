@@ -108,8 +108,8 @@
                         <input type="text" id="edit-fav-manga" placeholder="Ex: Bleach, Naruto...">
                     </div>
                     <div class="full-width">
-                        <label><small>Signature :</small></label>
-                        <input type="text" id="edit-signature" placeholder="Votre phrase de signature ou bannières...">
+                        <label><small>Signature (Lien d'image ou texte) :</small></label>
+                        <input type="text" id="edit-signature" placeholder="https://... ou votre texte">
                     </div>
                 </div>
                 <button type="submit" class="btn-save-profile">Enregistrer les modifications</button>
@@ -172,8 +172,17 @@
                 document.getElementById('user-joined').textContent = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Récemment';
                 document.getElementById('user-fav').textContent = profile.favorite_manga || 'Non spécifié';
                 
-                // Affichage propre de la signature (permettant le HTML/images rétro si besoin)
-                document.getElementById('user-sig').innerHTML = profile.signature ? `<div>${profile.signature}</div>` : '<em>-</em>';
+                // Transformation automatique du lien de signature en image s'il commence par http
+                const sigCell = document.getElementById('user-sig');
+                if (profile.signature) {
+                    if (profile.signature.startsWith('http://') || profile.signature.startsWith('https://')) {
+                        sigCell.innerHTML = `<img src="${profile.signature}" alt="Signature" style="max-width: 100%; height: auto; display: block; margin-top: 5px;">`;
+                    } else {
+                        sigCell.textContent = profile.signature;
+                    }
+                } else {
+                    sigCell.innerHTML = '<em>-</em>';
+                }
                 
                 if (profile.avatar_url) {
                     document.getElementById('user-avatar').src = profile.avatar_url;
