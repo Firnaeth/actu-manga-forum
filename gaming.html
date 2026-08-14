@@ -25,7 +25,7 @@
             <a href="index.html">Accueil</a> &raquo; <span>Jeux Vidéo Manga & VS Fighting</span>
         </div>
 
-        <!-- EN-TÊTE DE LA SECTION (TEXTE CENTRÉ) -->
+        <!-- EN-TÊTE DE LA SECTION -->
         <div class="welcome-banner" style="text-align: center; padding: 15px;">
             <h2>🎮 Jeux Vidéo Manga & VS Fighting</h2>
             <p style="margin-top: 5px;">Discussions et avis jeux vidéo, versus fighting et adaptations.</p>
@@ -45,7 +45,7 @@
             </tbody>
         </table>
 
-        <!-- BOUTON CRÉER UN SUJET EN DESSOUS DU TABLEAU -->
+        <!-- BOUTON CRÉER UN SUJET -->
         <div style="margin-top: 15px; margin-bottom: 20px;">
             <a href="new-topic.html?cat=gaming" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">+ Créer un Sujet</a>
         </div>
@@ -53,17 +53,28 @@
 
     <script type="module">
         import { supabase } from './supabase.js';
+
         const currentUsername = localStorage.getItem('forumUsername');
         if (currentUsername) {
             document.getElementById('nav-profile-link').classList.remove('hidden');
             const authLink = document.getElementById('nav-auth-link');
             authLink.textContent = "Déconnexion";
-            authLink.onclick = async () => { await supabase.auth.signOut(); localStorage.clear(); window.location.reload(); };
+            authLink.onclick = async () => { 
+                await supabase.auth.signOut(); 
+                localStorage.clear(); 
+                window.location.reload(); 
+            };
         }
 
         async function loadGamingTopics() {
             const container = document.getElementById('gaming-topics-container');
-            const { data: topics, error } = await supabase.from('gaming_topics').select('*').order('created_at', { ascending: false });
+            
+            // On récupère depuis la table globale 'topics' filtrée par la catégorie 'gaming'
+            const { data: topics, error } = await supabase
+                .from('topics')
+                .select('*')
+                .eq('category', 'gaming')
+                .order('created_at', { ascending: false });
 
             if (error || !topics || topics.length === 0) {
                 container.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun sujet gaming pour le moment.</td></tr>`;
@@ -76,7 +87,8 @@
                     <tr>
                         <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">🎮</span></td>
                         <td class="forum-desc">
-                            <a href="topic-gaming.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                            <!-- Utilisation de topic.html universel -->
+                            <a href="topic.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
                         </td>
                         <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
@@ -86,6 +98,7 @@
                 `;
             }).join('');
         }
+
         loadGamingTopics();
     </script>
 </body>
