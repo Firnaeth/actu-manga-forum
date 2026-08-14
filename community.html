@@ -13,6 +13,7 @@
         .badge.manga { background: #e84393; }
         .badge.anime { background: #0984e3; }
         .badge.game { background: #00b894; }
+        .badge.film { background: #d35400; }
         
         .form-row {
             display: flex;
@@ -47,7 +48,7 @@
 
         <!-- EN-TÊTE ESPACE FICHES -->
         <div style="font-size: 16px; font-weight: bold; color: #c2185b; margin-bottom: 15px; border-bottom: 2px solid #f8bbd0; padding-bottom: 5px;">
-            Espace Fiches : Mangas, Animes & Jeux Vidéo
+            Espace Fiches : Mangas, Animes, Jeux Vidéo & Films
         </div>
 
         <!-- BARRE D'ACTIONS ET FILTRES -->
@@ -59,6 +60,7 @@
                 <button onclick="filterSheets('manga')" style="background: #fff; color: #e84393; border: 1px solid #e84393; padding: 4px 12px; font-size: 11px; border-radius: 12px; cursor: pointer; font-weight: bold;">📖 Mangas</button>
                 <button onclick="filterSheets('anime')" style="background: #fff; color: #0984e3; border: 1px solid #0984e3; padding: 4px 12px; font-size: 11px; border-radius: 12px; cursor: pointer; font-weight: bold;">📺 Animes</button>
                 <button onclick="filterSheets('game')" style="background: #fff; color: #00b894; border: 1px solid #00b894; padding: 4px 12px; font-size: 11px; border-radius: 12px; cursor: pointer; font-weight: bold;">🎮 Jeux Vidéo</button>
+                <button onclick="filterSheets('film')" style="background: #fff; color: #d35400; border: 1px solid #d35400; padding: 4px 12px; font-size: 11px; border-radius: 12px; cursor: pointer; font-weight: bold;">🎬 Films</button>
             </div>
         </div>
 
@@ -88,6 +90,7 @@
                             <option value="manga">Manga</option>
                             <option value="anime">Anime</option>
                             <option value="game">Jeu Vidéo</option>
+                            <option value="film">Film Japonais</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -212,8 +215,8 @@
 
             tbody.innerHTML = sheets.map(sheet => {
                 let type = sheet.sheet_type || 'manga';
-                let iconMap = { manga: "📖", anime: "📺", game: "🎮" };
-                let typeTextMap = { manga: "MANGA", anime: "ANIME", game: "JEU" };
+                let iconMap = { manga: "📖", anime: "📺", game: "🎮", film: "🎬" };
+                let typeTextMap = { manga: "MANGA", anime: "ANIME", game: "JEU", film: "FILM" };
                 let ratingNum = sheet.rating || 5;
                 let stars = "⭐".repeat(ratingNum);
                 let author = sheet.author || 'Anonyme';
@@ -227,7 +230,7 @@
                         <td>
                             <div style="font-weight: bold; font-size: 13px;">
                                 <span style="margin-right: 5px;">${iconMap[type] || '📖'}</span>
-                                <a href="sheet-view.html?id=${sheet.id}" style="color: #c2185b; text-decoration: none;">[${typeTextMap[type]}] ${sheet.title}</a>
+                                <a href="sheet-view.html?id=${sheet.id}" style="color: #c2185b; text-decoration: none;">[${typeTextMap[type] || 'MANGA'}] ${sheet.title}</a>
                             </div>
                             <div style="font-size: 11px; color: #7f8c8d; margin-top: 2px; margin-left: 20px;">
                                 ${sheet.genre || ''} / ${sheet.details || ''} — <span style="color: #e74c3c; font-weight: bold;">${sheet.age_rating || 'Tous publics'}</span>
