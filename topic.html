@@ -14,96 +14,77 @@
 <body>
 
     <div id="wrapper">
-        <!-- BARRE DE CONNEXION / RÔLE -->
+        <!-- BARRE DE CONNEXION -->
         <div class="admin-bar">
             <span>Connecté en tant que : <strong id="current-user-display">---</strong></span>
             <div>
-                <button type="button" onclick="switchRole('group-admin')" style="cursor:pointer;">Mode Admin</button>
-                <button type="button" onclick="switchRole('group-member')" style="cursor:pointer;">Mode Membre</button>
+                <button type="button" onclick="switchRole('group-admin')">Mode Admin</button>
+                <button type="button" onclick="switchRole('group-member')">Mode Membre</button>
             </div>
         </div>
 
         <!-- BREADCRUMB DYNAMIQUE -->
         <div class="breadcrumb" id="topic-breadcrumb">
-            <a href="index.html">Index du Forum</a> &raquo; <span id="bread-category-slot"><a href="index.html">Chargement...</a></span> &raquo; <span id="bread-topic-title">Chargement...</span>
+            <a href="index.html">Index du Forum</a> &raquo; 
+            <span id="bread-category-slot"><a href="index.html">Chargement...</a></span> &raquo; 
+            <span id="bread-topic-title">Chargement...</span>
         </div>
 
         <h1 class="topic-main-title" id="topic-title">Chargement du sujet...</h1>
 
-        <!-- BOUTONS D'ACTION DU SUJET -->
         <div class="topic-actions" style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <a href="create-topic.html" id="btn-create-topic" class="btn-submit" style="text-decoration: none; font-weight: bold;">+ Créer un Sujet / Planning</a>
+            <a href="create-topic.html" id="btn-create-topic" class="btn-submit" style="text-decoration: none; font-weight: bold;">+ Créer un nouveau sujet</a>
             <a href="#reply-form" class="btn-reply">Répondre à ce sujet</a>
         </div>
 
-        <!-- ZONE D'AFFICHAGE DES POSTS -->
         <div id="posts-container">
             <p style="text-align: center; padding: 20px;">Chargement du message...</p>
         </div>
 
-        <!-- FORMULAIRE POUR RÉPONDRE -->
         <div class="reply-box" id="reply-form">
             <div class="box-title">Poster une réponse</div>
             <form class="reply-form" id="form-add-reply">
-                <label for="message">Votre message :</label>
                 <textarea id="message" rows="6" placeholder="Écrivez votre réponse ici..." required></textarea>
-                <button type="submit" class="btn-submit" style="margin-top: 10px;">Envoyer le message</button>
+                <button type="submit" class="btn-submit" style="margin-top: 10px;">Envoyer</button>
             </form>
         </div>
     </div>
 
-    <!-- SCRIPT SUPABASE -->
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // --- 1. GESTION DU RÔLE ET DE LA SESSION ---
+        // --- 1. SESSION ET RÔLES ---
         if (!localStorage.getItem('forumUsername')) {
             localStorage.setItem('forumUserRole', 'admin');
             localStorage.setItem('forumUsername', 'Admin_Otaku');
         }
 
         window.switchRole = function(role) {
-            if (role === 'group-admin') {
-                localStorage.setItem('forumUserRole', 'admin');
-                localStorage.setItem('forumUsername', 'Admin_Otaku');
-            } else {
-                localStorage.setItem('forumUserRole', 'member');
-                localStorage.setItem('forumUsername', 'Yoru_Chan');
-            }
+            localStorage.setItem('forumUserRole', role === 'group-admin' ? 'admin' : 'member');
+            localStorage.setItem('forumUsername', role === 'group-admin' ? 'Admin_Otaku' : 'Yoru_Chan');
             location.reload();
         }
 
         const currentRole = localStorage.getItem('forumUserRole');
         const currentUsername = localStorage.getItem('forumUsername');
-        const isStaff = (currentRole === 'admin' || currentUsername.includes('Otaku') || currentUsername.includes('Admin'));
+        const isStaff = (currentRole === 'admin' || currentUsername.includes('Otaku'));
+        document.getElementById('current-user-display').textContent = `${currentUsername} (${isStaff ? 'Staff' : 'Membre'})`;
 
-        document.getElementById('current-user-display').textContent = `${currentUsername} (${isStaff ? 'Staff/Admin' : 'Membre'})`;
-
-        const btnCreate = document.getElementById('btn-create-topic');
-        if (!isStaff && btnCreate) {
-            btnCreate.style.display = 'none';
-        }
-
-        // Dictionnaire pour mapper le code de la catégorie vers son nom lisible et son fichier HTML
+        // --- 2. CONFIGURATION DES CATÉGORIES (UNIVERSEL) ---
         const categoryMap = {
             'planning': { name: 'Planning des Sorties VF', url: 'news.html' },
-            'licences': { name: 'Annonce / Nouvelle Licence', url: 'news.html' },
-            'manga': { name: 'Discussion Manga / Anime', url: 'community.html' },
-            'gaming': { name: 'Zone Gaming & Jeux Vidéo', url: 'gaming.html' },
-            'general': { name: 'Le QG des Discussions', url: 'general-discussion.html' }
+            'manga': { name: 'Discussion Manga', url: 'community.html' },
+            'gaming': { name: 'Zone Gaming', url: 'gaming.html' },
+            'fc': { name: 'Fan Clubs Officiels', url: 'forum_fc.html' },
+            'graphisme': { name: 'Atelier Graphique', url: 'atelier.html' },
+            'general': { name: 'Général', url: 'general.html' }
         };
 
-        // --- 2. RÉCUPÉRATION DU SUJET DEPUIS SUPABASE VIA L'URL ---
-        const urlParams = new URLSearchParams(window.location.search);
-        const topicId = urlParams.get('id');
+        // --- 3. CHARGEMENT DU SUJET ---
+        const topicId = new URLSearchParams(window.location.search).get('id');
 
-        async function loadTopicFromSupabase() {
-            if (!topicId) {
-                document.getElementById('topic-title').textContent = "Aucun sujet sélectionné";
-                document.getElementById('bread-topic-title').textContent = "Erreur";
-                document.getElementById('posts-container').innerHTML = `<p style="text-align:center; color:red;">Aucun identifiant de sujet n'a été fourni dans l'URL.</p>`;
-                return;
-            }
+        async function loadTopic() {
+            if (!topicId) return;
 
             const { data: topic, error } = await supabase
                 .from('topics')
@@ -112,85 +93,54 @@
                 .single();
 
             if (error || !topic) {
-                document.getElementById('topic-title').textContent = "Sujet introuvable";
-                document.getElementById('bread-topic-title').textContent = "Erreur";
-                document.getElementById('posts-container').innerHTML = `<p style="text-align:center; color:red;">Ce sujet n'existe pas dans la base de données Supabase.</p>`;
+                document.getElementById('posts-container').innerHTML = "<p>Sujet introuvable.</p>";
                 return;
             }
 
-            // Affichage du titre
+            // Mise à jour de la page
             document.getElementById('topic-title').textContent = topic.title;
             document.getElementById('bread-topic-title').textContent = topic.title;
-
-            // Mise à jour dynamique du fil d'Ariane selon la catégorie du sujet
-            const catInfo = categoryMap[topic.category] || { name: 'Général', url: 'index.html' };
+            
+            // Gestion dynamique du lien de retour
+            const catInfo = categoryMap[topic.category] || { name: topic.category, url: 'index.html' };
             document.getElementById('bread-category-slot').innerHTML = `<a href="${catInfo.url}">${catInfo.name}</a>`;
 
-            const authorName = topic.author || 'Admin_Otaku';
-            const isAuthorStaff = (authorName.includes('Otaku') || authorName.includes('Admin'));
-
-            // Affichage du message principal dans le style exact du forum
-            const postsContainer = document.getElementById('posts-container');
-            postsContainer.innerHTML = `
-                <div class="post-box" id="post-${topic.id}">
+            const isAuthorStaff = (topic.author || '').includes('Otaku');
+            
+            document.getElementById('posts-container').innerHTML = `
+                <div class="post-box">
                     <div class="post-user">
-                        <a href="#" class="username ${isAuthorStaff ? 'admin' : 'member'}">${authorName}</a>
+                        <a href="#" class="username ${isAuthorStaff ? 'admin' : 'member'}">${topic.author || 'Anonyme'}</a>
                         <div class="user-rank">${isAuthorStaff ? 'Fondateur' : 'Membre'}</div>
-                        <img src="${isAuthorStaff ? 'https://i.pinimg.com/236x/88/33/1b/88331b1516e0535e6a2d1d36d338f08a.jpg' : 'https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg'}" alt="Avatar" class="user-avatar">
                     </div>
                     <div class="post-content">
-                        <div class="post-date" style="display:flex; justify-content:space-between; align-items:center;">
-                            <span>Posté le ${new Date(topic.created_at).toLocaleDateString()} à ${new Date(topic.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                            ${isStaff ? `
-                                <div>
-                                    <button class="btn-edit" onclick="editTopic(${topic.id})">Éditer</button>
-                                    <button class="btn-mod" onclick="deleteTopic(${topic.id})">Supprimer</button>
-                                </div>
-                            ` : ''}
+                        <div class="post-date">Posté le ${new Date(topic.created_at).toLocaleDateString()}
+                            ${isStaff ? `<button class="btn-edit" onclick="editTopic(${topic.id})">Éditer</button>
+                                          <button class="btn-mod" onclick="deleteTopic(${topic.id})">Supprimer</button>` : ''}
                         </div>
-                        <div class="post-text">
-                            <p>${topic.content}</p>
-                        </div>
+                        <p>${topic.content}</p>
                     </div>
                 </div>
             `;
         }
 
-        loadTopicFromSupabase();
-
-        // --- 3. GESTION DES RÉPONSES OU INTERACTIONS ---
-        document.getElementById('form-add-reply').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const msg = document.getElementById('message').value;
-            alert("Votre réponse a bien été prise en compte !");
-            document.getElementById('message').value = '';
-        });
-
-        // Fonctions admin de suppression/édition reliées à Supabase
-        window.deleteTopic = async function(id) {
-            if (confirm("Voulez-vous vraiment supprimer ce sujet de Supabase ?")) {
-                const { error } = await supabase.from('topics').delete().eq('id', id);
-                if (!error) {
-                    alert("Sujet supprimé avec succès !");
-                    window.location.href = "index.html";
-                } else {
-                    alert("Erreur lors de la suppression.");
-                }
+        // --- 4. ACTIONS ADMIN ---
+        window.deleteTopic = async (id) => {
+            if(confirm("Supprimer ?")) {
+                await supabase.from('topics').delete().eq('id', id);
+                window.location.href = "index.html";
             }
-        }
+        };
 
-        window.editTopic = async function(id) {
-            const newContent = prompt("Modifier le contenu du message :");
-            if (newContent !== null) {
-                const { error } = await supabase.from('topics').update({ content: newContent }).eq('id', id);
-                if (!error) {
-                    alert("Sujet mis à jour !");
-                    location.reload();
-                } else {
-                    alert("Erreur lors de la modification.");
-                }
+        window.editTopic = async (id) => {
+            const newContent = prompt("Nouveau contenu :");
+            if (newContent) {
+                await supabase.from('topics').update({ content: newContent }).eq('id', id);
+                location.reload();
             }
-        }
+        };
+
+        loadTopic();
     </script>
 </body>
 </html>
