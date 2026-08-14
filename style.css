@@ -730,10 +730,9 @@ a.group-admin:hover, a.group-member:hover {
     font-size: 20px;
 }
 
-/* Style du Grade (Rank) - Version moderne et lisible optimisée */
+/* Style de base du Grade (Rank) */
 .rank {
     display: inline-block !important;
-    background: linear-gradient(135deg, #ff80ab, #ff4081) !important;
     color: #ffffff !important;
     padding: 5px 15px !important;
     font-size: 0.9em !important;
@@ -743,6 +742,19 @@ a.group-admin:hover, a.group-member:hover {
     margin-bottom: 8px !important;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4) !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+/* Couleurs spécifiques selon le rôle injecté par le JS */
+.rank.rank-admin {
+    background: linear-gradient(135deg, #ff416c, #ff4b2b) !important; /* Rose vif / Rouge Admin */
+}
+
+.rank.rank-mod {
+    background: linear-gradient(135deg, #11998e, #38ef7d) !important; /* Vert Modérateur */
+}
+
+.rank.rank-member {
+    background: linear-gradient(135deg, #4e54c8, #8f94fb) !important; /* Bleu Membre classique */
 }
 
 /* Statut utilisateur */
