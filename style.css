@@ -993,8 +993,21 @@ a.group-admin:hover, a.group-member:hover {
     border: 1px solid #333;
 }
 
-.post-user img, .profile-avatar img {
-    max-width: 100%;      /* L'image ne dépasse jamais la largeur du bloc */
-    height: auto;         /* Conserve les proportions d'origine */
-    display: block;       /* Évite les espaces bizarres en bas */
+/* Le conteneur/cadre s'adapte à la taille de l'image */
+.profile-avatar-box, .post-user img {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    max-width: 200px; /* Optionnel : limite la taille max si l'image est immense */
+    max-height: 250px; /* Optionnel : limite la hauteur max */
+    padding: 4px;     /* Pour garder l'effet de cadre (bordure) */
+    background: #fff; /* Fond du cadre si besoin */
+    border: 1px solid #ffb6c1; /* Ta bordure rose actuelle */
+}
+
+/* L'image prend toute la place naturelle du cadre sans se déformer */
+.profile-avatar-box img {
+    width: 100%;
+    height: auto;
+    display: block;
 }
