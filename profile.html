@@ -152,7 +152,24 @@
 
             if (profile) {
                 currentUserId = profile.id;
-                document.getElementById('user-rank').textContent = profile.rank || (profile.role === 'admin' ? 'Administrateur' : 'Membre');
+                
+                // Gestion dynamique du rang et de sa couleur de badge
+                const rankSpan = document.getElementById('user-rank');
+                const userRole = profile.role ? profile.role.toLowerCase() : 'member';
+                const userRankText = profile.rank || (userRole === 'admin' ? 'Administrateur' : userRole === 'moderator' ? 'Modérateur' : 'Membre');
+                
+                rankSpan.textContent = userRankText;
+                
+                // Nettoyage des anciennes classes et application de la bonne classe de couleur
+                rankSpan.className = 'rank';
+                if (userRole === 'admin') {
+                    rankSpan.classList.add('rank-admin');
+                } else if (userRole === 'moderator' || userRole === 'modérateur') {
+                    rankSpan.classList.add('rank-mod');
+                } else {
+                    rankSpan.classList.add('rank-member');
+                }
+
                 document.getElementById('user-joined').textContent = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Récemment';
                 document.getElementById('user-fav').textContent = profile.favorite_manga || 'Non spécifié';
                 
