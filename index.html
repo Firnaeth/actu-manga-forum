@@ -10,7 +10,7 @@
 
     <div id="wrapper">
 
-        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR) -->
+        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
             <button class="btn-admin-edit" id="btn-toggle-admin">Modifier Titre & Bannière</button>
@@ -261,8 +261,11 @@
             authLink.onclick = window.logout;
         }
 
+        // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
         const adminBar = document.getElementById('admin-bar-container');
-        if (currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku" || currentUserRole === "admin") {
+        const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
+
+        if (isStaff && adminBar) {
             adminBar.classList.remove('hidden');
         }
         
