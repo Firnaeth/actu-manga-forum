@@ -115,7 +115,6 @@
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">🎟️</span></td>
                     <td class="forum-desc">
-                        <!-- CORRECTION ICI : href pointe vers news.html -->
                         <a href="news.html" class="forum-title">Planning des Conventions & Projets</a>
                         <p>Retrouvez le calendrier des conventions et plannings à venir.</p>
                     </td>
@@ -149,7 +148,7 @@
                 <tr>
                     <td class="icon-cell"><span class="category-emoji">🎨</span></td>
                     <td class="forum-desc">
-                        <a href="contest-view.html" class="forum-title">	Concours & Fan-Arts (100% SANS IA)</a>
+                        <a href="contest-view.html" class="forum-title">    Concours & Fan-Arts (100% SANS IA)</a>
                         <p>Participe aux concours de dessin et partage tes créations traditionnelles ou digitales.</p>
                     </td>
                     <td class="stat-cell">45</td>
@@ -225,13 +224,28 @@
         const currentUsername = localStorage.getItem('forumUsername');
         const currentUserRole = localStorage.getItem('forumUserRole');
 
+        // Fonction globale de déconnexion avec redirection vers l'index
+        window.logout = async function(e) {
+            if (e) e.preventDefault();
+            try {
+                await supabase.auth.signOut();
+            } catch (err) {
+                console.error("Erreur déconnexion Supabase:", err);
+            }
+            localStorage.removeItem('forumUsername');
+            localStorage.removeItem('forumUserRole');
+            localStorage.removeItem('forumAdminMode');
+            window.location.href = 'index.html';
+        };
+
         // GESTION CONNEXION
         const profileLink = document.getElementById('nav-profile-link');
         const authLink = document.getElementById('nav-auth-link');
         if (currentUsername) {
             profileLink.classList.remove('hidden');
             authLink.textContent = "Déconnexion";
-            authLink.onclick = async () => { await supabase.auth.signOut(); localStorage.clear(); window.location.reload(); };
+            authLink.setAttribute('href', '#');
+            authLink.onclick = window.logout;
         }
 
         // GESTION ADMINISTRATION
@@ -382,5 +396,4 @@
         loadOnlineUsers();
     </script>
 </body>
-</html>
 </html>
