@@ -9,6 +9,8 @@
         .admin-bar { background: #2c3e50; color: #fff; padding: 8px 12px; margin-bottom: 15px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; }
         .btn-mod { background: #e74c3c; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; margin-left: 5px; }
         .btn-edit { background: #f39c12; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; }
+        .post-signature { margin-top: 20px; padding-top: 10px; border-top: 1px dashed #ffb6c1; }
+        .post-signature img { max-width: 100%; height: auto; display: block; }
     </style>
 </head>
 <body>
@@ -44,7 +46,7 @@
         <div class="reply-box" id="reply-form">
             <div class="box-title">Poster une réponse</div>
             <form class="reply-form" id="form-add-reply">
-                <textarea id="message" rows="6" placeholder="Écrivez votre réponse ici..." required></textarea>
+                <textarea id="message" rows="6" placeholder="Écrivez votre réponse ici... (Collez un lien direct http... pour afficher une image)" required></textarea>
                 <button type="submit" class="btn-submit" style="margin-top: 10px;">Envoyer</button>
             </form>
         </div>
@@ -80,7 +82,19 @@
             'general': { name: 'Général', url: 'general.html' }
         };
 
-        // --- 3. CHARGEMENT DU SUJET ---
+        // --- 3. FONCTION DE TRANSFORMATION DES LIENS EN IMAGES ---
+        function formatContent(text) {
+            if (!text) return '';
+            // Transforme les liens d'images directs en balises <img>
+            const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif))/gi;
+            let formatted = text.replace(urlRegex, (url) => {
+                return `<br><img src="${url}" alt="Création graphique" style="max-width: 100%; border-radius: 4px; margin: 10px 0;"><br>`;
+            });
+            // Conserve les retours à la ligne
+            return formatted.replace(/\n/g, '<br>');
+        }
+
+        // --- 4. CHARGEMENT DU SUJET ET DE LA SIGNATURE DE L'AUTEUR ---
         const topicId = new URLSearchParams(window.location.search).get('id');
 
         async function loadTopic() {
@@ -97,11 +111,28 @@
                 return;
             }
 
+            // Récupérer le profil de l'auteur pour choper sa signature
+            let authorSignatureHtml = '';
+            if (topic.author) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('signature')
+                    .eq('username', topic.author)
+                    .single();
+
+                if (profile && profile.signature) {
+                    if (profile.signature.startsWith('http://') || profile.signature.startsWith('https://')) {
+                        authorSignatureHtml = `<div class="post-signature"><img src="${profile.signature}" alt="Signature"></div>`;
+                    } else {
+                        authorSignatureHtml = `<div class="post-signature"><small>${profile.signature}</small></div>`;
+                    }
+                }
+            }
+
             // Mise à jour de la page
             document.getElementById('topic-title').textContent = topic.title;
             document.getElementById('bread-topic-title').textContent = topic.title;
             
-            // Gestion dynamique du lien de retour
             const catInfo = categoryMap[topic.category] || { name: topic.category, url: 'index.html' };
             document.getElementById('bread-category-slot').innerHTML = `<a href="${catInfo.url}">${catInfo.name}</a>`;
 
@@ -110,7 +141,7 @@
             document.getElementById('posts-container').innerHTML = `
                 <div class="post-box">
                     <div class="post-user">
-                        <a href="#" class="username ${isAuthorStaff ? 'admin' : 'member'}">${topic.author || 'Anonyme'}</a>
+                        <a href="profile.html?user=${topic.author}" class="username ${isAuthorStaff ? 'admin' : 'member'}">${topic.author || 'Anonyme'}</a>
                         <div class="user-rank">${isAuthorStaff ? 'Fondateur' : 'Membre'}</div>
                     </div>
                     <div class="post-content">
@@ -118,15 +149,18 @@
                             ${isStaff ? `<button class="btn-edit" onclick="editTopic(${topic.id})">Éditer</button>
                                           <button class="btn-mod" onclick="deleteTopic(${topic.id})">Supprimer</button>` : ''}
                         </div>
-                        <p>${topic.content}</p>
+                        <div class="post-text" style="margin-top: 10px;">
+                            ${formatContent(topic.content)}
+                        </div>
+                        ${authorSignatureHtml}
                     </div>
                 </div>
             `;
         }
 
-        // --- 4. ACTIONS ADMIN ---
+        // --- 5. ACTIONS ADMIN ---
         window.deleteTopic = async (id) => {
-            if(confirm("Supprimer ?")) {
+            if(confirm("Supprimer ce sujet ?")) {
                 await supabase.from('topics').delete().eq('id', id);
                 window.location.href = "index.html";
             }
