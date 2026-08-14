@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="wrapper">
-        <div style="background: #2c3e50; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; margin-bottom: 15px;">
+        <div id="admin-top-bar" style="background: #2c3e50; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; margin-bottom: 15px;">
             <span id="user-status-bar">Connexion en cours...</span>
             <div>
                 <button onclick="setAdminMode(true)" style="background: #ecf0f1; color: #2c3e50; border: none; padding: 4px 8px; font-weight: bold; cursor: pointer; border-radius: 3px; margin-right: 5px;">Mode Admin</button>
@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div style="flex-grow: 1; padding: 15px; position: relative;">
-                <div id="topic-actions" style="position: absolute; top: 10px; right: 15px;" class="hidden">
+                <div id="topic-actions" style="position: absolute; top: 10px; right: 15px; display: none;">
                     <button onclick="editTopic()" style="background: #f39c12; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; font-weight: bold; margin-right: 4px;">Éditer</button>
                     <button onclick="deleteTopic()" style="background: #e74c3c; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; font-weight: bold;">Supprimer</button>
                 </div>
@@ -74,12 +74,20 @@
 
         function updateStatusBar() {
             const bar = document.getElementById('user-status-bar');
-            let roleText = isAdminMode ? ' (Staff/Admin)' : ' (Membre)';
+            const topBar = document.getElementById('admin-top-bar');
+
+            // Masquer entièrement le bandeau admin pour les simples membres
+            if (currentUsername !== 'Otaku_33') {
+                if (topBar) topBar.style.display = 'none';
+                return;
+            }
+
+            if (topBar) topBar.style.display = 'flex';
+            let roleText = (isAdminMode && currentUsername === 'Otaku_33') ? ' (Staff/Admin)' : ' (Membre)';
             bar.textContent = `Connecté en tant que : ${currentUsername}${roleText}`;
         }
 
         window.setAdminMode = function(status) {
-            // Sécurité : Seul Otaku_33 peut activer le mode admin
             if (status === true && currentUsername !== 'Otaku_33') {
                 alert("Accès refusé : Seul 'Otaku_33' peut passer en mode administrateur !");
                 return;
@@ -151,10 +159,13 @@
             document.getElementById('topic-date').textContent = new Date(topic.created_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'});
             document.getElementById('topic-content-body').textContent = topic.content || '';
 
-            if (isAdminMode || currentUsername === topic.author || currentUsername === 'Otaku_33') {
-                document.getElementById('topic-actions').classList.remove('hidden');
+            const isTopicAuthor = (currentUsername === topic.author);
+            const isAdminAuthorized = (isAdminMode && currentUsername === 'Otaku_33');
+
+            if (isTopicAuthor || isAdminAuthorized) {
+                document.getElementById('topic-actions').style.display = 'block';
             } else {
-                document.getElementById('topic-actions').classList.add('hidden');
+                document.getElementById('topic-actions').style.display = 'none';
             }
 
             loadReplies();
@@ -176,7 +187,10 @@
 
             container.innerHTML = replies.map(r => {
                 const replyDate = new Date(r.created_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'});
-                const canModify = isAdminMode || currentUsername === r.author || currentUsername === 'Otaku_33';
+                
+                const isAuthor = (currentUsername === r.author);
+                const isAdminAuthorized = (isAdminMode && currentUsername === 'Otaku_33');
+                const canModify = isAuthor || isAdminAuthorized;
                 
                 return `
                     <div style="display: flex; border: 1px solid #f2d9de; background: white; margin-bottom: 15px;">
