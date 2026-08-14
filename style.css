@@ -992,3 +992,9 @@ a.group-admin:hover, a.group-member:hover {
     height: 19px; /* Format classique des mini-banners FC */
     border: 1px solid #333;
 }
+
+.post-user img, .profile-avatar img {
+    max-width: 100%;      /* L'image ne dépasse jamais la largeur du bloc */
+    height: auto;         /* Conserve les proportions d'origine */
+    display: block;       /* Évite les espaces bizarres en bas */
+}
