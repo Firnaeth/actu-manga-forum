@@ -56,37 +56,36 @@
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // --- 1. SESSION ET RÔLES (ADMIN, MODO, MEMBRE) ---
-        if (!localStorage.getItem('forumUsername')) {
-            localStorage.setItem('forumUserRole', 'admin');
-            localStorage.setItem('forumUsername', 'Admin_Otaku');
+        // --- 1. SESSION ET RÔLES SÉCURISÉS ---
+        const currentUsername = localStorage.getItem('forumUsername');
+        const currentRole = localStorage.getItem('forumUserRole') || 'member';
+        
+        if (!currentUsername) {
+            document.getElementById('current-user-display').textContent = "Déconnecté (Invité)";
+        } else {
+            let displayRankName = 'Membre';
+            if (currentRole === 'admin') displayRankName = 'Fondateur / Admin';
+            else if (currentRole === 'modo') displayRankName = 'Modérateur';
+            
+            document.getElementById('current-user-display').textContent = `${currentUsername} (${displayRankName})`;
         }
 
+        // Le staff est strictement réservé aux rôles 'admin' ou 'modo' enregistrés
+        const isStaff = (currentRole === 'admin' || currentRole === 'modo');
+        
         window.switchRole = function(role) {
             if (role === 'group-admin') {
                 localStorage.setItem('forumUserRole', 'admin');
                 localStorage.setItem('forumUsername', 'Admin_Otaku');
             } else if (role === 'group-modo') {
                 localStorage.setItem('forumUserRole', 'modo');
-                localStorage.setItem('forumUsername', 'Modo_Test');
+                localStorage.setItem('forumUsername', 'Nanguille40');
             } else {
                 localStorage.setItem('forumUserRole', 'member');
                 localStorage.setItem('forumUsername', 'Yoru_Chan');
             }
             location.reload();
         }
-
-        const currentRole = localStorage.getItem('forumUserRole');
-        const currentUsername = localStorage.getItem('forumUsername');
-        
-        // Le staff inclut les admins, les modos et les pseudos contenant Otaku
-        const isStaff = (currentRole === 'admin' || currentRole === 'modo' || currentUsername.includes('Otaku'));
-        
-        let displayRankName = 'Membre';
-        if (currentRole === 'admin') displayRankName = 'Fondateur / Admin';
-        else if (currentRole === 'modo') displayRankName = 'Modérateur';
-        
-        document.getElementById('current-user-display').textContent = `${currentUsername} (${displayRankName})`;
 
         // --- 2. CONFIGURATION DES CATÉGORIES (UNIVERSEL) ---
         const categoryMap = {
@@ -125,7 +124,6 @@
                 return;
             }
 
-            // Récupérer le profil de l'auteur pour choper sa signature
             let authorSignatureHtml = '';
             if (topic.author) {
                 const { data: profile } = await supabase
@@ -143,7 +141,6 @@
                 }
             }
 
-            // Mise à jour de la page
             document.getElementById('topic-title').textContent = topic.title;
             document.getElementById('bread-topic-title').textContent = topic.title;
             
@@ -161,7 +158,7 @@
                     <div class="post-content">
                         <div class="post-date">Posté le ${new Date(topic.created_at).toLocaleDateString()}
                             ${isStaff ? `<button class="btn-edit" onclick="editTopic(${topic.id})">Éditer</button>
-                                          <button class="btn-mod" onclick="deleteTopic(${topic.id})">Supprimer</button>` : ''}
+                                        <button class="btn-mod" onclick="deleteTopic(${topic.id})">Supprimer</button>` : ''}
                         </div>
                         <div class="post-text" style="margin-top: 10px;">
                             ${formatContent(topic.content)}
