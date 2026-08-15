@@ -59,37 +59,40 @@
     const urlParams = new URLSearchParams(window.location.search);
     const fcId = urlParams.get('id'); // ID numérique du Fan Club
 
-    // Définition des sous-catégories personnalisées selon le manga/Fan Club
-    // Tu peux facilement modifier ou ajouter des listes ici par la suite !
+    // Fonction stricte pour attribuer les bons onglets selon le titre exact du Fan Club
     function getTabsForFanClub(title) {
-        const lowerTitle = title.toLowerCase();
+        if (!title) return getDefaultTabs();
+        const upperTitle = title.toUpperCase();
 
-        if (lowerTitle.includes('vandread')) {
+        if (upperTitle.includes('VANDREAD')) {
             return [
                 { id: 'dita', label: 'Fans de Dita' },
                 { id: 'hibiki', label: 'Fans de Hibiki' },
                 { id: 'precurseur', label: 'Le Précurseur' }
             ];
-        } else if (lowerTitle.includes('bleach')) {
+        } else if (upperTitle.includes('BLEACH')) {
             return [
                 { id: 'ichigo', label: 'Fans d\'Ichigo' },
                 { id: 'capitaines', label: 'Les Capitaines Gotei 13' },
                 { id: 'zanpakuto', label: 'Théories Zanpakutô' }
             ];
-        } else if (lowerTitle.includes('inuyasha')) {
+        } else if (upperTitle.includes('INUYASHA')) {
             return [
                 { id: 'inuyasha_kagome', label: 'Inuyasha & Kagome' },
                 { id: 'sesshomaru', label: 'Fans de Sesshômaru' },
                 { id: 'shikon', label: 'La Perle de Shikon' }
             ];
         } else {
-            // Onglets par défaut si c'est un nouveau Fan Club créé par un membre
-            return [
-                { id: 'general', label: 'Discussion Générale' },
-                { id: 'theories', label: 'Théories & Avis' },
-                { id: 'galerie', label: 'Galerie & Fanarts' }
-            ];
+            return getDefaultTabs();
         }
+    }
+
+    function getDefaultTabs() {
+        return [
+            { id: 'general', label: 'Discussion Générale' },
+            { id: 'theories', label: 'Théories & Avis' },
+            { id: 'galerie', label: 'Galerie & Fanarts' }
+        ];
     }
 
     async function initFanClubPage() {
@@ -98,7 +101,7 @@
             return;
         }
 
-        // 1. Récupérer les infos du Fan Club
+        // 1. Récupérer les infos du Fan Club depuis Supabase
         const { data: fc, error } = await supabase
             .from('topics')
             .select('*')
@@ -116,7 +119,7 @@
         document.getElementById('breadcrumb-fc-name').textContent = fc.title;
         document.getElementById('fc-main-desc').textContent = `Créé par ${fc.author} - Espace officiel.`;
 
-        // 2. Générer les onglets adaptés à ce Fan Club spécifique
+        // 2. Générer les onglets adaptés au titre exact du Fan Club
         const tabs = getTabsForFanClub(fc.title);
         const tabsContainer = document.getElementById('fc-tabs-container');
 
@@ -171,7 +174,6 @@
         }).join('');
     }
 
-    // Lancement de l'initialisation de la page
     initFanClubPage();
 </script>
 </body>
