@@ -6,7 +6,7 @@
     <title>Fan Club - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .fc-tabs { display: flex; gap: 10px; margin: 20px 0; border-bottom: 2px solid #f8d7da; padding-bottom: 10px; }
+        .fc-tabs { display: flex; gap: 10px; margin: 20px 0; border-bottom: 2px solid #f8d7da; padding-bottom: 10px; flex-wrap: wrap; }
         .tab-link { padding: 8px 15px; background: #fff0f3; color: #d63384; text-decoration: none; border-radius: 5px; font-weight: bold; }
         .tab-link.active { background: #d63384; color: white; }
     </style>
@@ -19,7 +19,7 @@
         <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner">
     </div>
 
-    <!-- FIL D'ARIANE MIS À JOUR -->
+    <!-- FIL D'ARIANE -->
     <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
         <a href="index.html">Accueil</a> &raquo; <a href="forum_fc.html">Fan Clubs</a> &raquo; <span id="breadcrumb-fc-name">Chargement...</span>
     </div>
@@ -30,11 +30,9 @@
         <p style="margin-top: 5px;" id="fc-main-desc">Espace de discussion et sous-sections thématiques.</p>
     </div>
 
-    <!-- SOUS-MENUS (ONGLETS) -->
-    <div class="fc-tabs">
-        <a href="#" class="tab-link active" data-tab="dita">Fans de Dita</a>
-        <a href="#" class="tab-link" data-tab="hibiki">Fans de Hibiki</a>
-        <a href="#" class="tab-link" data-tab="precurseur">Le Précurseur</a>
+    <!-- SOUS-MENUS (ONGLETS DYNAMIQUES) -->
+    <div class="fc-tabs" id="fc-tabs-container">
+        <!-- Les onglets seront générés dynamiquement ici -->
     </div>
 
     <table class="forum-table">
@@ -49,7 +47,7 @@
         </tbody>
     </table>
 
-    <!-- BOUTON CRÉER UN SUJET DANS L'ONGLET ACTIF -->
+    <!-- BOUTON CRÉER UN SUJET -->
     <div style="margin-top: 15px; margin-bottom: 20px;">
         <a href="#" id="btn-create-fc-topic" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em;">+ Créer un Sujet dans cette section</a>
     </div>
@@ -59,16 +57,48 @@
     import { supabase } from './supabase.js';
 
     const urlParams = new URLSearchParams(window.location.search);
-    const fcId = urlParams.get('id'); // ID numérique du topic/fan club (ex: 12 ou 9)
-    let currentTab = 'dita'; // Onglet par défaut
+    const fcId = urlParams.get('id'); // ID numérique du Fan Club
 
-    // 1. Charger les infos du Fan Club principal pour afficher son vrai nom
-    async function loadFanClubDetails() {
+    // Définition des sous-catégories personnalisées selon le manga/Fan Club
+    // Tu peux facilement modifier ou ajouter des listes ici par la suite !
+    function getTabsForFanClub(title) {
+        const lowerTitle = title.toLowerCase();
+
+        if (lowerTitle.includes('vandread')) {
+            return [
+                { id: 'dita', label: 'Fans de Dita' },
+                { id: 'hibiki', label: 'Fans de Hibiki' },
+                { id: 'precurseur', label: 'Le Précurseur' }
+            ];
+        } else if (lowerTitle.includes('bleach')) {
+            return [
+                { id: 'ichigo', label: 'Fans d\'Ichigo' },
+                { id: 'capitaines', label: 'Les Capitaines Gotei 13' },
+                { id: 'zanpakuto', label: 'Théories Zanpakutô' }
+            ];
+        } else if (lowerTitle.includes('inuyasha')) {
+            return [
+                { id: 'inuyasha_kagome', label: 'Inuyasha & Kagome' },
+                { id: 'sesshomaru', label: 'Fans de Sesshômaru' },
+                { id: 'shikon', label: 'La Perle de Shikon' }
+            ];
+        } else {
+            // Onglets par défaut si c'est un nouveau Fan Club créé par un membre
+            return [
+                { id: 'general', label: 'Discussion Générale' },
+                { id: 'theories', label: 'Théories & Avis' },
+                { id: 'galerie', label: 'Galerie & Fanarts' }
+            ];
+        }
+    }
+
+    async function initFanClubPage() {
         if (!fcId) {
             document.getElementById('fc-main-title').textContent = "Fan Club introuvable";
             return;
         }
 
+        // 1. Récupérer les infos du Fan Club
         const { data: fc, error } = await supabase
             .from('topics')
             .select('*')
@@ -81,22 +111,39 @@
             return;
         }
 
-        // Afficher le vrai titre du Fan Club (ex: "[FAN CLUB] VANDREAD...")
+        // Afficher les infos principales
         document.getElementById('fc-main-title').textContent = `⭐ ${fc.title}`;
         document.getElementById('breadcrumb-fc-name').textContent = fc.title;
         document.getElementById('fc-main-desc').textContent = `Créé par ${fc.author} - Espace officiel.`;
+
+        // 2. Générer les onglets adaptés à ce Fan Club spécifique
+        const tabs = getTabsForFanClub(fc.title);
+        const tabsContainer = document.getElementById('fc-tabs-container');
+
+        tabsContainer.innerHTML = tabs.map((tab, index) => `
+            <a href="#" class="tab-link ${index === 0 ? 'active' : ''}" data-tab="${tab.id}">${tab.label}</a>
+        `).join('');
+
+        // 3. Charger les sujets du premier onglet par défaut
+        loadTopics(tabs[0].id);
+
+        // 4. Écouter les clics sur les onglets générés
+        document.querySelectorAll('.tab-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                loadTopics(link.getAttribute('data-tab'));
+            });
+        });
     }
 
-    // 2. Charger les sujets de la sous-catégorie active
+    // Charger les sujets de l'onglet actif
     async function loadTopics(tab) {
-        currentTab = tab;
         const container = document.getElementById('fc-topics-container');
         container.innerHTML = '<tr><td colspan="2" style="text-align: center; padding: 20px;"><em>Chargement...</em></td></tr>';
 
-        // Construction de la catégorie unique (ex: fc_12_dita ou fc_9_hibiki)
         const categoryKey = `fc_${fcId}_${tab}`;
-
-        // Mettre à jour le lien du bouton de création de sujet
         document.getElementById('btn-create-fc-topic').setAttribute('href', `new-topic.html?cat=${categoryKey}`);
 
         const { data: topics, error } = await supabase
@@ -124,19 +171,8 @@
         }).join('');
     }
 
-    // 3. Gestion des clics sur les onglets
-    document.querySelectorAll('.tab-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-            loadTopics(link.getAttribute('data-tab'));
-        });
-    });
-
-    // Chargement initial au démarrage de la page
-    loadFanClubDetails();
-    loadTopics('dita');
+    // Lancement de l'initialisation de la page
+    initFanClubPage();
 </script>
 </body>
 </html>
