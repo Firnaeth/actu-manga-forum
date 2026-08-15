@@ -10,49 +10,49 @@
         .fc-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
         .tab-link { padding: 8px 15px; background: #fff0f3; color: #d63384; text-decoration: none; border-radius: 5px; font-weight: bold; }
         .tab-link.active { background: #d63384; color: white; }
-        .btn-add-tab { background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 0.9em; }
-        .btn-add-tab:hover { background: #218838; }
-
-        /* Style du panneau d'administration inspiré de l'accueil */
-        .admin-panel-box { background: #fff0f3; border: 1px solid #f5c2c7; padding: 15px; border-radius: 6px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .admin-panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f5c2c7; padding-bottom: 8px; margin-bottom: 12px; }
-        .admin-panel-title { font-weight: bold; color: #842029; font-size: 0.95em; }
-        .btn-toggle-admin { background: #d63384; color: white; border: none; padding: 5px 12px; border-radius: 4px; font-size: 0.85em; font-weight: bold; cursor: pointer; }
-        .btn-toggle-admin:hover { background: #b02a65; }
-        .admin-form-group { margin-bottom: 10px; }
-        .admin-form-group label { display: block; font-size: 0.85em; font-weight: bold; color: #555; margin-bottom: 3px; }
-        .admin-form-control { width: 100%; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9em; box-sizing: border-box; }
-        .admin-buttons-bar { display: flex; gap: 8px; margin-top: 12px; }
-        .btn-save-admin { background: #198754; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
-        .btn-save-admin:hover { background: #157347; }
-        .btn-cancel-admin { background: #6c757d; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
-        .btn-cancel-admin:hover { background: #5c636a; }
+        
+        /* Styles pour faire correspondre exactement ton panneau d'index */
+        .hidden { display: none !important; }
+        .admin-edit-bar { background: #fff0f3; border: 1px solid #f5c2c7; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .admin-title-badge { font-weight: bold; color: #842029; font-size: 0.95em; }
+        .admin-panel-inputs { background: #fff0f3; border: 1px solid #f5c2c7; padding: 15px; border-radius: 6px; margin-bottom: 20px; box-sizing: border-box; }
+        .admin-panel-inputs label { display: block; font-size: 0.85em; font-weight: bold; color: #555; margin-bottom: 4px; margin-top: 10px; }
+        .admin-panel-inputs label:first-child { margin-top: 0; }
+        .admin-panel-inputs input, .admin-panel-inputs textarea { width: 100%; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9em; box-sizing: border-box; }
+        .admin-form-actions { display: flex; gap: 8px; margin-top: 12px; }
+        .btn-admin-edit { background: #d63384; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
+        .btn-admin-edit:hover { background: #b02a65; }
+        .btn-cancel { background: #6c757d; }
+        .btn-cancel:hover { background: #5c636a; }
+        .btn-add-tab-admin { background: #28a745; }
+        .btn-add-tab-admin:hover { background: #218838; }
     </style>
 </head>
 <body>
 
 <div id="wrapper">
-    <!-- PANNEAU D'ADMINISTRATION DU FAN CLUB (Style Accueil) -->
-    <div class="admin-panel-box" id="fc-admin-panel" style="display: none;">
-        <div class="admin-panel-header">
-            <span class="admin-panel-title">⚙️ Administration de l'en-tête du Fan Club</span>
-            <button id="btn-toggle-form" class="btn-toggle-admin">Modifier le Fan Club</button>
+    <!-- PANNEAU D'ÉDITION EN-TÊTE (FAN CLUB) -->
+    <div id="admin-bar-container" class="admin-edit-bar hidden">
+        <span class="admin-title-badge">⚙️ Administration du Fan Club</span>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn-admin-edit btn-add-tab-admin" id="btn-open-add-tab">+ Ajouter un onglet</button>
+            <button class="btn-admin-edit" id="btn-toggle-admin">Modifier le Fan Club</button>
         </div>
-        
-        <div id="admin-form-container" style="display: none;">
-            <div class="admin-form-group">
-                <label>Description / Sous-titre du Fan Club :</label>
-                <textarea id="input-fc-desc" class="admin-form-control" rows="2"></textarea>
+    </div>
+
+    <div id="admin-panel-form" class="admin-panel-inputs hidden">
+        <form id="form-config-header">
+            <label>Description / Sous-titre du Fan Club :</label>
+            <textarea id="input-fc-desc" rows="2" required></textarea>
+
+            <label>Lien (URL) de l'image de bannière :</label>
+            <input type="url" id="input-fc-banner" required>
+
+            <div class="admin-form-actions">
+                <button type="submit" class="btn-admin-edit">Enregistrer</button>
+                <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
             </div>
-            <div class="admin-form-group">
-                <label>Lien (URL) de l'image de bannière :</label>
-                <input type="text" id="input-fc-banner" class="admin-form-control">
-            </div>
-            <div class="admin-buttons-bar">
-                <button id="btn-save-admin" class="btn-save-admin">Enregistrer</button>
-                <button id="btn-cancel-admin" class="btn-cancel-admin">Annuler</button>
-            </div>
-        </div>
+        </form>
     </div>
 
     <!-- EN-TÊTE ET BANNIÈRE DYNAMIQUE -->
@@ -74,12 +74,11 @@
         </p>
     </div>
 
-    <!-- SOUS-MENUS ET BOUTON VERT D'AJOUT D'ONGLET -->
+    <!-- SOUS-MENUS DES ONGLETS -->
     <div class="fc-tabs-wrapper">
         <div class="fc-tabs" id="fc-tabs-container">
             <!-- Les onglets dynamiques s'afficheront ici -->
         </div>
-        <button id="btn-open-add-tab" class="btn-add-tab" style="display: none;">+ Ajouter un onglet</button>
     </div>
 
     <table class="forum-table">
@@ -125,8 +124,8 @@
             return;
         }
 
-        // Afficher le panneau d'administration
-        document.getElementById('fc-admin-panel').style.display = 'block';
+        // Rendre visible la barre d'administration
+        document.getElementById('admin-bar-container').classList.remove('hidden');
 
         // Gestion de la bannière personnalisée
         const bannerImgElem = document.getElementById('forum-banner-img');
@@ -144,28 +143,32 @@
         let customDesc = localStorage.getItem(`fc_desc_${fcId}`) || fc.content || "Bienvenue dans l'espace de discussion et sous-sections thématiques de ce Fan Club.";
         descElem.textContent = customDesc;
 
-        // Remplir les champs du formulaire d'administration
+        // Remplir les champs du formulaire
         const inputDesc = document.getElementById('input-fc-desc');
         const inputBanner = document.getElementById('input-fc-banner');
         inputDesc.value = customDesc;
         inputBanner.value = activeBanner;
 
-        // Gestion de l'affichage du formulaire déroulant
-        const toggleBtn = document.getElementById('btn-toggle-form');
-        const formContainer = document.getElementById('admin-form-container');
+        // Gestion du bouton bascule "Modifier le Fan Club"
+        const toggleBtn = document.getElementById('btn-toggle-admin');
+        const formPanel = document.getElementById('admin-panel-form');
 
         toggleBtn.onclick = () => {
-            if (formContainer.style.display === 'none') {
-                formContainer.style.display = 'block';
-                toggleBtn.textContent = 'Fermer';
-            } else {
-                formContainer.style.display = 'none';
-                toggleBtn.textContent = 'Modifier le Fan Club';
-            }
+            formPanel.classList.toggle('hidden');
+            toggleBtn.textContent = formPanel.classList.contains('hidden') ? 'Modifier le Fan Club' : 'Fermer';
         };
 
-        // Bouton Enregistrer
-        document.getElementById('btn-save-admin').onclick = () => {
+        // Bouton Annuler
+        document.getElementById('btn-cancel-admin').onclick = () => {
+            inputDesc.value = descElem.textContent;
+            inputBanner.value = bannerImgElem.src;
+            formPanel.classList.add('hidden');
+            toggleBtn.textContent = 'Modifier le Fan Club';
+        };
+
+        // Soumission du formulaire (Enregistrer)
+        document.getElementById('form-config-header').onsubmit = (e) => {
+            e.preventDefault();
             const newDesc = inputDesc.value.trim();
             const newBanner = inputBanner.value.trim();
 
@@ -178,21 +181,10 @@
                 bannerImgElem.src = newBanner;
             }
 
-            formContainer.style.display = 'none';
+            formPanel.classList.add('hidden');
             toggleBtn.textContent = 'Modifier le Fan Club';
             alert("Modifications enregistrées avec succès !");
         };
-
-        // Bouton Annuler
-        document.getElementById('btn-cancel-admin').onclick = () => {
-            inputDesc.value = descElem.textContent;
-            inputBanner.value = bannerImgElem.src;
-            formContainer.style.display = 'none';
-            toggleBtn.textContent = 'Modifier le Fan Club';
-        };
-
-        // Afficher le bouton vert d'ajout d'onglet
-        document.getElementById('btn-open-add-tab').style.display = 'inline-block';
 
         // 2. Charger les onglets depuis la table SQL 'fan_club_tabs'
         let tabs = await loadTabsFromSupabase(fcId, fc.title);
