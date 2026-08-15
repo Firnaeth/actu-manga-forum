@@ -6,9 +6,12 @@
     <title>Fan Club - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .fc-tabs { display: flex; gap: 10px; margin: 20px 0; border-bottom: 2px solid #f8d7da; padding-bottom: 10px; flex-wrap: wrap; }
+        .fc-tabs-wrapper { display: flex; align-items: center; justify-content: space-between; margin: 20px 0; border-bottom: 2px solid #f8d7da; padding-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+        .fc-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
         .tab-link { padding: 8px 15px; background: #fff0f3; color: #d63384; text-decoration: none; border-radius: 5px; font-weight: bold; }
         .tab-link.active { background: #d63384; color: white; }
+        .btn-add-tab { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
+        .btn-add-tab:hover { background: #218838; }
     </style>
 </head>
 <body>
@@ -30,9 +33,13 @@
         <p style="margin-top: 5px;" id="fc-main-desc">Espace de discussion et sous-sections thématiques.</p>
     </div>
 
-    <!-- SOUS-MENUS (ONGLETS DYNAMIQUES) -->
-    <div class="fc-tabs" id="fc-tabs-container">
-        <!-- Les onglets seront générés dynamiquement ici -->
+    <!-- SOUS-MENUS ET BOUTON D'ADMINISTRATION DES ONGLETS -->
+    <div class="fc-tabs-wrapper">
+        <div class="fc-tabs" id="fc-tabs-container">
+            <!-- Les onglets dynamiques s'afficheront ici -->
+        </div>
+        <!-- Bouton pour ajouter un onglet à la volée -->
+        <button id="btn-open-add-tab" class="btn-add-tab" style="display: none;">+ Ajouter un onglet</button>
     </div>
 
     <table class="forum-table">
@@ -59,8 +66,8 @@
     const urlParams = new URLSearchParams(window.location.search);
     const fcId = urlParams.get('id'); // ID numérique du Fan Club
 
-    // Fonction stricte pour attribuer les bons onglets selon le titre exact du Fan Club
-    function getTabsForFanClub(title) {
+    // Dictionnaire de base par défaut ou pré-rempli (tu peux y ajouter tes onglets initiaux)
+    function getDefaultTabsForFanClub(title) {
         if (!title) return getDefaultTabs();
         const upperTitle = title.toUpperCase();
 
@@ -119,18 +126,60 @@
         document.getElementById('breadcrumb-fc-name').textContent = fc.title;
         document.getElementById('fc-main-desc').textContent = `Créé par ${fc.author} - Espace officiel.`;
 
-        // 2. Générer les onglets adaptés au titre exact du Fan Club
-        const tabs = getTabsForFanClub(fc.title);
-        const tabsContainer = document.getElementById('fc-tabs-container');
+        // Afficher le bouton d'ajout d'onglet (tu pourras restreindre si besoin aux admins)
+        const addTabBtn = document.getElementById('btn-open-add-tab');
+        addTabBtn.style.display = 'inline-block';
 
+        // 2. Charger les onglets (depuis localStorage pour l'instant ou fusionnés)
+        let tabs = getStoredTabs(fcId, fc.title);
+        renderTabs(tabs);
+
+        // 3. Action du bouton d'ajout d'onglet à la volée
+        addTabBtn.onclick = () => {
+            const labelNom = prompt("Entrez le nom du nouvel onglet (ex: Les Classes de Quincy) :");
+            if (!labelNom) return;
+
+            // Créer un identifiant technique propre (ex: "Les Classes de Quincy" -> "les_classes_de_quincy")
+            const tabId = labelNom.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '_');
+
+            // Vérifier s'il existe déjà
+            if (tabs.some(t => t.id === tabId)) {
+                alert("Cet onglet existe déjà !");
+                return;
+            }
+
+            tabs.push({ id: tabId, label: labelNom });
+            saveStoredTabs(fcId, tabs);
+            renderTabs(tabs);
+            alert(`L'onglet "${labelNom}" a été ajouté avec succès !`);
+        };
+    }
+
+    // Gestion du stockage local par Fan Club pour que tes ajouts persistent sans table SQL complexe
+    function getStoredTabs(fcId, title) {
+        const saved = localStorage.getItem(`fc_tabs_${fcId}`);
+        if (saved) {
+            try { return JSON.parse(saved); } catch(e) {}
+        }
+        return getDefaultTabsForFanClub(title);
+    }
+
+    function saveStoredTabs(fcId, tabs) {
+        localStorage.setItem(`fc_tabs_${fcId}`, JSON.stringify(tabs));
+    }
+
+    function renderTabs(tabs) {
+        const tabsContainer = document.getElementById('fc-tabs-container');
         tabsContainer.innerHTML = tabs.map((tab, index) => `
             <a href="#" class="tab-link ${index === 0 ? 'active' : ''}" data-tab="${tab.id}">${tab.label}</a>
         `).join('');
 
-        // 3. Charger les sujets du premier onglet par défaut
-        loadTopics(tabs[0].id);
+        // Charger le premier onglet par défaut
+        if (tabs.length > 0) {
+            loadTopics(tabs[0].id);
+        }
 
-        // 4. Écouter les clics sur les onglets générés
+        // Écouter les clics sur les onglets
         document.querySelectorAll('.tab-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -156,7 +205,7 @@
             .order('created_at', { ascending: false });
 
         if (error || !topics || topics.length === 0) {
-            container.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Aucun sujet dans cette section. <a href="new-topic.html?cat=${categoryKey}" style="color: #61b3e8; font-weight: bold;">Créez-en un !</a></td></tr>`;
+            container.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Aucun sujet dans cette section. <a href="new-topic.html?color=#61b3e8; font-weight: bold;" href="new-topic.html?cat=${categoryKey}" style="color: #61b3e8; font-weight: bold;">Créez-en un !</a></td></tr>`;
             return;
         }
 
