@@ -37,6 +37,10 @@
                     <td id="user-age">-</td>
                 </tr>
                 <tr>
+                    <td class="label-col">Sexe / Race :</td>
+                    <td id="user-sex-race">-</td>
+                </tr>
+                <tr>
                     <td class="label-col">Nombre de messages :</td>
                     <td id="user-posts">0 message</td>
                 </tr>
@@ -83,6 +87,10 @@
                     <div>
                         <label><small>Âge :</small></label>
                         <input type="number" id="edit-age" placeholder="Ex: 20" min="1" max="120">
+                    </div>
+                    <div>
+                        <label><small>Sexe / Race :</small></label>
+                        <input type="text" id="edit-sex-race" placeholder="Ex: Homme / Humain, Saiyan...">
                     </div>
                     <div>
                         <label><small>Statut / Humeur du moment :</small></label>
@@ -187,6 +195,7 @@
 
                 document.getElementById('user-joined').textContent = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Récemment';
                 document.getElementById('user-age').textContent = profile.age ? `${profile.age} ans` : 'Non renseigné';
+                document.getElementById('user-sex-race').textContent = profile.sex_race || 'Non renseigné';
                 document.getElementById('user-fav').textContent = profile.favorite_manga || 'Non spécifié';
                 
                 document.getElementById('user-status').innerHTML = profile.status ? `<em>"${profile.status}"</em>` : '<em>Pas de statut particulier...</em>';
@@ -222,6 +231,7 @@
                     document.getElementById('edit-profile-section').style.display = 'block';
                     document.getElementById('edit-avatar-url').value = profile.avatar_url || '';
                     document.getElementById('edit-age').value = profile.age || '';
+                    document.getElementById('edit-sex-race').value = profile.sex_race || '';
                     document.getElementById('edit-status').value = profile.status || '';
                     document.getElementById('edit-fav-manga').value = profile.favorite_manga || '';
                     document.getElementById('edit-anime').value = profile.current_anime || '';
@@ -238,6 +248,7 @@
             e.preventDefault();
             const avatarUrl = document.getElementById('edit-avatar-url').value;
             const ageVal = document.getElementById('edit-age').value;
+            const sexRace = document.getElementById('edit-sex-race').value;
             const status = document.getElementById('edit-status').value;
             const favManga = document.getElementById('edit-fav-manga').value;
             const anime = document.getElementById('edit-anime').value;
@@ -251,6 +262,7 @@
                 .update({
                     avatar_url: avatarUrl,
                     age: ageVal ? parseInt(ageVal) : null,
+                    sex_race: sexRace,
                     status: status,
                     favorite_manga: favManga,
                     current_anime: anime,
