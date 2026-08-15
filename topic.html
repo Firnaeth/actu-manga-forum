@@ -129,6 +129,20 @@
             const ageText = (profile && profile.age) ? `${profile.age} ans` : '-';
             const sexRaceText = (profile && profile.sex_race) ? profile.sex_race : '-';
 
+            // --- COMPTAGE AUTOMATIQUE DES MESSAGES (SUJETS + RÉPONSES) ---
+            const { count: topicsCount } = await supabase
+                .from('topics')
+                .select('*', { count: 'exact', head: true })
+                .eq('author', username);
+
+            const { count: repliesCount } = await supabase
+                .from('replies')
+                .select('*', { count: 'exact', head: true })
+                .eq('author', username);
+
+            const totalPosts = (topicsCount || 0) + (repliesCount || 0);
+            // -------------------------------------------------------------
+
             return `
                 <div class="post-user">
                     <div class="post-user-avatar">
@@ -142,6 +156,7 @@
                     <div class="post-user-details">
                         <p><strong>Âge :</strong> ${ageText}</p>
                         <p><strong>Sexe/Race :</strong> ${sexRaceText}</p>
+                        <p><strong>Messages :</strong> ${totalPosts}</p>
                     </div>
                 </div>
             `;
