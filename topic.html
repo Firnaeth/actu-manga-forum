@@ -10,6 +10,31 @@
         .btn-edit { background: #f39c12; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; }
         .post-signature { margin-top: 20px; padding-top: 10px; border-top: 1px dashed #ffb6c1; }
         .post-signature img { max-width: 100%; height: auto; display: block; }
+        
+        /* Styles pour le mini-profil dans les messages */
+        .post-user {
+            text-align: center;
+            padding: 10px;
+        }
+        .post-user-avatar img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-bottom: 5px;
+        }
+        .post-user-details {
+            font-size: 0.85em;
+            color: #555;
+            margin-top: 8px;
+            text-align: left;
+            border-top: 1px dashed #eee;
+            padding-top: 6px;
+        }
+        .post-user-details p {
+            margin: 3px 0;
+        }
     </style>
 </head>
 <body>
@@ -73,6 +98,55 @@
 
         const topicId = new URLSearchParams(window.location.search).get('id');
 
+        // --- FONCTION UTILITAIRE POUR GÉNÉRER LE BLOC DE GAUCHE (MINI-PROFIL) ---
+        async function buildUserProfileBox(username) {
+            if (!username) {
+                return `
+                    <div class="post-user">
+                        <div class="post-user-avatar"><img src="https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg" alt="Avatar"></div>
+                        <span class="username member">Anonyme</span>
+                        <div class="user-rank rank-member">Membre</div>
+                    </div>
+                `;
+            }
+
+            // Récupérer les données du profil depuis Supabase
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('username', username)
+                .single();
+
+            const avatarUrl = (profile && profile.avatar_url) ? profile.avatar_url : 'https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg';
+            const userRole = profile && profile.role ? profile.role.toLowerCase() : 'member';
+            const userRankText = profile && profile.rank ? profile.rank : (userRole === 'admin' ? 'Administrateur' : (userRole === 'moderator' || userRole === 'modérateur' || userRole === 'modo') ? 'Modérateur' : 'Membre');
+            
+            // Classe CSS du rang
+            let rankClass = 'rank-member';
+            if (userRole === 'admin') rankClass = 'rank-admin';
+            else if (userRole === 'moderator' || userRole === 'modérateur' || userRole === 'modo') rankClass = 'rank-mod';
+
+            const ageText = (profile && profile.age) ? `${profile.age} ans` : '-';
+            const sexRaceText = (profile && profile.sex_race) ? profile.sex_race : '-';
+
+            return `
+                <div class="post-user">
+                    <div class="post-user-avatar">
+                        <img src="${avatarUrl}" alt="Avatar de ${username}">
+                    </div>
+                    <div>
+                        <a href="profile.html?user=${username}" class="username ${userRole === 'admin' ? 'admin' : 'member'}" style="font-weight: bold;">${username}</a>
+                    </div>
+                    <div><span class="rank ${rankClass}">${userRankText}</span></div>
+                    
+                    <div class="post-user-details">
+                        <p><strong>Âge :</strong> ${ageText}</p>
+                        <p><strong>Sexe/Race :</strong> ${sexRaceText}</p>
+                    </div>
+                </div>
+            `;
+        }
+
         // --- 4. CHARGEMENT DU SUJET ET DES RÉPONSES ---
         async function loadTopicAndReplies() {
             if (!topicId) {
@@ -100,6 +174,7 @@
 
             // Récupérer la signature de l'auteur du sujet
             let authorSignatureHtml = '';
+            let authorProfileData = null;
             if (topic.author) {
                 const { data: profile } = await supabase
                     .from('profiles')
@@ -107,6 +182,7 @@
                     .eq('username', topic.author)
                     .single();
 
+                authorProfileData = profile;
                 if (profile && profile.signature) {
                     if (profile.signature.startsWith('http://') || profile.signature.startsWith('https://')) {
                         authorSignatureHtml = `<div class="post-signature"><img src="${profile.signature}" alt="Signature"></div>`;
@@ -116,15 +192,13 @@
                 }
             }
 
-            const isAuthorStaff = (topic.author || '').includes('Otaku') || (topic.author || '').includes('Modo');
+            // Générer le bloc latéral de l'auteur du sujet
+            const authorBoxHtml = await buildUserProfileBox(topic.author);
 
             // Construction du HTML du premier message
             let htmlContent = `
                 <div class="post-box">
-                    <div class="post-user">
-                        <a href="profile.html?user=${topic.author}" class="username ${isAuthorStaff ? 'admin' : 'member'}">${topic.author || 'Anonyme'}</a>
-                        <div class="user-rank">${isAuthorStaff ? 'Staff' : 'Membre'}</div>
-                    </div>
+                    ${authorBoxHtml}
                     <div class="post-content">
                         <div class="post-date">Posté le ${new Date(topic.created_at).toLocaleDateString()}
                             ${isStaff ? `<button class="btn-edit" onclick="editTopic(${topic.id})">Éditer</button>
@@ -147,9 +221,7 @@
 
             if (!repliesError && replies && replies.length > 0) {
                 for (const reply of replies) {
-                    const isReplyStaff = (reply.author || '').includes('Otaku') || (reply.author || '').includes('Modo');
-                    
-                    // Optionnel : récupérer la signature de l'auteur de la réponse
+                    // Récupérer la signature de l'auteur de la réponse
                     let replySigHtml = '';
                     const { data: replyProfile } = await supabase
                         .from('profiles')
@@ -165,12 +237,12 @@
                         }
                     }
 
+                    // Générer le bloc latéral de l'auteur de la réponse
+                    const replyAuthorBoxHtml = await buildUserProfileBox(reply.author);
+
                     htmlContent += `
                         <div class="post-box" style="margin-top: 15px;">
-                            <div class="post-user">
-                                <a href="profile.html?user=${reply.author}" class="username ${isReplyStaff ? 'admin' : 'member'}">${reply.author || 'Anonyme'}</a>
-                                <div class="user-rank">${isReplyStaff ? 'Staff' : 'Membre'}</div>
-                            </div>
+                            ${replyAuthorBoxHtml}
                             <div class="post-content">
                                 <div class="post-date">Répondu le ${new Date(reply.created_at).toLocaleDateString()}
                                     ${isStaff ? `<button class="btn-mod" onclick="deleteReply(${reply.id})">Supprimer</button>` : ''}
