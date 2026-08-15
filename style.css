@@ -80,19 +80,23 @@ body {
 }
 
 .welcome-banner {
-    background: linear-gradient(135deg, #a8c0ff, #3f2b96);
-    color: white;
+    background: #fdfdfd;
+    border: 2px solid #ddd;
+    padding: 20px;
     text-align: center;
-    padding: 12px;
-    border-radius: 4px;
-    margin-bottom: 10px;
-   font-family: 'Verdana', sans-serif; /* Très typique des forums 2010 */
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    font-family: 'Verdana', sans-serif; /* Très typique des forums 2010 */
 }
 
 .welcome-banner h2 {
-    margin: 0 0 4px 0;
-    font-size: 15px;
-    letter-spacing: 1px;
+    color: #2c3e50;
+    margin-top: 0;
+    text-transform: uppercase;
+    font-size: 1.5em;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
 }
 
 .welcome-banner p {
