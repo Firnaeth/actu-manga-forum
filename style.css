@@ -86,6 +86,7 @@ body {
     padding: 12px;
     border-radius: 4px;
     margin-bottom: 10px;
+   font-family: 'Verdana', sans-serif; /* Très typique des forums 2010 */
 }
 
 .welcome-banner h2 {
