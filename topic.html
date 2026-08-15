@@ -110,7 +110,7 @@
                 `;
             }
 
-            // Récupérer les données du profil depuis Supabase
+            // Récupérer les données du profil depuis Supabase (inclut la colonne 'status')
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('*')
@@ -128,6 +128,9 @@
 
             const ageText = (profile && profile.age) ? `${profile.age} ans` : '-';
             const sexRaceText = (profile && profile.sex_race) ? profile.sex_race : '-';
+            
+            // Récupération du statut (si vide ou égal à "EMPTY", on affiche un tiret ou on ne met rien)
+            let statutText = (profile && profile.status && profile.status !== 'EMPTY') ? profile.status : '-';
 
             // --- COMPTAGE AUTOMATIQUE DES MESSAGES (SUJETS + RÉPONSES) ---
             const { count: topicsCount } = await supabase
@@ -141,7 +144,6 @@
                 .eq('author', username);
 
             const totalPosts = (topicsCount || 0) + (repliesCount || 0);
-            // -------------------------------------------------------------
 
             return `
                 <div class="post-user">
@@ -156,6 +158,7 @@
                     <div class="post-user-details">
                         <p><strong>Âge :</strong> ${ageText}</p>
                         <p><strong>Sexe/Race :</strong> ${sexRaceText}</p>
+                        <p><strong>Statut :</strong> ${statutText}</p>
                         <p><strong>Messages :</strong> ${totalPosts}</p>
                     </div>
                 </div>
@@ -189,7 +192,6 @@
 
             // Récupérer la signature de l'auteur du sujet
             let authorSignatureHtml = '';
-            let authorProfileData = null;
             if (topic.author) {
                 const { data: profile } = await supabase
                     .from('profiles')
@@ -197,7 +199,6 @@
                     .eq('username', topic.author)
                     .single();
 
-                authorProfileData = profile;
                 if (profile && profile.signature) {
                     if (profile.signature.startsWith('http://') || profile.signature.startsWith('https://')) {
                         authorSignatureHtml = `<div class="post-signature"><img src="${profile.signature}" alt="Signature"></div>`;
@@ -236,7 +237,6 @@
 
             if (!repliesError && replies && replies.length > 0) {
                 for (const reply of replies) {
-                    // Récupérer la signature de l'auteur de la réponse
                     let replySigHtml = '';
                     const { data: replyProfile } = await supabase
                         .from('profiles')
@@ -252,7 +252,6 @@
                         }
                     }
 
-                    // Générer le bloc latéral de l'auteur de la réponse
                     const replyAuthorBoxHtml = await buildUserProfileBox(reply.author);
 
                     htmlContent += `
@@ -298,7 +297,7 @@
                 alert("Erreur lors de l'envoi de la réponse : " + error.message);
             } else {
                 document.getElementById('message').value = '';
-                loadTopicAndReplies(); // Recharger la liste pour afficher la nouvelle réponse instantanément
+                loadTopicAndReplies();
             }
         });
 
