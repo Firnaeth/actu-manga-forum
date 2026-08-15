@@ -3,342 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fan Club - Actu Manga World</title>
+    <title id="page-title">Fan Clubs Officiels - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .fc-tabs-wrapper { display: flex; align-items: center; justify-content: space-between; margin: 20px 0; border-bottom: 2px solid #f8d7da; padding-bottom: 10px; flex-wrap: wrap; gap: 10px; }
-        .fc-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
-        .tab-link { padding: 8px 15px; background: #fff0f3; color: #d63384; text-decoration: none; border-radius: 5px; font-weight: bold; }
-        .tab-link.active { background: #d63384; color: white; }
-        
-        /* Styles pour faire correspondre exactement ton panneau d'index */
-        .hidden { display: none !important; }
-        .admin-edit-bar { background: #fff0f3; border: 1px solid #f5c2c7; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-        .admin-title-badge { font-weight: bold; color: #842029; font-size: 0.95em; }
-        .admin-panel-inputs { background: #fff0f3; border: 1px solid #f5c2c7; padding: 15px; border-radius: 6px; margin-bottom: 20px; box-sizing: border-box; }
-        .admin-panel-inputs label { display: block; font-size: 0.85em; font-weight: bold; color: #555; margin-bottom: 4px; margin-top: 10px; }
-        .admin-panel-inputs label:first-child { margin-top: 0; }
-        .admin-panel-inputs input, .admin-panel-inputs textarea { width: 100%; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9em; box-sizing: border-box; }
-        .admin-form-actions { display: flex; gap: 8px; margin-top: 12px; }
-        .btn-admin-edit { background: #d63384; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
-        .btn-admin-edit:hover { background: #b02a65; }
-        .btn-cancel { background: #6c757d; }
-        .btn-cancel:hover { background: #5c636a; }
-        .btn-add-tab-admin { background: #28a745; }
-        .btn-add-tab-admin:hover { background: #218838; }
-    </style>
 </head>
 <body>
 
-<div id="wrapper">
-    <!-- PANNEAU D'ÉDITION EN-TÊTE (FAN CLUB) -->
-    <div id="admin-bar-container" class="admin-edit-bar hidden">
-        <span class="admin-title-badge">⚙️ Administration du Fan Club</span>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="btn-admin-edit btn-add-tab-admin" id="btn-open-add-tab">+ Ajouter un onglet</button>
-            <button class="btn-admin-edit" id="btn-toggle-admin">Modifier le Fan Club</button>
+    <div id="wrapper">
+
+        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
+        <div id="admin-bar-container" class="admin-edit-bar hidden">
+            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
+            <button class="btn-admin-edit" id="btn-toggle-admin">Modifier Titre & Bannière</button>
         </div>
-    </div>
 
-    <div id="admin-panel-form" class="admin-panel-inputs hidden">
-        <form id="form-config-header">
-            <label>Description / Sous-titre du Fan Club :</label>
-            <textarea id="input-fc-desc" rows="2" required></textarea>
+        <div id="admin-panel-form" class="admin-panel-inputs hidden">
+            <form id="form-config-header">
+                <label>Titre principal du forum :</label>
+                <input type="text" id="input-forum-title" required>
 
-            <label>Lien (URL) de l'image de bannière :</label>
-            <input type="url" id="input-fc-banner" required>
+                <label>Description / Sous-titre :</label>
+                <input type="text" id="input-forum-subtitle" required>
 
-            <div class="admin-form-actions">
-                <button type="submit" class="btn-admin-edit">Enregistrer</button>
-                <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
+                <label>Lien (URL) de l'image de bannière :</label>
+                <input type="url" id="input-forum-banner" required>
+
+                <div class="admin-form-actions">
+                    <button type="submit" class="btn-admin-edit">Enregistrer</button>
+                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- BANNIÈRE EN-TÊTE PRINCIPALE -->
+        <div class="main-header">
+            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
+        </div>
+
+        <!-- BARRE DE NAVIGATION VINTAGE -->
+        <nav class="forum-nav">
+            <a href="index.html" class="nav-link">Index</a>
+            <a href="community.html" class="nav-link">Fiches & Critiques</a>
+            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
+            <a href="forum_fc.html" class="nav-link highlight">Fan Clubs</a>
+
+            <!-- LIEN PROFIL (Masqué si non connecté) -->
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
+
+            <!-- BOUTON D'INSCRIPTION OU DÉCONNEXION -->
+            <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
+            <a href="#" class="nav-link">FAQ</a>
+        </nav>
+
+        <!-- ANNONCE & ACTUALITÉS -->
+        <div class="news-container">
+            <div class="welcome-banner">
+                <h2 id="forum-title-display">Fan Clubs Officiels - Actu Manga World</h2>
+                <p id="forum-subtitle-display">Rejoignez, supportez et créez des Fan Clubs pour vos mangas et personnages favoris !</p>
+                <p style="font-style: italic; color: #555; margin-top: 10px;">
+                    <small>Portez fièrement vos bannières et discutez entre passionnés.</small>
+                </p>
             </div>
-        </form>
-    </div>
-
-    <!-- EN-TÊTE ET BANNIÈRE DYNAMIQUE -->
-    <div class="main-header">
-        <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière du Fan Club" class="header-banner">
-    </div>
-
-    <!-- FIL D'ARIANE -->
-    <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
-        <a href="index.html">Accueil</a> &raquo; <a href="forum_fc.html">Fan Clubs</a> &raquo; <span id="breadcrumb-fc-name">Chargement...</span>
-    </div>
-
-    <!-- BANNIÈRE DE PRÉSENTATION DU FAN CLUB -->
-    <div class="welcome-banner" style="text-align: center; padding: 15px;">
-        <h2 id="fc-main-title">⭐ Chargement du Fan Club...</h2>
-        <p style="margin-top: 8px; color: #555;" id="fc-main-desc">Chargement de la description...</p>
-        <p style="font-size: 0.85em; color: #888; margin-top: 5px;">
-            <span id="fc-author-info">Créé par Inconnu</span> - Espace officiel.
-        </p>
-    </div>
-
-    <!-- SOUS-MENUS DES ONGLETS -->
-    <div class="fc-tabs-wrapper">
-        <div class="fc-tabs" id="fc-tabs-container">
-            <!-- Les onglets dynamiques s'afficheront ici -->
         </div>
+
+        <!-- CONTENU PRINCIPAL : LISTE DES FAN CLUBS -->
+        <table class="forum-table">
+            <thead>
+                <tr>
+                    <th colspan="2" class="cat-title">_ Liste des Fan Clubs Actifs _</th>
+                    <th class="stat-head">Membres</th>
+                    <th class="stat-head">Discussions</th>
+                    <th class="last-post-head">Créateur / Infos</th>
+                </tr>
+            </thead>
+            <tbody id="fan-clubs-list-container">
+                <tr>
+                    <td class="icon-cell"><span class="category-emoji">⭐</span></td>
+                    <td colspan="4" class="forum-desc">
+                        <em>Chargement des Fan Clubs depuis Supabase...</em>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- BOUTON CRÉATION DE FAN CLUB (Si connecté) -->
+        <div style="margin: 20px 0; text-align: right;" id="create-fc-container" class="hidden">
+            <a href="create-fc.html" class="btn-admin-edit" style="text-decoration: none;">+ Créer un nouveau Fan Club</a>
+        </div>
+
+        <!-- WIDGET QUI EST EN LIGNE -->
+        <div class="online-box">
+            <div class="box-title">Qui est en ligne ?</div>
+            <div class="box-content">
+                <p id="online-count-msg">Chargement des membres inscrits...</p>
+                <hr class="box-hr">
+                <p><small>Membres inscrits : <span id="online-users-list">...</span></small></p>
+            </div>
+        </div>
+
     </div>
 
-    <table class="forum-table">
-        <thead>
-            <tr>
-                <th class="cat-title">_ Sujets de cette section _</th>
-                <th class="stat-head" style="text-align: center;">Auteur</th>
-            </tr>
-        </thead>
-        <tbody id="fc-topics-container">
-            <tr><td colspan="2" style="text-align: center; padding: 20px;"><em>Chargement des sujets...</em></td></tr>
-        </tbody>
-    </table>
+    <!-- SCRIPT GLOBAL SUPABASE POUR LA PAGE FAN CLUB -->
+    <script type="module">
+        import { supabase } from './supabase.js';
 
-    <!-- BOUTON CRÉER UN SUJET -->
-    <div style="margin-top: 15px; margin-bottom: 20px;">
-        <a href="#" id="btn-create-fc-topic" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em;">+ Créer un Sujet dans cette section</a>
-    </div>
-</div>
+        const currentUsername = localStorage.getItem('forumUsername');
+        const currentUserRole = localStorage.getItem('forumUserRole');
 
-<script type="module">
-    import { supabase } from './supabase.js';
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const fcId = urlParams.get('id'); // ID numérique du Fan Club (topic_id)
-
-    async function initFanClubPage() {
-        if (!fcId) {
-            document.getElementById('fc-main-title').textContent = "Fan Club introuvable";
-            return;
-        }
-
-        // 1. Récupérer les infos du Fan Club depuis Supabase
-        const { data: fc, error } = await supabase
-            .from('topics')
-            .select('*')
-            .eq('id', fcId)
-            .single();
-
-        if (error || !fc) {
-            document.getElementById('fc-main-title').textContent = "Fan Club introuvable";
-            document.getElementById('breadcrumb-fc-name').textContent = "Erreur";
-            return;
-        }
-
-        // Rendre visible la barre d'administration
-        document.getElementById('admin-bar-container').classList.remove('hidden');
-
-        // Gestion de la bannière personnalisée
-        const bannerImgElem = document.getElementById('forum-banner-img');
-        const customBanner = localStorage.getItem(`fc_banner_${fcId}`);
-        const activeBanner = customBanner || getBannerForTitle(fc.title);
-        bannerImgElem.src = activeBanner;
-
-        // Afficher les infos principales
-        document.getElementById('fc-main-title').textContent = `⭐ ${fc.title}`;
-        document.getElementById('breadcrumb-fc-name').textContent = fc.title;
-        document.getElementById('fc-author-info').textContent = `Créé par ${fc.author || 'Inconnu'}`;
-
-        // Gestion de la description
-        const descElem = document.getElementById('fc-main-desc');
-        let customDesc = localStorage.getItem(`fc_desc_${fcId}`) || fc.content || "Bienvenue dans l'espace de discussion et sous-sections thématiques de ce Fan Club.";
-        descElem.textContent = customDesc;
-
-        // Remplir les champs du formulaire
-        const inputDesc = document.getElementById('input-fc-desc');
-        const inputBanner = document.getElementById('input-fc-banner');
-        inputDesc.value = customDesc;
-        inputBanner.value = activeBanner;
-
-        // Gestion du bouton bascule "Modifier le Fan Club"
-        const toggleBtn = document.getElementById('btn-toggle-admin');
-        const formPanel = document.getElementById('admin-panel-form');
-
-        toggleBtn.onclick = () => {
-            formPanel.classList.toggle('hidden');
-            toggleBtn.textContent = formPanel.classList.contains('hidden') ? 'Modifier le Fan Club' : 'Fermer';
+        window.logout = async function(e) {
+            if (e) e.preventDefault();
+            try { await supabase.auth.signOut(); } catch (err) { console.error(err); }
+            localStorage.clear();
+            window.location.href = 'index.html';
         };
 
-        // Bouton Annuler
-        document.getElementById('btn-cancel-admin').onclick = () => {
-            inputDesc.value = descElem.textContent;
-            inputBanner.value = bannerImgElem.src;
-            formPanel.classList.add('hidden');
-            toggleBtn.textContent = 'Modifier le Fan Club';
-        };
+        const profileLink = document.getElementById('nav-profile-link');
+        const authLink = document.getElementById('nav-auth-link');
+        const createFcContainer = document.getElementById('create-fc-container');
 
-        // Soumission du formulaire (Enregistrer)
-        document.getElementById('form-config-header').onsubmit = (e) => {
+        if (currentUsername) {
+            profileLink.classList.remove('hidden');
+            authLink.textContent = "Déconnexion";
+            authLink.setAttribute('href', '#');
+            authLink.onclick = window.logout;
+            if (createFcContainer) createFcContainer.classList.remove('hidden');
+        }
+
+        // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
+        const adminBar = document.getElementById('admin-bar-container');
+        const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
+
+        if (isStaff && adminBar) {
+            adminBar.classList.remove('hidden');
+        }
+        
+        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.toggle('hidden');
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
+                title: "Bienvenue sur Actu Manga World", 
+                subtitle: "Toutes les sorties VF, fiches animes...", 
+                banner: "https://images.alphacoders.com/605/605592.png" 
+            };
+            document.getElementById('input-forum-title').value = config.title;
+            document.getElementById('input-forum-subtitle').value = config.subtitle;
+            document.getElementById('input-forum-banner').value = config.banner;
+        });
+
+        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.add('hidden');
+        });
+
+        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
             e.preventDefault();
-            const newDesc = inputDesc.value.trim();
-            const newBanner = inputBanner.value.trim();
+            const newConfig = {
+                title: document.getElementById('input-forum-title').value,
+                subtitle: document.getElementById('input-forum-subtitle').value,
+                banner: document.getElementById('input-forum-banner').value
+            };
+            localStorage.setItem('forumHeaderConfig', JSON.stringify(newConfig));
+            alert("En-tête mis à jour avec succès !");
+            window.location.reload();
+        });
 
-            if (newDesc) {
-                localStorage.setItem(`fc_desc_${fcId}`, newDesc);
-                descElem.textContent = newDesc;
-            }
-            if (newBanner) {
-                localStorage.setItem(`fc_banner_${fcId}`, newBanner);
-                bannerImgElem.src = newBanner;
-            }
+        function loadHeaderConfig() {
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
+                title: "Bienvenue sur Actu Manga World", 
+                subtitle: "Toutes les sorties VF / VOSTFR...", 
+                banner: "https://images.alphacoders.com/605/605592.png" 
+            };
+            const titleDisplay = document.getElementById('forum-title-display');
+            if(titleDisplay) titleDisplay.textContent = config.title;
+            const subtitleEl = document.getElementById('forum-subtitle-display');
+            if (subtitleEl) subtitleEl.textContent = config.subtitle;
+            const bannerImg = document.getElementById('forum-banner-img');
+            if(bannerImg) bannerImg.src = config.banner;
+        }
 
-            formPanel.classList.add('hidden');
-            toggleBtn.textContent = 'Modifier le Fan Club';
-            alert("Modifications enregistrées avec succès !");
-        };
+        // --- CHARGEMENT DES FAN CLUBS DEPUIS SUPABASE ---
+        async function loadFanClubs() {
+            const tbody = document.getElementById('fan-clubs-list-container');
+            
+            // Assure-toi que ta table s'appelle bien 'fan_clubs' (ou adapte selon ta base)
+            const { data: fanClubs, error } = await supabase
+                .from('fan_clubs')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-        // 2. Charger les onglets depuis la table SQL 'fan_club_tabs'
-        let tabs = await loadTabsFromSupabase(fcId, fc.title);
-        renderTabs(tabs);
-
-        // 3. Action du bouton vert pour ajouter un onglet en base SQL
-        document.getElementById('btn-open-add-tab').onclick = async () => {
-            const labelNom = prompt("Entrez le nom du nouvel onglet (ex: Les Classes de Quincy) :");
-            if (!labelNom) return;
-
-            const tabKey = labelNom.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '_');
-
-            // Insérer le nouvel onglet dans Supabase
-            const { error: insertError } = await supabase
-                .from('fan_club_tabs')
-                .insert([{ topic_id: fcId, tab_key: tabKey, tab_label: labelNom }]);
-
-            if (insertError) {
-                alert("Erreur lors de l'ajout de l'onglet : " + insertError.message);
+            if (error) {
+                console.error("Erreur chargement fan clubs:", error);
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: red;">Erreur lors du chargement des Fan Clubs.</td></tr>`;
                 return;
             }
 
-            // Recharger les onglets
-            tabs = await loadTabsFromSupabase(fcId, fc.title);
-            renderTabs(tabs);
-            alert(`L'onglet "${labelNom}" a été ajouté avec succès !`);
-        };
-    }
-
-    function getBannerForTitle(title) {
-        if (!title) return "https://images.alphacoders.com/605/605592.png";
-        const upperTitle = title.toUpperCase();
-        if (upperTitle.includes('VANDREAD')) return "https://images.alphacoders.com/605/605592.png";
-        if (upperTitle.includes('BLEACH')) return "https://images.alphacoders.com/605/605592.png";
-        if (upperTitle.includes('INUYASHA')) return "https://images.alphacoders.com/605/605592.png";
-        return "https://images.alphacoders.com/605/605592.png";
-    }
-
-    async function loadTabsFromSupabase(topicId, title) {
-        const { data: dbTabs, error } = await supabase
-            .from('fan_club_tabs')
-            .select('*')
-            .eq('topic_id', topicId)
-            .order('display_order', { ascending: true });
-
-        if (error || !dbTabs || dbTabs.length === 0) {
-            let defaultTabs = getDefaultTabsForTitle(title);
-            for (let i = 0; i < defaultTabs.length; i++) {
-                await supabase.from('fan_club_tabs').insert([{
-                    topic_id: topicId,
-                    tab_key: defaultTabs[i].id,
-                    tab_label: defaultTabs[i].label,
-                    display_order: i
-                }]);
+            if (!fanClubs || fanClubs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Aucun Fan Club créé pour le moment. Soyez le premier à en lancer un !</td></tr>`;
+                return;
             }
-            const { data: newDbTabs } = await supabase
-                .from('fan_club_tabs')
-                .select('*')
-                .eq('topic_id', topicId)
-                .order('display_order', { ascending: true });
-            
-            return newDbTabs.map(t => ({ id: t.tab_key, label: t.tab_label }));
+
+            tbody.innerHTML = fanClubs.map(fc => {
+                const dateFormatted = new Date(fc.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
+                return `
+                    <tr>
+                        <td class="icon-cell"><span class="category-emoji">⭐</span></td>
+                        <td class="forum-desc">
+                            <a href="fc-detail.html?id=${fc.id}" class="forum-title">${fc.name}</a>
+                            <p>${fc.description || 'Rejoignez ce Fan Club officiel !'}</p>
+                        </td>
+                        <td class="stat-cell">${fc.members_count || 1}</td>
+                        <td class="stat-cell">${fc.topics_count || 0}</td>
+                        <td class="last-post-cell">
+                            Créé par <span style="color: #c0392b;">${fc.creator || 'Anonyme'}</span><br>
+                            <span style="font-size: 0.85em; color: #7f8c8d;">Le ${dateFormatted}</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        return dbTabs.map(t => ({ id: t.tab_key, label: t.tab_label }));
-    }
+        async function loadOnlineUsers() {
+            const { data: profiles } = await supabase.from('profiles').select('username, role, avatar_url');
+            const countMsg = document.getElementById('online-count-msg');
+            const usersListContainer = document.getElementById('online-users-list');
 
-    function getDefaultTabsForTitle(title) {
-        if (!title) return getDefaultTabs();
-        const upperTitle = title.toUpperCase();
-        if (upperTitle.includes('VANDREAD')) {
-            return [
-                { id: 'dita', label: 'Fans de Dita' },
-                { id: 'hibiki', label: 'Fans de Hibiki' },
-                { id: 'precurseur', label: 'Le Précurseur' }
-            ];
-        } else if (upperTitle.includes('BLEACH')) {
-            return [
-                { id: 'ichigo', label: 'Fans d\'Ichigo' },
-                { id: 'capitaines', label: 'Les Capitaines Gotei 13' },
-                { id: 'zanpakuto', label: 'Théories Zanpakutô' }
-            ];
-        } else if (upperTitle.includes('INUYASHA')) {
-            return [
-                { id: 'inuyasha_kagome', label: 'Inuyasha & Kagome' },
-                { id: 'sesshomaru', label: 'Fans de Sesshômaru' },
-                { id: 'shikon', label: 'La Perle de Shikon' }
-            ];
-        } else {
-            return getDefaultTabs();
-        }
-    }
+            if (!profiles || profiles.length === 0) return;
 
-    function getDefaultTabs() {
-        return [
-            { id: 'general', label: 'Discussion Générale' },
-            { id: 'theories', label: 'Théories & Avis' },
-            { id: 'galerie', label: 'Galerie & Fanarts' }
-        ];
-    }
-
-    function renderTabs(tabs) {
-        const tabsContainer = document.getElementById('fc-tabs-container');
-        tabsContainer.innerHTML = tabs.map((tab, index) => `
-            <a href="#" class="tab-link ${index === 0 ? 'active' : ''}" data-tab="${tab.id}">${tab.label}</a>
-        `).join('');
-
-        if (tabs.length > 0) {
-            loadTopics(tabs[0].id);
+            if (countMsg) countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
+            if (usersListContainer) {
+                usersListContainer.innerHTML = profiles.map(u => `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none;">${u.username}</a>`).join(', ');
+            }
         }
 
-        document.querySelectorAll('.tab-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-                loadTopics(link.getAttribute('data-tab'));
-            });
-        });
-    }
-
-    async function loadTopics(tab) {
-        const container = document.getElementById('fc-topics-container');
-        container.innerHTML = '<tr><td colspan="2" style="text-align: center; padding: 20px;"><em>Chargement...</em></td></tr>';
-
-        const categoryKey = `fc_${fcId}_${tab}`;
-        document.getElementById('btn-create-fc-topic').setAttribute('href', `new-topic.html?cat=${categoryKey}`);
-
-        const { data: topics, error } = await supabase
-            .from('topics')
-            .select('*')
-            .eq('category', categoryKey)
-            .order('created_at', { ascending: false });
-
-        if (error || !topics || topics.length === 0) {
-            container.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Aucun sujet dans cette section. <a href="new-topic.html?cat=${categoryKey}" style="color: #61b3e8; font-weight: bold;">Créez-en un !</a></td></tr>`;
-            return;
-        }
-
-        container.innerHTML = topics.map(t => {
-            const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
-            return `
-                <tr>
-                    <td class="forum-desc">
-                        <a href="topic.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.05em;">${t.title}</a>
-                        <p style="font-size: 0.8em; color: #666; margin-top: 2px;">Créé le ${dateFormatted}</p>
-                    </td>
-                    <td class="stat-cell" style="text-align: center;">${t.author || 'Inconnu'}</td>
-                </tr>
-            `;
-        }).join('');
-    }
-
-    initFanClubPage();
-</script>
+        loadHeaderConfig();
+        loadFanClubs();
+        loadOnlineUsers();
+    </script>
 </body>
 </html>
