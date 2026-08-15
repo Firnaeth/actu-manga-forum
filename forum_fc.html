@@ -41,8 +41,10 @@
             <a href="index.html" class="nav-link">Index</a>
             <a href="community.html" class="nav-link">Fiches & Critiques</a>
             <a href="contest-view.html" class="nav-link">Concours Dessin</a>
-            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil</a>
+            <a href="#" class="nav-link">Rechercher</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
             <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
+            <a href="#" class="nav-link">FAQ</a>
         </nav>
 
         <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
@@ -89,7 +91,7 @@
                 e.preventDefault();
                 try { await supabase.auth.signOut(); } catch(err) { console.error(err); }
                 localStorage.clear(); 
-                window.location.href = 'index.html'; 
+                window.location.reload(); 
             };
         }
 
