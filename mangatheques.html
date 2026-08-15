@@ -35,8 +35,8 @@
                 <h3>Liste des collectionneurs</h3>
                 <p style="font-size: 0.9em; color: #666; margin-bottom: 20px;">Cliquez sur un profil pour voir le détail ou accédez directement à leur page MyAnimeList.</p>
                 
-                <!-- Grille ou liste des profils chargés depuis Supabase -->
-                <div id="mangatheques-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                <!-- Grille sur 3 colonnes -->
+                <div id="mangatheques-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
                     <p><em>Chargement des mangathèques...</em></p>
                 </div>
             </div>
@@ -87,18 +87,19 @@
             gridEl.innerHTML = profiles.map(user => {
                 const avatar = (user.avatar_url && user.avatar_url.trim() !== "") ? user.avatar_url : defaultAvatar;
                 const malLink = (user.mal_url && user.mal_url.trim() !== "") 
-                    ? `<a href="${user.mal_url}" target="_blank" class="btn-admin-edit" style="display:inline-block; margin-top:10px; text-decoration:none; font-size:11px; padding:4px 8px; background:#2e51a2; color:white;">🔗 Voir MyAnimeList</a>`
-                    : `<span style="font-size: 11px; color: #999; display:block; margin-top:10px;">Pas de MAL renseigné</span>`;
+                    ? `<a href="${user.mal_url}" target="_blank" style="display:inline-block; text-decoration:none; font-size:11px; padding:4px 8px; background:#2e51a2; color:white; border-radius:3px; font-weight:bold;">🔗 MyAnimeList</a>`
+                    : `<span style="font-size: 11px; color: #999; font-style: italic;">Pas de MAL</span>`;
 
                 return `
-                    <div style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; background: #f9f9f9; text-align: center;">
-                        <img src="${avatar}" alt="${user.username}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc;"><br>
-                        <h4 style="margin: 10px 0 5px 0;">
-                            <a href="profile.html?user=${encodeURIComponent(user.username)}" style="color: #c0392b; text-decoration: none;">${user.username}</a>
-                        </h4>
-                        <span style="font-size: 11px; background: #eee; padding: 2px 6px; border-radius: 3px;">Rôle : ${user.role || 'Membre'}</span>
-                        <div style="margin-top: 10px;">
-                            ${malLink}
+                    <div style="display: flex; align-items: center; gap: 12px; border: 1px solid #ddd; padding: 12px; border-radius: 4px; background: #f9f9f9;">
+                        <img src="${avatar}" alt="${user.username}" style="width: 45px; height: 45px; border-radius: 4px; object-fit: cover; border: 1px solid #ccc; flex-shrink: 0;">
+                        <div style="overflow: hidden; flex-grow: 1;">
+                            <h4 style="margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <a href="profile.html?user=${encodeURIComponent(user.username)}" style="color: #c0392b; text-decoration: none; font-size: 14px;">${user.username}</a>
+                            </h4>
+                            <div style="margin-top: 4px;">
+                                ${malLink}
+                            </div>
                         </div>
                     </div>
                 `;
