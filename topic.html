@@ -73,8 +73,10 @@
 
         // --- 1. VÉRIFICATION DE LA VRAIE SESSION ---
         const currentUsername = localStorage.getItem('forumUsername');
-        const currentRole = localStorage.getItem('forumUserRole') || 'member';
-        const isStaff = (currentRole === 'admin' || currentRole === 'modo');
+        const currentRole = (localStorage.getItem('forumUserRole') || 'member').toLowerCase();
+        
+        // Reconnaissance élargie du staff (inclut 'mod')
+        const isStaff = (currentRole === 'admin' || currentRole === 'mod' || currentRole === 'modo' || currentRole === 'moderator' || currentRole === 'modérateur');
 
         // --- 2. CONFIGURATION DES CATÉGORIES ---
         const categoryMap = {
@@ -110,7 +112,7 @@
                 `;
             }
 
-            // Récupérer les données du profil depuis Supabase (inclut la colonne 'status')
+            // Récupérer les données du profil depuis Supabase
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('*')
@@ -119,17 +121,15 @@
 
             const avatarUrl = (profile && profile.avatar_url) ? profile.avatar_url : 'https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg';
             const userRole = profile && profile.role ? profile.role.toLowerCase() : 'member';
-            const userRankText = profile && profile.rank ? profile.rank : (userRole === 'admin' ? 'Administrateur' : (userRole === 'moderator' || userRole === 'modérateur' || userRole === 'modo') ? 'Modérateur' : 'Membre');
+            const userRankText = profile && profile.rank ? profile.rank : (userRole === 'admin' ? 'Administrateur' : (userRole === 'mod' || userRole === 'moderator' || userRole === 'modérateur' || userRole === 'modo') ? 'Modérateur' : 'Membre');
             
             // Classe CSS du rang
             let rankClass = 'rank-member';
             if (userRole === 'admin') rankClass = 'rank-admin';
-            else if (userRole === 'moderator' || userRole === 'modérateur' || userRole === 'modo') rankClass = 'rank-mod';
+            else if (userRole === 'mod' || userRole === 'moderator' || userRole === 'modérateur' || userRole === 'modo') rankClass = 'rank-mod';
 
             const ageText = (profile && profile.age) ? `${profile.age} ans` : '-';
             const sexRaceText = (profile && profile.sex_race) ? profile.sex_race : '-';
-            
-            // Récupération du statut (si vide ou égal à "EMPTY", on affiche un tiret ou on ne met rien)
             let statutText = (profile && profile.status && profile.status !== 'EMPTY') ? profile.status : '-';
 
             // --- COMPTAGE AUTOMATIQUE DES MESSAGES (SUJETS + RÉPONSES) ---
@@ -208,17 +208,18 @@
                 }
             }
 
-            // Générer le bloc latéral de l'auteur du sujet
             const authorBoxHtml = await buildUserProfileBox(topic.author);
 
-            // Construction du HTML du premier message
+            // Un utilisateur peut modifier/supprimer si c'est son propre message OU s'il est staff
+            const canManageTopic = (currentUsername === topic.author || isStaff);
+
             let htmlContent = `
                 <div class="post-box">
                     ${authorBoxHtml}
                     <div class="post-content">
                         <div class="post-date">Posté le ${new Date(topic.created_at).toLocaleDateString()}
-                            ${isStaff ? `<button class="btn-edit" onclick="editTopic(${topic.id})">Éditer</button>
-                                        <button class="btn-mod" onclick="deleteTopic(${topic.id})">Supprimer</button>` : ''}
+                            ${canManageTopic ? `<button class="btn-edit" onclick="editTopic(${topic.id})">Éditer</button>
+                                                <button class="btn-mod" onclick="deleteTopic(${topic.id})">Supprimer</button>` : ''}
                         </div>
                         <div class="post-text" style="margin-top: 10px;">
                             ${formatContent(topic.content)}
@@ -253,13 +254,15 @@
                     }
 
                     const replyAuthorBoxHtml = await buildUserProfileBox(reply.author);
+                    const canManageReply = (currentUsername === reply.author || isStaff);
 
                     htmlContent += `
                         <div class="post-box" style="margin-top: 15px;">
                             ${replyAuthorBoxHtml}
                             <div class="post-content">
                                 <div class="post-date">Répondu le ${new Date(reply.created_at).toLocaleDateString()}
-                                    ${isStaff ? `<button class="btn-mod" onclick="deleteReply(${reply.id})">Supprimer</button>` : ''}
+                                    ${canManageReply ? `<button class="btn-edit" onclick="editReply(${reply.id})">Éditer</button>
+                                                         <button class="btn-mod" onclick="deleteReply(${reply.id})">Supprimer</button>` : ''}
                                 </div>
                                 <div class="post-text" style="margin-top: 10px;">
                                     ${formatContent(reply.content)}
@@ -301,7 +304,7 @@
             }
         });
 
-        // --- 6. ACTIONS DE MODÉRATION ---
+        // --- 6. ACTIONS DE MODÉRATION & EDITION ---
         window.deleteTopic = async (id) => {
             if(confirm("Supprimer ce sujet ?")) {
                 await supabase.from('topics').delete().eq('id', id);
@@ -314,6 +317,14 @@
             if (newContent) {
                 await supabase.from('topics').update({ content: newContent }).eq('id', id);
                 location.reload();
+            }
+        };
+
+        window.editReply = async (id) => {
+            const newContent = prompt("Nouveau contenu de la réponse :");
+            if (newContent) {
+                await supabase.from('replies').update({ content: newContent }).eq('id', id);
+                loadTopicAndReplies();
             }
         };
 
