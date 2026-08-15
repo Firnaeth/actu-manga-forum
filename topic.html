@@ -3,242 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sujet - Forum Actu Manga</title>
+    <title>Lecture de Topic - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .btn-mod { background: #e74c3c; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; margin-left: 5px; }
-        .btn-edit { background: #f39c12; color: white; border: none; padding: 3px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; }
-        .post-signature { margin-top: 20px; padding-top: 10px; border-top: 1px dashed #ffb6c1; }
-        .post-signature img { max-width: 100%; height: auto; display: block; }
-    </style>
 </head>
 <body>
 
     <div id="wrapper">
-        <!-- BREADCRUMB DYNAMIQUE -->
-        <div class="breadcrumb" id="topic-breadcrumb">
-            <a href="index.html">Index du Forum</a> &raquo; 
-            <span id="bread-category-slot"><a href="index.html">Chargement...</a></span> &raquo; 
-            <span id="bread-topic-title">Chargement...</span>
+
+        <!-- EN-TÊTE ET NAVIGATION -->
+        <div class="main-header">
+            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
         </div>
 
-        <h1 class="topic-main-title" id="topic-title">Chargement du sujet...</h1>
+        <nav class="forum-nav">
+            <a href="index.html" class="nav-link">Index</a>
+            <a href="community.html" class="nav-link">Fiches & Critiques</a>
+            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
+            <a href="mangatheques.html" class="nav-link">Mangathèques</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil</a>
+            <a href="register.html" id="nav-auth-link" class="nav-link">S'enregistrer</a>
+        </nav>
 
-        <div class="topic-actions" style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <a href="create-topic.html" id="btn-create-topic" class="btn-submit" style="text-decoration: none; font-weight: bold;">+ Créer un nouveau sujet</a>
-            <a href="#reply-form" class="btn-reply">Répondre à ce sujet</a>
+        <!-- CONTENU DU TOPIC -->
+        <div style="margin-top: 15px; margin-bottom: 10px;">
+            <a href="community.html" style="color: #2e51a2; text-decoration: underline; font-size: 0.9em;">&laquo; Retour à la liste des sujets</a>
+            <h2 id="topic-title" style="margin-top: 5px; color: #333; border-bottom: 2px solid #ccc; padding-bottom: 5px;">Chargement du topic...</h2>
         </div>
 
-        <!-- CONTENEUR GLOBAL DES POSTS (SUJET + RÉPONSES) -->
+        <!-- LISTE DES MESSAGES -->
         <div id="posts-container">
-            <p style="text-align: center; padding: 20px;">Chargement du sujet et des réponses...</p>
+            <div style="text-align: center; padding: 20px;"><em>Chargement des messages...</em></div>
         </div>
 
-        <div class="reply-box" id="reply-form">
-            <div class="box-title">Poster une réponse</div>
-            <form class="reply-form" id="form-add-reply">
-                <textarea id="message" rows="6" placeholder="Écrivez votre réponse ici... (Collez un lien direct http... pour afficher une image)" required></textarea>
-                <button type="submit" class="btn-submit" style="margin-top: 10px;">Envoyer</button>
+        <!-- FORMULAIRE DE RÉPONSE RAPIDE (Visible si connecté) -->
+        <div id="reply-section" class="hidden" style="margin-top: 20px; background: #f9f9f9; padding: 15px; border: 1px solid #ccc; border-radius: 4px;">
+            <h3>Répondre à ce sujet</h3>
+            <form id="reply-form">
+                <textarea id="reply-content" rows="4" placeholder="Votre message..." style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc;" required></textarea>
+                <button type="submit" style="background: #2e51a2; color: white; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold;">Envoyer la réponse</button>
             </form>
         </div>
+
     </div>
 
+    <!-- SCRIPT DE CHARGEMENT SUPABASE -->
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // --- 1. VÉRIFICATION DE LA VRAIE SESSION ---
+        // Gestion de l'affichage connexion / déconnexion dans la nav
         const currentUsername = localStorage.getItem('forumUsername');
-        const currentRole = localStorage.getItem('forumUserRole') || 'member';
-        const isStaff = (currentRole === 'admin' || currentRole === 'modo');
-
-        // --- 2. CONFIGURATION DES CATÉGORIES ---
-        const categoryMap = {
-            'planning': { name: 'Planning des Sorties VF', url: 'news.html' },
-            'manga': { name: 'Discussion Manga', url: 'community.html' },
-            'gaming': { name: 'Zone Gaming', url: 'gaming.html' },
-            'fc': { name: 'Fan Clubs Officiels', url: 'forum_fc.html' },
-            'graphisme': { name: 'Atelier Graphique', url: 'atelier.html' },
-            'general': { name: 'Général', url: 'general.html' }
-        };
-
-        // --- 3. FONCTION DE TRANSFORMATION DES LIENS EN IMAGES ---
-        function formatContent(text) {
-            if (!text) return '';
-            const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif))/gi;
-            let formatted = text.replace(urlRegex, (url) => {
-                return `<br><img src="${url}" alt="Image" style="max-width: 100%; border-radius: 4px; margin: 10px 0;"><br>`;
-            });
-            return formatted.replace(/\n/g, '<br>');
+        const profileLink = document.getElementById('nav-profile-link');
+        const authLink = document.getElementById('nav-auth-link');
+        const replySection = document.getElementById('reply-section');
+        
+        if (currentUsername) {
+            profileLink.classList.remove('hidden');
+            replySection.classList.remove('hidden');
+            authLink.textContent = "Déconnexion";
+            authLink.setAttribute('href', '#');
+            authLink.onclick = async (e) => {
+                e.preventDefault();
+                try { await supabase.auth.signOut(); } catch (err) {}
+                localStorage.clear();
+                window.location.href = 'index.html';
+            };
         }
 
-        const topicId = new URLSearchParams(window.location.search).get('id');
+        // Récupérer l'ID du topic depuis l'URL (ex: topic.html?id=1)
+        const urlParams = new URLSearchParams(window.location.search);
+        const topicId = urlParams.get('id');
 
-        // --- 4. CHARGEMENT DU SUJET ET DES RÉPONSES ---
-        async function loadTopicAndReplies() {
+        async function loadTopicData() {
+            const postsContainer = document.getElementById('posts-container');
+            const topicTitleEl = document.getElementById('topic-title');
+            const defaultAvatar = "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg";
+
             if (!topicId) {
-                document.getElementById('posts-container').innerHTML = "<p>Aucun sujet spécifié.</p>";
+                topicTitleEl.textContent = "Topic introuvable";
+                postsContainer.innerHTML = `<p style="text-align: center; color: red;">Aucun identifiant de topic spécifié.</p>`;
                 return;
             }
 
-            // A. Charger le sujet principal
-            const { data: topic, error: topicError } = await supabase
-                .from('topics')
-                .select('*')
-                .eq('id', topicId)
-                .single();
-
-            if (topicError || !topic) {
-                document.getElementById('posts-container').innerHTML = "<p>Sujet introuvable.</p>";
-                return;
-            }
-
-            document.getElementById('topic-title').textContent = topic.title;
-            document.getElementById('bread-topic-title').textContent = topic.title;
-            
-            const catInfo = categoryMap[topic.category] || { name: topic.category, url: 'index.html' };
-            document.getElementById('bread-category-slot').innerHTML = `<a href="${catInfo.url}">${catInfo.name}</a>`;
-
-            // Récupérer la signature de l'auteur du sujet
-            let authorSignatureHtml = '';
-            if (topic.author) {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('signature')
-                    .eq('username', topic.author)
-                    .single();
-
-                if (profile && profile.signature) {
-                    if (profile.signature.startsWith('http://') || profile.signature.startsWith('https://')) {
-                        authorSignatureHtml = `<div class="post-signature"><img src="${profile.signature}" alt="Signature"></div>`;
-                    } else {
-                        authorSignatureHtml = `<div class="post-signature"><small>${profile.signature}</small></div>`;
-                    }
-                }
-            }
-
-            const isAuthorStaff = (topic.author || '').includes('Otaku') || (topic.author || '').includes('Modo');
-
-            // Construction du HTML du premier message
-            let htmlContent = `
-                <div class="post-box">
-                    <div class="post-user">
-                        <a href="profile.html?user=${topic.author}" class="username ${isAuthorStaff ? 'admin' : 'member'}">${topic.author || 'Anonyme'}</a>
-                        <div class="user-rank">${isAuthorStaff ? 'Staff' : 'Membre'}</div>
-                    </div>
-                    <div class="post-content">
-                        <div class="post-date">Posté le ${new Date(topic.created_at).toLocaleDateString()}
-                            ${isStaff ? `<button class="btn-edit" onclick="editTopic(${topic.id})">Éditer</button>
-                                        <button class="btn-mod" onclick="deleteTopic(${topic.id})">Supprimer</button>` : ''}
-                        </div>
-                        <div class="post-text" style="margin-top: 10px;">
-                            ${formatContent(topic.content)}
-                        </div>
-                        ${authorSignatureHtml}
-                    </div>
-                </div>
-            `;
-
-            // B. Charger les réponses (replies) associées à ce sujet
-            const { data: replies, error: repliesError } = await supabase
-                .from('replies')
-                .select('*')
+            // 1. Récupérer les informations du sujet principal (optionnel selon ta structure de tables)
+            // Ici on suppose une table 'topics' ou on charge directement les messages liés à un topic_id
+            // 2. Charger les messages avec une jointure sur la table 'profiles' pour choper l'avatar et les infos
+            const { data: posts, error } = await supabase
+                .from('posts') // Remplace par le nom exact de ta table de messages si besoin
+                .select(`
+                    id,
+                    content,
+                    created_at,
+                    username,
+                    profiles (
+                        avatar_url,
+                        rank,
+                        age,
+                        gender,
+                        mood,
+                        favorite_manga
+                    )
+                `)
                 .eq('topic_id', topicId)
                 .order('created_at', { ascending: true });
 
-            if (!repliesError && replies && replies.length > 0) {
-                for (const reply of replies) {
-                    const isReplyStaff = (reply.author || '').includes('Otaku') || (reply.author || '').includes('Modo');
-                    
-                    // Optionnel : récupérer la signature de l'auteur de la réponse
-                    let replySigHtml = '';
-                    const { data: replyProfile } = await supabase
-                        .from('profiles')
-                        .select('signature')
-                        .eq('username', reply.author)
-                        .single();
-
-                    if (replyProfile && replyProfile.signature) {
-                        if (replyProfile.signature.startsWith('http://') || replyProfile.signature.startsWith('https://')) {
-                            replySigHtml = `<div class="post-signature"><img src="${replyProfile.signature}" alt="Signature"></div>`;
-                        } else {
-                            replySigHtml = `<div class="post-signature"><small>${replyProfile.signature}</small></div>`;
-                        }
-                    }
-
-                    htmlContent += `
-                        <div class="post-box" style="margin-top: 15px;">
-                            <div class="post-user">
-                                <a href="profile.html?user=${reply.author}" class="username ${isReplyStaff ? 'admin' : 'member'}">${reply.author || 'Anonyme'}</a>
-                                <div class="user-rank">${isReplyStaff ? 'Staff' : 'Membre'}</div>
-                            </div>
-                            <div class="post-content">
-                                <div class="post-date">Répondu le ${new Date(reply.created_at).toLocaleDateString()}
-                                    ${isStaff ? `<button class="btn-mod" onclick="deleteReply(${reply.id})">Supprimer</button>` : ''}
-                                </div>
-                                <div class="post-text" style="margin-top: 10px;">
-                                    ${formatContent(reply.content)}
-                                </div>
-                                ${replySigHtml}
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-
-            document.getElementById('posts-container').innerHTML = htmlContent;
-        }
-
-        // --- 5. ENVOI D'UNE NOUVELLE RÉPONSE ---
-        document.getElementById('form-add-reply').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!currentUsername) {
-                alert("Vous devez être connecté pour répondre.");
+            if (error) {
+                postsContainer.innerHTML = `<p style="text-align: center; color: red;">Erreur lors du chargement des messages.</p>`;
                 return;
             }
 
-            const content = document.getElementById('message').value;
-
-            const { error } = await supabase
-                .from('replies')
-                .insert([{
-                    topic_id: topicId,
-                    author: currentUsername,
-                    content: content
-                }]);
-
-            if (error) {
-                alert("Erreur lors de l'envoi de la réponse : " + error.message);
-            } else {
-                document.getElementById('message').value = '';
-                loadTopicAndReplies(); // Recharger la liste pour afficher la nouvelle réponse instantanément
+            if (!posts || posts.length === 0) {
+                topicTitleEl.textContent = "Discussion";
+                postsContainer.innerHTML = `<p style="text-align: center; padding: 20px;">Aucun message dans ce topic pour le moment.</p>`;
+                return;
             }
-        });
 
-        // --- 6. ACTIONS DE MODÉRATION ---
-        window.deleteTopic = async (id) => {
-            if(confirm("Supprimer ce sujet ?")) {
-                await supabase.from('topics').delete().eq('id', id);
-                window.location.href = "index.html";
-            }
-        };
+            topicTitleEl.textContent = "Fil de discussion # " + topicId;
 
-        window.editTopic = async (id) => {
-            const newContent = prompt("Nouveau contenu :");
-            if (newContent) {
-                await supabase.from('topics').update({ content: newContent }).eq('id', id);
-                location.reload();
-            }
-        };
+            // Affichage de chaque message avec la carte profil du membre sur le côté
+            postsContainer.innerHTML = posts.map(post => {
+                // Récupération sécurisée des données du profil lié
+                const profile = post.profiles || {};
+                const avatar = (profile.avatar_url && profile.avatar_url.trim() !== "") ? profile.avatar_url : defaultAvatar;
+                const rank = profile.rank ? profile.rank : '<span style="color: #7f8c8d;">Membre</span>';
+                
+                // Infos complémentaires (âge, sexe, humeur, favori)
+                const age = profile.age ? `${profile.age} ans` : '';
+                const gender = profile.gender ? `${profile.gender}` : '';
+                const mood = profile.mood ? `Humeur : ${profile.mood}` : '';
+                const fav = profile.favorite_manga ? `Fav : ${profile.favorite_manga}` : '';
+                
+                const details = [age, gender, mood, fav].filter(Boolean).join(' • ');
 
-        window.deleteReply = async (id) => {
-            if(confirm("Supprimer cette réponse ?")) {
-                await supabase.from('replies').delete().eq('id', id);
-                loadTopicAndReplies();
-            }
-        };
+                return `
+                    <div style="display: flex; border: 1px solid #ccc; margin-bottom: 10px; background: #fff; border-radius: 4px; overflow: hidden;">
+                        <!-- Colonne Profil / Membre -->
+                        <div style="width: 180px; background: #f4f4f4; padding: 10px; text-align: center; border-right: 1px solid #ccc; font-size: 0.85em;">
+                            <a href="profile.html?user=${encodeURIComponent(post.username)}" style="font-weight: bold; color: #2e51a2; text-decoration: underline;">${post.username}</a>
+                            <div style="margin: 8px 0;">
+                                <img src="${avatar}" alt="${post.username}" style="width: 70px; height: 70px; border-radius: 4px; object-fit: cover; border: 1px solid #bbb;">
+                            </div>
+                            <div style="font-weight: bold; color: #c0392b; margin-bottom: 4px;">${rank}</div>
+                            <div style="color: #555; font-size: 0.8em; line-height: 1.2;">${details || '<em>Pas d\'infos</em>'}</div>
+                        </div>
 
-        loadTopicAndReplies();
+                        <!-- Colonne Message -->
+                        <div style="flex: 1; padding: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div style="font-size: 0.8em; color: #888; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 8px;">
+                                Posté le ${new Date(post.created_at).toLocaleString('fr-FR')}
+                            </div>
+                            <div style="font-size: 0.95em; color: #222; line-height: 1.4; white-space: pre-wrap;">${post.content}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Gestion de l'envoi d'une réponse
+        const replyForm = document.getElementById('reply-form');
+        if (replyForm) {
+            replyForm.onsubmit = async (e) => {
+                e.preventDefault();
+                const content = document.getElementById('reply-content').value;
+                const username = localStorage.getItem('forumUsername');
+
+                if (!username) {
+                    alert("Vous devez être connecté pour répondre.");
+                    return;
+                }
+
+                const { error } = await supabase
+                    .from('posts')
+                    .insert([{ topic_id: topicId, username: username, content: content }]);
+
+                if (error) {
+                    alert("Erreur lors de l'envoi du message : " + error.message);
+                } else {
+                    document.getElementById('reply-content').value = "";
+                    loadTopicData(); // Recharger les messages
+                }
+            };
+        }
+
+        loadTopicData();
     </script>
 </body>
 </html>
