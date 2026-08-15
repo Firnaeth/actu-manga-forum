@@ -63,6 +63,19 @@
             };
         }
 
+        // Fonction pour formater joliment le rôle selon la valeur en base
+        function formatRole(role) {
+            if (!role) return '<span style="color: #7f8c8d;">Membre</span>';
+            const r = role.toLowerCase();
+            if (r === 'admin' || r === 'administrateur') {
+                return '<span style="color: #c0392b; font-weight: bold;">Administrateur</span>';
+            } else if (r === 'modo' || r === 'moderateur' || r === 'modérateur') {
+                return '<span style="color: #27ae60; font-weight: bold;">Modérateur</span>';
+            } else {
+                return `<span style="color: #2980b9;">${role}</span>`;
+            }
+        }
+
         // Chargement des profils depuis Supabase
         async function loadMangatheques() {
             const tbodyEl = document.getElementById('mangatheques-tbody');
@@ -97,7 +110,7 @@
                             <a href="profile.html?user=${encodeURIComponent(user.username)}" class="forum-title">${user.username}</a>
                             <p>Espace de partage de collection et statistiques.</p>
                         </td>
-                        <td class="stat-cell" style="text-align: center;">${user.role || 'Membre'}</td>
+                        <td class="stat-cell" style="text-align: center;">${formatRole(user.role)}</td>
                         <td class="last-post-cell" style="text-align: center;">${malLink}</td>
                     </tr>
                 `;
