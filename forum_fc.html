@@ -75,7 +75,6 @@
         const currentUsername = localStorage.getItem('forumUsername');
         const currentUserRole = localStorage.getItem('forumUserRole');
 
-        // Gestion de l'affichage du profil / authentification
         if (currentUsername) {
             document.getElementById('nav-profile-link').classList.remove('hidden');
             const authLink = document.getElementById('nav-auth-link');
@@ -89,7 +88,6 @@
             };
         }
 
-        // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
         const adminBar = document.getElementById('admin-bar-container');
         const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
 
@@ -125,7 +123,6 @@
             }
         }
 
-        // Chargement des Fan Clubs avec comptage dynamique des réponses
         async function loadFcTopics() {
             const container = document.getElementById('fc-topics-container');
             
@@ -146,11 +143,14 @@
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
                 const topicRepliesCount = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
 
+                // TRANSITION : Le lien pointe maintenant vers le conteneur fan-club-view.html en passant l'ID (ou le titre converti en identifiant)
+                const fcSlug = t.id; // Ou tu peux utiliser un identifiant basé sur le nom
+
                 return `
                     <tr>
                         <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">⭐</span></td>
                         <td class="forum-desc">
-                            <a href="topic.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                            <a href="fan-club-view.html?id=${fcSlug}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
                         </td>
                         <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
