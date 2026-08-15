@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mangathèques & Profils MyAnimeList - Actu Manga World</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="wrapper">
+
+        <!-- EN-TÊTE ET NAVIGATION -->
+        <div class="main-header">
+            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
+        </div>
+
+        <nav class="forum-nav">
+            <a href="index.html" class="nav-link">Index</a>
+            <a href="community.html" class="nav-link">Fiches & Critiques</a>
+            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
+            <a href="mangatheques.html" class="nav-link highlight">Mangathèques</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil</a>
+            <a href="register.html" id="nav-auth-link" class="nav-link">S'enregistrer</a>
+        </nav>
+
+        <!-- CONTENU PRINCIPAL -->
+        <div class="news-container">
+            <div class="welcome-banner">
+                <h2>📊 Galerie des Mangathèques & MyAnimeList</h2>
+                <p>Découvrez les profils et les collections de tous les membres de la communauté !</p>
+            </div>
+
+            <div style="padding: 20px; background: #fff; border: 1px solid #ccc; margin-top: 15px;">
+                <h3>Liste des collectionneurs</h3>
+                <p style="font-size: 0.9em; color: #666; margin-bottom: 20px;">Cliquez sur un profil pour voir le détail ou accédez directement à leur page MyAnimeList.</p>
+                
+                <!-- Grille ou liste des profils chargés depuis Supabase -->
+                <div id="mangatheques-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                    <p><em>Chargement des mangathèques...</em></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DE CHARGEMENT SUPABASE -->
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        // Gestion de l'affichage connexion / déconnexion dans la nav
+        const currentUsername = localStorage.getItem('forumUsername');
+        const profileLink = document.getElementById('nav-profile-link');
+        const authLink = document.getElementById('nav-auth-link');
+        
+        if (currentUsername) {
+            profileLink.classList.remove('hidden');
+            authLink.textContent = "Déconnexion";
+            authLink.setAttribute('href', '#');
+            authLink.onclick = async (e) => {
+                e.preventDefault();
+                try { await supabase.auth.signOut(); } catch (err) {}
+                localStorage.clear();
+                window.location.href = 'index.html';
+            };
+        }
+
+        // Chargement des profils depuis Supabase
+        async function loadMangatheques() {
+            const gridEl = document.getElementById('mangatheques-grid');
+            const defaultAvatar = "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg";
+
+            const { data: profiles, error } = await supabase
+                .from('profiles')
+                .select('username, role, avatar_url, mal_url');
+
+            if (error) {
+                gridEl.innerHTML = "<p style='color: red;'>Erreur lors du chargement des données.</p>";
+                return;
+            }
+
+            if (!profiles || profiles.length === 0) {
+                gridEl.innerHTML = "<p>Aucun profil enregistré pour le moment.</p>";
+                return;
+            }
+
+            gridEl.innerHTML = profiles.map(user => {
+                const avatar = (user.avatar_url && user.avatar_url.trim() !== "") ? user.avatar_url : defaultAvatar;
+                const malLink = (user.mal_url && user.mal_url.trim() !== "") 
+                    ? `<a href="${user.mal_url}" target="_blank" class="btn-admin-edit" style="display:inline-block; margin-top:10px; text-decoration:none; font-size:11px; padding:4px 8px; background:#2e51a2; color:white;">🔗 Voir MyAnimeList</a>`
+                    : `<span style="font-size: 11px; color: #999; display:block; margin-top:10px;">Pas de MAL renseigné</span>`;
+
+                return `
+                    <div style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; background: #f9f9f9; text-align: center;">
+                        <img src="${avatar}" alt="${user.username}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc;"><br>
+                        <h4 style="margin: 10px 0 5px 0;">
+                            <a href="profile.html?user=${encodeURIComponent(user.username)}" style="color: #c0392b; text-decoration: none;">${user.username}</a>
+                        </h4>
+                        <span style="font-size: 11px; background: #eee; padding: 2px 6px; border-radius: 3px;">Rôle : ${user.role || 'Membre'}</span>
+                        <div style="margin-top: 10px;">
+                            ${malLink}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        loadMangatheques();
+    </script>
+</body>
+</html>
