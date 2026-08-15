@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Fan Club - Actu Manga World</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .fc-tabs { display: flex; gap: 10px; margin: 20px 0; border-bottom: 2px solid #f8d7da; padding-bottom: 10px; }
+        .tab-link { padding: 8px 15px; background: #fff0f3; color: #d63384; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .tab-link.active { background: #d63384; color: white; }
+    </style>
+</head>
+<body>
+
+<div id="wrapper">
+    <div class="main-header">
+        <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner">
+    </div>
+
+    <div class="breadcrumb" style="margin: 10px 0;">
+        <a href="index.html">Accueil</a> &raquo; <a href="forum.html">Fan Clubs</a> &raquo; <span id="fc-name">Chargement...</span>
+    </div>
+
+    <!-- SOUS-MENUS -->
+    <div class="fc-tabs">
+        <a href="#" class="tab-link active" data-tab="dita">Fans de Dita</a>
+        <a href="#" class="tab-link" data-tab="hibiki">Fans de Hibiki</a>
+        <a href="#" class="tab-link" data-tab="precurseur">Le Précurseur</a>
+    </div>
+
+    <table class="forum-table">
+        <thead>
+            <tr>
+                <th class="cat-title">_ Sujets de cette section _</th>
+                <th class="stat-head">Auteur</th>
+            </tr>
+        </thead>
+        <tbody id="fc-topics-container">
+            <tr><td colspan="2" style="text-align: center; padding: 20px;">Sélectionnez une catégorie...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script type="module">
+    import { supabase } from './supabase.js';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const fcId = urlParams.get('id') || 'vandread'; // ID du fan club
+    document.getElementById('fc-name').textContent = fcId.toUpperCase();
+
+    async function loadTopics(tab) {
+        const container = document.getElementById('fc-topics-container');
+        container.innerHTML = '<tr><td colspan="2">Chargement...</td></tr>';
+
+        // La catégorie dans Supabase sera par ex: fc_vandread_dita
+        const categoryKey = `fc_${fcId}_${tab}`;
+
+        const { data: topics, error } = await supabase
+            .from('topics')
+            .select('*')
+            .eq('category', categoryKey);
+
+        if (error || topics.length === 0) {
+            container.innerHTML = `<tr><td colspan="2" style="text-align: center;">Aucun sujet dans cette section. <a href="new-topic.html?cat=${categoryKey}">Créez-en un !</a></td></tr>`;
+            return;
+        }
+
+        container.innerHTML = topics.map(t => `
+            <tr>
+                <td><a href="topic.html?id=${t.id}" style="font-weight:bold;">${t.title}</a></td>
+                <td>${t.author}</td>
+            </tr>
+        `).join('');
+    }
+
+    // Gestion des clics sur les onglets
+    document.querySelectorAll('.tab-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            loadTopics(link.getAttribute('data-tab'));
+        });
+    });
+
+    // Chargement initial
+    loadTopics('dita');
+</script>
+</body>
+</html>
