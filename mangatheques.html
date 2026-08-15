@@ -68,7 +68,6 @@
             const tbodyEl = document.getElementById('mangatheques-tbody');
             const defaultAvatar = "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg";
 
-            // On sélectionne bien 'rank' au lieu de 'role'
             const { data: profiles, error } = await supabase
                 .from('profiles')
                 .select('username, rank, avatar_url, mal_url');
@@ -78,17 +77,16 @@
                 return;
             }
 
-            if (!profiles || profiles.length === 0) {
-                tbodyEl.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px;">Aucun profil enregistré pour le moment.</td></tr>`;
+            // Filtrer pour ne garder que les membres qui ont un lien MAL renseigné
+            const filteredProfiles = profiles ? profiles.filter(user => user.mal_url && user.mal_url.trim() !== "") : [];
+
+            if (filteredProfiles.length === 0) {
+                tbodyEl.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px;">Aucun membre n'a encore partagé son profil MyAnimeList.</td></tr>`;
                 return;
             }
 
-            tbodyEl.innerHTML = profiles.map(user => {
+            tbodyEl.innerHTML = filteredProfiles.map(user => {
                 const avatar = (user.avatar_url && user.avatar_url.trim() !== "") ? user.avatar_url : defaultAvatar;
-                const malLink = (user.mal_url && user.mal_url.trim() !== "") 
-                    ? `<a href="${user.mal_url}" target="_blank" style="color: #2e51a2; font-weight: bold; text-decoration: underline;">Voir le profil MAL</a>`
-                    : `<span style="color: #999; font-style: italic;">Non renseigné</span>`;
-
                 const userRank = user.rank ? user.rank : '<span style="color: #7f8c8d;">Membre</span>';
 
                 return `
@@ -101,7 +99,9 @@
                             <p>Espace de partage de collection et statistiques.</p>
                         </td>
                         <td class="stat-cell" style="text-align: center; font-weight: bold; color: #c0392b;">${userRank}</td>
-                        <td class="last-post-cell" style="text-align: center;">${malLink}</td>
+                        <td class="last-post-cell" style="text-align: center;">
+                            <a href="${user.mal_url}" target="_blank" style="color: #2e51a2; font-weight: bold; text-decoration: underline;">Voir le profil MAL</a>
+                        </td>
                     </tr>
                 `;
             }).join('');
