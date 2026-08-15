@@ -45,6 +45,10 @@
                     <td id="user-anime">-</td>
                 </tr>
                 <tr>
+                    <td class="label-col">MyAnimeList (MAL) :</td>
+                    <td id="user-mal">-</td>
+                </tr>
+                <tr>
                     <td class="label-col">Citation favorite :</td>
                     <td id="user-quote"><em>-</em></td>
                 </tr>
@@ -83,6 +87,10 @@
                     <div>
                         <label><small>Animé du moment :</small></label>
                         <input type="text" id="edit-anime" placeholder="Ex: Solo Leveling...">
+                    </div>
+                    <div class="full-width">
+                        <label><small>Lien MyAnimeList (MAL) :</small></label>
+                        <input type="url" id="edit-mal" placeholder="https://myanimelist.net/profile/...">
                     </div>
                     <div>
                         <label><small>Pseudo Discord :</small></label>
@@ -176,6 +184,15 @@
                 // Remplissage des nouveaux champs
                 document.getElementById('user-status').innerHTML = profile.status ? `<em>"${profile.status}"</em>` : '<em>Pas de statut particulier...</em>';
                 document.getElementById('user-anime').textContent = profile.current_anime || 'Non spécifié';
+                
+                // Gestion du lien MyAnimeList
+                const malCell = document.getElementById('user-mal');
+                if (profile.mal_url) {
+                    malCell.innerHTML = `<a href="${profile.mal_url}" target="_blank" style="color: #2e51a2; font-weight: bold; text-decoration: underline;">🔗 Voir le profil MyAnimeList</a>`;
+                } else {
+                    malCell.innerHTML = '<em>Non renseigné</em>';
+                }
+
                 document.getElementById('user-quote').innerHTML = profile.favorite_quote ? `« ${profile.favorite_quote} »` : '<em>-</em>';
                 document.getElementById('user-discord').textContent = profile.discord_tag || 'Non renseigné';
                 
@@ -202,6 +219,7 @@
                     document.getElementById('edit-status').value = profile.status || '';
                     document.getElementById('edit-fav-manga').value = profile.favorite_manga || '';
                     document.getElementById('edit-anime').value = profile.current_anime || '';
+                    document.getElementById('edit-mal').value = profile.mal_url || '';
                     document.getElementById('edit-discord').value = profile.discord_tag || '';
                     document.getElementById('edit-quote').value = profile.favorite_quote || '';
                     document.getElementById('edit-signature').value = profile.signature || '';
@@ -216,6 +234,7 @@
             const status = document.getElementById('edit-status').value;
             const favManga = document.getElementById('edit-fav-manga').value;
             const anime = document.getElementById('edit-anime').value;
+            const malUrl = document.getElementById('edit-mal').value;
             const discord = document.getElementById('edit-discord').value;
             const quote = document.getElementById('edit-quote').value;
             const signature = document.getElementById('edit-signature').value;
@@ -227,6 +246,7 @@
                     status: status,
                     favorite_manga: favManga,
                     current_anime: anime,
+                    mal_url: malUrl,
                     discord_tag: discord,
                     favorite_quote: quote,
                     signature: signature
