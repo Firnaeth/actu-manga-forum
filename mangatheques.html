@@ -29,7 +29,7 @@
             <thead>
                 <tr>
                     <th colspan="2" class="cat-title">_ Galerie des Mangathèques & MyAnimeList _</th>
-                    <th class="stat-head">Rôle</th>
+                    <th class="stat-head">Rang</th>
                     <th class="last-post-head">MyAnimeList</th>
                 </tr>
             </thead>
@@ -63,27 +63,15 @@
             };
         }
 
-        // Fonction pour formater joliment le rôle selon la valeur en base
-        function formatRole(role) {
-            if (!role) return '<span style="color: #7f8c8d;">Membre</span>';
-            const r = role.toLowerCase();
-            if (r === 'admin' || r === 'administrateur') {
-                return '<span style="color: #c0392b; font-weight: bold;">Administrateur</span>';
-            } else if (r === 'modo' || r === 'moderateur' || r === 'modérateur') {
-                return '<span style="color: #27ae60; font-weight: bold;">Modérateur</span>';
-            } else {
-                return `<span style="color: #2980b9;">${role}</span>`;
-            }
-        }
-
         // Chargement des profils depuis Supabase
         async function loadMangatheques() {
             const tbodyEl = document.getElementById('mangatheques-tbody');
             const defaultAvatar = "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg";
 
+            // On sélectionne bien 'rank' au lieu de 'role'
             const { data: profiles, error } = await supabase
                 .from('profiles')
-                .select('username, role, avatar_url, mal_url');
+                .select('username, rank, avatar_url, mal_url');
 
             if (error) {
                 tbodyEl.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red; padding: 20px;">Erreur lors du chargement des données.</td></tr>`;
@@ -101,6 +89,8 @@
                     ? `<a href="${user.mal_url}" target="_blank" style="color: #2e51a2; font-weight: bold; text-decoration: underline;">Voir le profil MAL</a>`
                     : `<span style="color: #999; font-style: italic;">Non renseigné</span>`;
 
+                const userRank = user.rank ? user.rank : '<span style="color: #7f8c8d;">Membre</span>';
+
                 return `
                     <tr>
                         <td class="icon-cell" style="width: 60px; text-align: center;">
@@ -110,7 +100,7 @@
                             <a href="profile.html?user=${encodeURIComponent(user.username)}" class="forum-title">${user.username}</a>
                             <p>Espace de partage de collection et statistiques.</p>
                         </td>
-                        <td class="stat-cell" style="text-align: center;">${formatRole(user.role)}</td>
+                        <td class="stat-cell" style="text-align: center; font-weight: bold; color: #c0392b;">${userRank}</td>
                         <td class="last-post-cell" style="text-align: center;">${malLink}</td>
                     </tr>
                 `;
