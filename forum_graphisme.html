@@ -12,17 +12,11 @@
         <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <button class="btn-admin-edit" id="btn-toggle-admin">Modifier Titre & Bannière</button>
+            <button class="btn-admin-edit" id="btn-toggle-admin">Modifier la Bannière</button>
         </div>
 
         <div id="admin-panel-form" class="admin-panel-inputs hidden">
             <form id="form-config-header">
-                <label>Titre principal du forum :</label>
-                <input type="text" id="input-forum-title" required>
-
-                <label>Description / Sous-titre :</label>
-                <input type="text" id="input-forum-subtitle" required>
-
                 <label>Lien (URL) de l'image de bannière :</label>
                 <input type="url" id="input-forum-banner" required>
 
@@ -52,8 +46,8 @@
         </div>
 
         <div class="welcome-banner" style="text-align: center; padding: 15px;">
-            <h2 id="forum-title-display">🎨 Atelier Graphique & Signatures</h2>
-            <p id="forum-subtitle-display" style="margin-top: 5px;">Partagez vos créations, demandez des userbars et montrez vos bannières de profil !</p>
+            <h2>🎨 Atelier Graphique & Signatures</h2>
+            <p style="margin-top: 5px;">Partagez vos créations, demandez des userbars et montrez vos bannières de profil !</p>
         </div>
 
         <table class="forum-table">
@@ -106,13 +100,9 @@
         document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
             document.getElementById('admin-panel-form').classList.toggle('hidden');
             const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
-                title: "🎨 Atelier Graphique & Signatures", 
-                subtitle: "Partagez vos créations, demandez des userbars...", 
                 banner: "https://images.alphacoders.com/605/605592.png" 
             };
-            document.getElementById('input-forum-title').value = config.title;
-            document.getElementById('input-forum-subtitle').value = config.subtitle;
-            document.getElementById('input-forum-banner').value = config.banner;
+            document.getElementById('input-forum-banner').value = config.banner || "https://images.alphacoders.com/605/605592.png";
         });
 
         document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
@@ -121,21 +111,16 @@
 
         document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
             e.preventDefault();
-            const newConfig = {
-                title: document.getElementById('input-forum-title').value,
-                subtitle: document.getElementById('input-forum-subtitle').value,
-                banner: document.getElementById('input-forum-banner').value
-            };
-            localStorage.setItem('forumHeaderConfig', JSON.stringify(newConfig));
-            alert("En-tête mis à jour avec succès !");
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || {};
+            config.banner = document.getElementById('input-forum-banner').value;
+            localStorage.setItem('forumHeaderConfig', JSON.stringify(config));
+            alert("Bannière mise à jour avec succès !");
             window.location.reload();
         });
 
         function loadHeaderConfig() {
             const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
-            if (config) {
-                document.getElementById('forum-title-display').textContent = config.title;
-                document.getElementById('forum-subtitle-display').textContent = config.subtitle;
+            if (config && config.banner) {
                 document.getElementById('forum-banner-img').src = config.banner;
             }
         }
@@ -144,7 +129,6 @@
         async function loadGraphismeTopics() {
             const container = document.getElementById('graphisme-topics-container');
             
-            // Récupérer les sujets de la catégorie graphisme
             const { data: topics, error } = await supabase
                 .from('topics')
                 .select('*')
@@ -156,13 +140,10 @@
                 return;
             }
 
-            // Récupérer les réponses pour compter le nombre de messages par topic
             const { data: replies } = await supabase.from('replies').select('topic_id');
 
             container.innerHTML = topics.map(t => {
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
-                
-                // Calcul du nombre de réponses associées à ce sujet
                 const topicRepliesCount = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
 
                 return `
