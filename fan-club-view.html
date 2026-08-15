@@ -12,6 +12,7 @@
         .tab-link.active { background: #d63384; color: white; }
         .btn-add-tab { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
         .btn-add-tab:hover { background: #218838; }
+        .btn-edit-desc { background: transparent; border: none; color: #d63384; cursor: pointer; font-size: 0.85em; margin-left: 5px; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -30,7 +31,11 @@
     <!-- BANNIÈRE DE PRÉSENTATION DU FAN CLUB -->
     <div class="welcome-banner" style="text-align: center; padding: 15px;">
         <h2 id="fc-main-title">⭐ Chargement du Fan Club...</h2>
-        <p style="margin-top: 5px;" id="fc-main-desc">Espace de discussion et sous-sections thématiques.</p>
+        <p style="margin-top: 8px; color: #555;" id="fc-main-desc">Chargement de la description...</p>
+        <p style="font-size: 0.85em; color: #888; margin-top: 5px;">
+            <span id="fc-author-info">Créé par Inconnu</span> - Espace officiel. 
+            <button id="btn-edit-description" class="btn-edit-desc" style="display: none;">Modifier la description</button>
+        </p>
     </div>
 
     <!-- SOUS-MENUS ET BOUTON D'ADMINISTRATION DES ONGLETS -->
@@ -66,7 +71,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const fcId = urlParams.get('id'); // ID numérique du Fan Club
 
-    // Dictionnaire de base par défaut ou pré-rempli (tu peux y ajouter tes onglets initiaux)
     function getDefaultTabsForFanClub(title) {
         if (!title) return getDefaultTabs();
         const upperTitle = title.toUpperCase();
@@ -121,28 +125,41 @@
             return;
         }
 
-        // Afficher les infos principales
+        // Afficher les infos principales du Fan Club
         document.getElementById('fc-main-title').textContent = `⭐ ${fc.title}`;
         document.getElementById('breadcrumb-fc-name').textContent = fc.title;
-        document.getElementById('fc-main-desc').textContent = `Créé par ${fc.author} - Espace officiel.`;
+        document.getElementById('fc-author-info').textContent = `Créé par ${fc.author || 'Inconnu'}`;
 
-        // Afficher le bouton d'ajout d'onglet (tu pourras restreindre si besoin aux admins)
-        const addTabBtn = document.getElementById('btn-open-add-tab');
-        addTabBtn.style.display = 'inline-block';
+        // Gestion de la description personnalisée (sauvegardée dans le localStorage par Fan Club)
+        const descElem = document.getElementById('fc-main-desc');
+        const editDescBtn = document.getElementById('btn-edit-description');
+        
+        let customDesc = localStorage.getItem(`fc_desc_${fcId}`) || fc.content || "Bienvenue dans l'espace de discussion et sous-sections thématiques de ce Fan Club.";
+        descElem.textContent = customDesc;
+        editDescBtn.style.display = 'inline-block';
 
-        // 2. Charger les onglets (depuis localStorage pour l'instant ou fusionnés)
+        editDescBtn.onclick = () => {
+            const newDesc = prompt("Modifier la description du Fan Club :", descElem.textContent);
+            if (newDesc !== null) {
+                localStorage.setItem(`fc_desc_${fcId}`, newDesc);
+                descElem.textContent = newDesc;
+            }
+        };
+
+        // Afficher les boutons d'administration
+        document.getElementById('btn-open-add-tab').style.display = 'inline-block';
+
+        // 2. Charger les onglets
         let tabs = getStoredTabs(fcId, fc.title);
         renderTabs(tabs);
 
         // 3. Action du bouton d'ajout d'onglet à la volée
-        addTabBtn.onclick = () => {
+        document.getElementById('btn-open-add-tab').onclick = () => {
             const labelNom = prompt("Entrez le nom du nouvel onglet (ex: Les Classes de Quincy) :");
             if (!labelNom) return;
 
-            // Créer un identifiant technique propre (ex: "Les Classes de Quincy" -> "les_classes_de_quincy")
             const tabId = labelNom.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '_');
 
-            // Vérifier s'il existe déjà
             if (tabs.some(t => t.id === tabId)) {
                 alert("Cet onglet existe déjà !");
                 return;
@@ -155,7 +172,6 @@
         };
     }
 
-    // Gestion du stockage local par Fan Club pour que tes ajouts persistent sans table SQL complexe
     function getStoredTabs(fcId, title) {
         const saved = localStorage.getItem(`fc_tabs_${fcId}`);
         if (saved) {
@@ -174,12 +190,10 @@
             <a href="#" class="tab-link ${index === 0 ? 'active' : ''}" data-tab="${tab.id}">${tab.label}</a>
         `).join('');
 
-        // Charger le premier onglet par défaut
         if (tabs.length > 0) {
             loadTopics(tabs[0].id);
         }
 
-        // Écouter les clics sur les onglets
         document.querySelectorAll('.tab-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -190,7 +204,6 @@
         });
     }
 
-    // Charger les sujets de l'onglet actif
     async function loadTopics(tab) {
         const container = document.getElementById('fc-topics-container');
         container.innerHTML = '<tr><td colspan="2" style="text-align: center; padding: 20px;"><em>Chargement...</em></td></tr>';
@@ -205,7 +218,7 @@
             .order('created_at', { ascending: false });
 
         if (error || !topics || topics.length === 0) {
-            container.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Aucun sujet dans cette section. <a href="new-topic.html?color=#61b3e8; font-weight: bold;" href="new-topic.html?cat=${categoryKey}" style="color: #61b3e8; font-weight: bold;">Créez-en un !</a></td></tr>`;
+            container.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Aucun sujet dans cette section. <a href="new-topic.html?cat=${categoryKey}" style="color: #61b3e8; font-weight: bold;">Créez-en un !</a></td></tr>`;
             return;
         }
 
