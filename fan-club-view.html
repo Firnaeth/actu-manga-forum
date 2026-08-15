@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fan Club - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
     <style>
@@ -13,15 +14,23 @@
 <body>
 
 <div id="wrapper">
+    <!-- EN-TÊTE ET BANNIÈRE -->
     <div class="main-header">
         <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner">
     </div>
 
-    <div class="breadcrumb" style="margin: 10px 0;">
-        <a href="index.html">Accueil</a> &raquo; <a href="forum.html">Fan Clubs</a> &raquo; <span id="fc-name">Chargement...</span>
+    <!-- FIL D'ARIANE MIS À JOUR -->
+    <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
+        <a href="index.html">Accueil</a> &raquo; <a href="forum_fc.html">Fan Clubs</a> &raquo; <span id="breadcrumb-fc-name">Chargement...</span>
     </div>
 
-    <!-- SOUS-MENUS -->
+    <!-- BANNIÈRE DE PRÉSENTATION DU FAN CLUB -->
+    <div class="welcome-banner" style="text-align: center; padding: 15px;">
+        <h2 id="fc-main-title">⭐ Chargement du Fan Club...</h2>
+        <p style="margin-top: 5px;" id="fc-main-desc">Espace de discussion et sous-sections thématiques.</p>
+    </div>
+
+    <!-- SOUS-MENUS (ONGLETS) -->
     <div class="fc-tabs">
         <a href="#" class="tab-link active" data-tab="dita">Fans de Dita</a>
         <a href="#" class="tab-link" data-tab="hibiki">Fans de Hibiki</a>
@@ -32,48 +41,90 @@
         <thead>
             <tr>
                 <th class="cat-title">_ Sujets de cette section _</th>
-                <th class="stat-head">Auteur</th>
+                <th class="stat-head" style="text-align: center;">Auteur</th>
             </tr>
         </thead>
         <tbody id="fc-topics-container">
-            <tr><td colspan="2" style="text-align: center; padding: 20px;">Sélectionnez une catégorie...</td></tr>
+            <tr><td colspan="2" style="text-align: center; padding: 20px;"><em>Chargement des sujets...</em></td></tr>
         </tbody>
     </table>
+
+    <!-- BOUTON CRÉER UN SUJET DANS L'ONGLET ACTIF -->
+    <div style="margin-top: 15px; margin-bottom: 20px;">
+        <a href="#" id="btn-create-fc-topic" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em;">+ Créer un Sujet dans cette section</a>
+    </div>
 </div>
 
 <script type="module">
     import { supabase } from './supabase.js';
 
     const urlParams = new URLSearchParams(window.location.search);
-    const fcId = urlParams.get('id') || 'vandread'; // ID du fan club
-    document.getElementById('fc-name').textContent = fcId.toUpperCase();
+    const fcId = urlParams.get('id'); // ID numérique du topic/fan club (ex: 12 ou 9)
+    let currentTab = 'dita'; // Onglet par défaut
 
+    // 1. Charger les infos du Fan Club principal pour afficher son vrai nom
+    async function loadFanClubDetails() {
+        if (!fcId) {
+            document.getElementById('fc-main-title').textContent = "Fan Club introuvable";
+            return;
+        }
+
+        const { data: fc, error } = await supabase
+            .from('topics')
+            .select('*')
+            .eq('id', fcId)
+            .single();
+
+        if (error || !fc) {
+            document.getElementById('fc-main-title').textContent = "Fan Club introuvable";
+            document.getElementById('breadcrumb-fc-name').textContent = "Erreur";
+            return;
+        }
+
+        // Afficher le vrai titre du Fan Club (ex: "[FAN CLUB] VANDREAD...")
+        document.getElementById('fc-main-title').textContent = `⭐ ${fc.title}`;
+        document.getElementById('breadcrumb-fc-name').textContent = fc.title;
+        document.getElementById('fc-main-desc').textContent = `Créé par ${fc.author} - Espace officiel.`;
+    }
+
+    // 2. Charger les sujets de la sous-catégorie active
     async function loadTopics(tab) {
+        currentTab = tab;
         const container = document.getElementById('fc-topics-container');
-        container.innerHTML = '<tr><td colspan="2">Chargement...</td></tr>';
+        container.innerHTML = '<tr><td colspan="2" style="text-align: center; padding: 20px;"><em>Chargement...</em></td></tr>';
 
-        // La catégorie dans Supabase sera par ex: fc_vandread_dita
+        // Construction de la catégorie unique (ex: fc_12_dita ou fc_9_hibiki)
         const categoryKey = `fc_${fcId}_${tab}`;
+
+        // Mettre à jour le lien du bouton de création de sujet
+        document.getElementById('btn-create-fc-topic').setAttribute('href', `new-topic.html?cat=${categoryKey}`);
 
         const { data: topics, error } = await supabase
             .from('topics')
             .select('*')
-            .eq('category', categoryKey);
+            .eq('category', categoryKey)
+            .order('created_at', { ascending: false });
 
-        if (error || topics.length === 0) {
-            container.innerHTML = `<tr><td colspan="2" style="text-align: center;">Aucun sujet dans cette section. <a href="new-topic.html?cat=${categoryKey}">Créez-en un !</a></td></tr>`;
+        if (error || !topics || topics.length === 0) {
+            container.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Aucun sujet dans cette section. <a href="new-topic.html?cat=${categoryKey}" style="color: #61b3e8; font-weight: bold;">Créez-en un !</a></td></tr>`;
             return;
         }
 
-        container.innerHTML = topics.map(t => `
-            <tr>
-                <td><a href="topic.html?id=${t.id}" style="font-weight:bold;">${t.title}</a></td>
-                <td>${t.author}</td>
-            </tr>
-        `).join('');
+        container.innerHTML = topics.map(t => {
+            const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
+            return `
+                <tr>
+                    <td class="forum-desc">
+                        <a href="topic.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.05em;">${t.title}</a>
+                        <p style="font-size: 0.8em; color: #666; margin-top: 2px;">Créé le ${dateFormatted}</p>
+                    </td>
+                    <td class="stat-cell" style="text-align: center;">${t.author || 'Inconnu'}</td>
+                </tr>
+            `;
+        }).join('');
     }
 
-    // Gestion des clics sur les onglets
+    // 3. Gestion des clics sur les onglets
     document.querySelectorAll('.tab-link').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -83,7 +134,8 @@
         });
     });
 
-    // Chargement initial
+    // Chargement initial au démarrage de la page
+    loadFanClubDetails();
     loadTopics('dita');
 </script>
 </body>
