@@ -146,6 +146,16 @@
                     <td class="last-post-cell" id="last-manga-cell">Aucun sujet</td>
                 </tr>
                 <tr>
+                    <td class="icon-cell"><span class="category-emoji">📊</span></td>
+                    <td class="forum-desc">
+                        <a href="mangatheques.html" class="forum-title">Mangathèques & Profils MyAnimeList</a>
+                        <p>Partagez vos profils MyAnimeList, vos statistiques et vos plus belles collections en images !</p>
+                    </td>
+                    <td class="stat-cell" id="count-mangatheques">--</td>
+                    <td class="stat-cell">--</td>
+                    <td class="last-post-cell" id="last-mangatheques-cell">Aucun sujet</td>
+                </tr>
+                <tr>
                     <td class="icon-cell"><span class="category-emoji">🎨</span></td>
                     <td class="forum-desc">
                         <a href="forum_graphisme.html" class="forum-title">Atelier Graphique & Signatures</a>
@@ -326,7 +336,7 @@
                 newsListEl.innerHTML = "<li><em>Aucun sujet publié pour le moment.</em></li>";
             }
 
-            const categories = ['planning', 'licences', 'conventions', 'manga', 'graphisme', 'fc', 'gaming', 'general'];
+            const categories = ['planning', 'licences', 'conventions', 'manga', 'mangatheques', 'graphisme', 'fc', 'gaming', 'general'];
             
             categories.forEach(cat => {
                 const catTopics = topics.filter(t => t.category === cat);
