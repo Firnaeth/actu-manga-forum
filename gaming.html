@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeux Vidéo Manga & VS Fighting - Actu Manga World</title>
+    <title>Coin Arcade & Jeux Vidéo - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -48,12 +48,12 @@
         </nav>
 
         <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
-            <a href="index.html">Accueil</a> &raquo; <span>Jeux Vidéo Manga & VS Fighting</span>
+            <a href="index.html">Accueil</a> &raquo; <span>Coin Arcade & Jeux Vidéo</span>
         </div>
 
         <!-- EN-TÊTE DE LA SECTION -->
         <div class="welcome-banner" style="text-align: center; padding: 15px;">
-            <h2 id="forum-title-display">🎮 Jeux Vidéo Manga & VS Fighting</h2>
+            <h2 id="forum-title-display">🕹️ Coin Arcade & Jeux Vidéo</h2>
             <p id="forum-subtitle-display" style="margin-top: 5px;">Discussions et avis jeux vidéo, versus fighting et adaptations.</p>
         </div>
 
@@ -107,7 +107,7 @@
         document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
             document.getElementById('admin-panel-form').classList.toggle('hidden');
             const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
-                title: "🎮 Jeux Vidéo Manga & VS Fighting", 
+                title: "🕹️ Coin Arcade & Jeux Vidéo", 
                 subtitle: "Discussions et avis jeux vidéo, versus fighting et adaptations.", 
                 banner: "https://images.alphacoders.com/605/605592.png" 
             };
@@ -165,7 +165,7 @@
 
                 return `
                     <tr>
-                        <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">🎮</span></td>
+                        <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">🕹️</span></td>
                         <td class="forum-desc">
                             <a href="topic.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
