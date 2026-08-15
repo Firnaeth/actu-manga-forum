@@ -24,23 +24,21 @@
             <a href="register.html" id="nav-auth-link" class="nav-link">S'enregistrer</a>
         </nav>
 
-        <!-- CONTENU PRINCIPAL -->
-        <div class="news-container">
-            <div class="welcome-banner">
-                <h2>📊 Galerie des Mangathèques & MyAnimeList</h2>
-                <p>Découvrez les profils et les collections de tous les membres de la communauté !</p>
-            </div>
-
-            <div style="padding: 20px; background: #fff; border: 1px solid #ccc; margin-top: 15px;">
-                <h3>Liste des collectionneurs</h3>
-                <p style="font-size: 0.9em; color: #666; margin-bottom: 20px;">Cliquez sur un profil pour voir le détail ou accédez directement à leur page MyAnimeList.</p>
-                
-                <!-- Grille sur 3 colonnes -->
-                <div id="mangatheques-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                    <p><em>Chargement des mangathèques...</em></p>
-                </div>
-            </div>
-        </div>
+        <!-- CONTENU PRINCIPAL SOUS FORME DE TABLEAU FORUM -->
+        <table class="forum-table" style="margin-top: 15px;">
+            <thead>
+                <tr>
+                    <th colspan="2" class="cat-title">_ Galerie des Mangathèques & MyAnimeList _</th>
+                    <th class="stat-head">Rôle</th>
+                    <th class="last-post-head">MyAnimeList</th>
+                </tr>
+            </thead>
+            <tbody id="mangatheques-tbody">
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 20px;"><em>Chargement des mangathèques...</em></td>
+                </tr>
+            </tbody>
+        </table>
 
     </div>
 
@@ -67,7 +65,7 @@
 
         // Chargement des profils depuis Supabase
         async function loadMangatheques() {
-            const gridEl = document.getElementById('mangatheques-grid');
+            const tbodyEl = document.getElementById('mangatheques-tbody');
             const defaultAvatar = "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg";
 
             const { data: profiles, error } = await supabase
@@ -75,33 +73,33 @@
                 .select('username, role, avatar_url, mal_url');
 
             if (error) {
-                gridEl.innerHTML = "<p style='color: red;'>Erreur lors du chargement des données.</p>";
+                tbodyEl.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red; padding: 20px;">Erreur lors du chargement des données.</td></tr>`;
                 return;
             }
 
             if (!profiles || profiles.length === 0) {
-                gridEl.innerHTML = "<p>Aucun profil enregistré pour le moment.</p>";
+                tbodyEl.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px;">Aucun profil enregistré pour le moment.</td></tr>`;
                 return;
             }
 
-            gridEl.innerHTML = profiles.map(user => {
+            tbodyEl.innerHTML = profiles.map(user => {
                 const avatar = (user.avatar_url && user.avatar_url.trim() !== "") ? user.avatar_url : defaultAvatar;
                 const malLink = (user.mal_url && user.mal_url.trim() !== "") 
-                    ? `<a href="${user.mal_url}" target="_blank" style="display:inline-block; text-decoration:none; font-size:11px; padding:4px 8px; background:#2e51a2; color:white; border-radius:3px; font-weight:bold;">🔗 MyAnimeList</a>`
-                    : `<span style="font-size: 11px; color: #999; font-style: italic;">Pas de MAL</span>`;
+                    ? `<a href="${user.mal_url}" target="_blank" style="color: #2e51a2; font-weight: bold; text-decoration: underline;">Voir le profil MAL</a>`
+                    : `<span style="color: #999; font-style: italic;">Non renseigné</span>`;
 
                 return `
-                    <div style="display: flex; align-items: center; gap: 12px; border: 1px solid #ddd; padding: 12px; border-radius: 4px; background: #f9f9f9;">
-                        <img src="${avatar}" alt="${user.username}" style="width: 45px; height: 45px; border-radius: 4px; object-fit: cover; border: 1px solid #ccc; flex-shrink: 0;">
-                        <div style="overflow: hidden; flex-grow: 1;">
-                            <h4 style="margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                <a href="profile.html?user=${encodeURIComponent(user.username)}" style="color: #c0392b; text-decoration: none; font-size: 14px;">${user.username}</a>
-                            </h4>
-                            <div style="margin-top: 4px;">
-                                ${malLink}
-                            </div>
-                        </div>
-                    </div>
+                    <tr>
+                        <td class="icon-cell" style="width: 60px; text-align: center;">
+                            <img src="${avatar}" alt="${user.username}" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid #ccc;">
+                        </td>
+                        <td class="forum-desc">
+                            <a href="profile.html?user=${encodeURIComponent(user.username)}" class="forum-title">${user.username}</a>
+                            <p>Espace de partage de collection et statistiques.</p>
+                        </td>
+                        <td class="stat-cell" style="text-align: center;">${user.role || 'Membre'}</td>
+                        <td class="last-post-cell" style="text-align: center;">${malLink}</td>
+                    </tr>
                 `;
             }).join('');
         }
