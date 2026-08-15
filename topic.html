@@ -84,30 +84,15 @@
                 return;
             }
 
-            // 1. Récupérer les informations du sujet principal (optionnel selon ta structure de tables)
-            // Ici on suppose une table 'topics' ou on charge directement les messages liés à un topic_id
-            // 2. Charger les messages avec une jointure sur la table 'profiles' pour choper l'avatar et les infos
-            const { data: posts, error } = await supabase
-                .from('posts') // Remplace par le nom exact de ta table de messages si besoin
-                .select(`
-                    id,
-                    content,
-                    created_at,
-                    username,
-                    profiles (
-                        avatar_url,
-                        rank,
-                        age,
-                        gender,
-                        mood,
-                        favorite_manga
-                    )
-                `)
+            // 1. Charger les messages du topic depuis la table 'posts'
+            const { data: posts, error: postsError } = await supabase
+                .from('posts')
+                .select('*')
                 .eq('topic_id', topicId)
                 .order('created_at', { ascending: true });
 
-            if (error) {
-                postsContainer.innerHTML = `<p style="text-align: center; color: red;">Erreur lors du chargement des messages.</p>`;
+            if (postsError) {
+                postsContainer.innerHTML = `<p style="text-align: center; color: red;">Erreur Supabase : ${postsError.message} (Code: ${postsError.code})</p>`;
                 return;
             }
 
@@ -119,14 +104,27 @@
 
             topicTitleEl.textContent = "Fil de discussion # " + topicId;
 
-            // Affichage de chaque message avec la carte profil du membre sur le côté
+            // 2. Récupérer tous les profils des utilisateurs uniques présents dans ces messages
+            const usernames = [...new Set(posts.map(p => p.username))];
+            const { data: profiles, error: profilesError } = await supabase
+                .from('profiles')
+                .select('username, avatar_url, rank, age, gender, mood, favorite_manga')
+                .in('username', usernames);
+
+            // Créer un dictionnaire de profils pour y accéder rapidement par username
+            const profilesMap = {};
+            if (!profilesError && profiles) {
+                profiles.forEach(profile => {
+                    profilesMap[profile.username] = profile;
+                });
+            }
+
+            // 3. Affichage de chaque message avec la carte profil du membre
             postsContainer.innerHTML = posts.map(post => {
-                // Récupération sécurisée des données du profil lié
-                const profile = post.profiles || {};
+                const profile = profilesMap[post.username] || {};
                 const avatar = (profile.avatar_url && profile.avatar_url.trim() !== "") ? profile.avatar_url : defaultAvatar;
                 const rank = profile.rank ? profile.rank : '<span style="color: #7f8c8d;">Membre</span>';
                 
-                // Infos complémentaires (âge, sexe, humeur, favori)
                 const age = profile.age ? `${profile.age} ans` : '';
                 const gender = profile.gender ? `${profile.gender}` : '';
                 const mood = profile.mood ? `Humeur : ${profile.mood}` : '';
