@@ -18,9 +18,9 @@
 <body>
 
 <div id="wrapper">
-    <!-- EN-TÊTE ET BANNIÈRE -->
+    <!-- EN-TÊTE ET BANNIÈRE DYNAMIQUE -->
     <div class="main-header">
-        <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner">
+        <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière du Fan Club" class="header-banner">
     </div>
 
     <!-- FIL D'ARIANE -->
@@ -43,7 +43,6 @@
         <div class="fc-tabs" id="fc-tabs-container">
             <!-- Les onglets dynamiques s'afficheront ici -->
         </div>
-        <!-- Bouton pour ajouter un onglet à la volée -->
         <button id="btn-open-add-tab" class="btn-add-tab" style="display: none;">+ Ajouter un onglet</button>
     </div>
 
@@ -125,12 +124,19 @@
             return;
         }
 
+        // Afficher la bannière spécifique du Fan Club si elle existe dans la base de données (ex: fc.image ou fc.banner)
+        const bannerImgElem = document.getElementById('forum-banner-img');
+        const fanClubBanner = fc.image || fc.banner; // Adapte selon le nom de la colonne dans ta table 'topics'
+        if (fanClubBanner) {
+            bannerImgElem.src = fanClubBanner;
+        }
+
         // Afficher les infos principales du Fan Club
         document.getElementById('fc-main-title').textContent = `⭐ ${fc.title}`;
         document.getElementById('breadcrumb-fc-name').textContent = fc.title;
         document.getElementById('fc-author-info').textContent = `Créé par ${fc.author || 'Inconnu'}`;
 
-        // Gestion de la description personnalisée (sauvegardée dans le localStorage par Fan Club)
+        // Gestion de la description personnalisée
         const descElem = document.getElementById('fc-main-desc');
         const editDescBtn = document.getElementById('btn-edit-description');
         
@@ -146,7 +152,7 @@
             }
         };
 
-        // Afficher les boutons d'administration
+        // Afficher le bouton d'ajout d'onglet
         document.getElementById('btn-open-add-tab').style.display = 'inline-block';
 
         // 2. Charger les onglets
