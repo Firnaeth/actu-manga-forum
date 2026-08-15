@@ -201,6 +201,21 @@
                 document.getElementById('user-status').innerHTML = profile.status ? `<em>"${profile.status}"</em>` : '<em>Pas de statut particulier...</em>';
                 document.getElementById('user-anime').textContent = profile.current_anime || 'Non spécifié';
                 
+                // --- COMPTAGE AUTOMATIQUE DES MESSAGES (SUJETS + RÉPONSES) ---
+                const { count: topicsCount } = await supabase
+                    .from('topics')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('author', profileUser);
+
+                const { count: repliesCount } = await supabase
+                    .from('replies')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('author', profileUser);
+
+                const totalPosts = (topicsCount || 0) + (repliesCount || 0);
+                document.getElementById('user-posts').textContent = `${totalPosts} message${totalPosts > 1 ? 's' : ''}`;
+                // -------------------------------------------------------------
+
                 const malCell = document.getElementById('user-mal');
                 if (profile.mal_url) {
                     malCell.innerHTML = `<a href="${profile.mal_url}" target="_blank" style="color: #2e51a2; font-weight: bold; text-decoration: underline;">🔗 Voir le profil MyAnimeList</a>`;
