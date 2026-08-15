@@ -10,9 +10,18 @@
         .fc-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
         .tab-link { padding: 8px 15px; background: #fff0f3; color: #d63384; text-decoration: none; border-radius: 5px; font-weight: bold; }
         .tab-link.active { background: #d63384; color: white; }
-        .btn-add-tab { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
+        
+        /* Panneau d'administration de l'en-tête Fan Club */
+        .fc-admin-header-box { background: #fff0f3; border: 1px dashed #f5c2c7; padding: 12px 15px; border-radius: 6px; margin: 15px 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .fc-admin-title { font-weight: bold; color: #842029; font-size: 0.95em; }
+        .fc-admin-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-fc-action { padding: 6px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; color: white; }
+        .btn-edit-desc { background: #ffc107; color: #000; }
+        .btn-edit-desc:hover { background: #ffca2c; }
+        .btn-edit-banner { background: #17a2b8; }
+        .btn-edit-banner:hover { background: #138496; }
+        .btn-add-tab { background: #28a745; }
         .btn-add-tab:hover { background: #218838; }
-        .btn-edit-desc { background: transparent; border: none; color: #d63384; cursor: pointer; font-size: 0.85em; margin-left: 5px; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -28,22 +37,30 @@
         <a href="index.html">Accueil</a> &raquo; <a href="forum_fc.html">Fan Clubs</a> &raquo; <span id="breadcrumb-fc-name">Chargement...</span>
     </div>
 
+    <!-- PANNEAU D'ADMINISTRATION DE L'EN-TÊTE (3 boutons demandés) -->
+    <div class="fc-admin-header-box" id="fc-admin-panel" style="display: none;">
+        <span class="fc-admin-title">⚙️ Administration de l'en-tête</span>
+        <div class="fc-admin-actions">
+            <button id="btn-edit-description" class="btn-fc-action btn-edit-desc">Modifier la description</button>
+            <button id="btn-edit-banner" class="btn-fc-action btn-edit-banner">Modifier la Bannière</button>
+            <button id="btn-open-add-tab" class="btn-fc-action btn-add-tab">+ Ajouter un onglet</button>
+        </div>
+    </div>
+
     <!-- BANNIÈRE DE PRÉSENTATION DU FAN CLUB -->
     <div class="welcome-banner" style="text-align: center; padding: 15px;">
         <h2 id="fc-main-title">⭐ Chargement du Fan Club...</h2>
         <p style="margin-top: 8px; color: #555;" id="fc-main-desc">Chargement de la description...</p>
         <p style="font-size: 0.85em; color: #888; margin-top: 5px;">
-            <span id="fc-author-info">Créé par Inconnu</span> - Espace officiel. 
-            <button id="btn-edit-description" class="btn-edit-desc" style="display: none;">Modifier la description</button>
+            <span id="fc-author-info">Créé par Inconnu</span> - Espace officiel.
         </p>
     </div>
 
-    <!-- SOUS-MENUS ET BOUTON D'ADMINISTRATION DES ONGLETS -->
+    <!-- SOUS-MENUS DES ONGLETS -->
     <div class="fc-tabs-wrapper">
         <div class="fc-tabs" id="fc-tabs-container">
             <!-- Les onglets dynamiques s'afficheront ici -->
         </div>
-        <button id="btn-open-add-tab" class="btn-add-tab" style="display: none;">+ Ajouter un onglet</button>
     </div>
 
     <table class="forum-table">
@@ -68,12 +85,139 @@
     import { supabase } from './supabase.js';
 
     const urlParams = new URLSearchParams(window.location.search);
-    const fcId = urlParams.get('id'); // ID numérique du Fan Club
+    const fcId = urlParams.get('id'); // ID numérique du Fan Club (topic_id)
 
-    function getDefaultTabsForFanClub(title) {
+    async function initFanClubPage() {
+        if (!fcId) {
+            document.getElementById('fc-main-title').textContent = "Fan Club introuvable";
+            return;
+        }
+
+        // 1. Récupérer les infos du Fan Club depuis Supabase
+        const { data: fc, error } = await supabase
+            .from('topics')
+            .select('*')
+            .eq('id', fcId)
+            .single();
+
+        if (error || !fc) {
+            document.getElementById('fc-main-title').textContent = "Fan Club introuvable";
+            document.getElementById('breadcrumb-fc-name').textContent = "Erreur";
+            return;
+        }
+
+        // Afficher le panneau d'administration de l'en-tête
+        document.getElementById('fc-admin-panel').style.display = 'flex';
+
+        // Gestion de la bannière personnalisée
+        const bannerImgElem = document.getElementById('forum-banner-img');
+        const customBanner = localStorage.getItem(`fc_banner_${fcId}`);
+        if (customBanner) {
+            bannerImgElem.src = customBanner;
+        } else {
+            bannerImgElem.src = getBannerForTitle(fc.title);
+        }
+
+        // Action 1 : Modifier la bannière
+        document.getElementById('btn-edit-banner').onclick = () => {
+            const currentBanner = localStorage.getItem(`fc_banner_${fcId}`) || bannerImgElem.src;
+            const newBannerUrl = prompt("Entrez l'URL de la nouvelle image de bannière pour ce Fan Club :", currentBanner);
+            if (newBannerUrl !== null && newBannerUrl.trim() !== "") {
+                localStorage.setItem(`fc_banner_${fcId}`, newBannerUrl.trim());
+                bannerImgElem.src = newBannerUrl.trim();
+                alert("Bannière mise à jour avec succès !");
+            }
+        };
+
+        // Afficher les infos principales
+        document.getElementById('fc-main-title').textContent = `⭐ ${fc.title}`;
+        document.getElementById('breadcrumb-fc-name').textContent = fc.title;
+        document.getElementById('fc-author-info').textContent = `Créé par ${fc.author || 'Inconnu'}`;
+
+        // Gestion de la description
+        const descElem = document.getElementById('fc-main-desc');
+        let customDesc = localStorage.getItem(`fc_desc_${fcId}`) || fc.content || "Bienvenue dans l'espace de discussion et sous-sections thématiques de ce Fan Club.";
+        descElem.textContent = customDesc;
+
+        // Action 2 : Modifier la description
+        document.getElementById('btn-edit-description').onclick = () => {
+            const newDesc = prompt("Modifier la description du Fan Club :", descElem.textContent);
+            if (newDesc !== null) {
+                localStorage.setItem(`fc_desc_${fcId}`, newDesc);
+                descElem.textContent = newDesc;
+                alert("Description mise à jour avec succès !");
+            }
+        };
+
+        // 2. Charger les onglets depuis la table SQL 'fan_club_tabs'
+        let tabs = await loadTabsFromSupabase(fcId, fc.title);
+        renderTabs(tabs);
+
+        // Action 3 : Ajouter un onglet
+        document.getElementById('btn-open-add-tab').onclick = async () => {
+            const labelNom = prompt("Entrez le nom du nouvel onglet (ex: Les Classes de Quincy) :");
+            if (!labelNom) return;
+
+            const tabKey = labelNom.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '_');
+
+            // Insérer le nouvel onglet dans Supabase
+            const { error: insertError } = await supabase
+                .from('fan_club_tabs')
+                .insert([{ topic_id: fcId, tab_key: tabKey, tab_label: labelNom }]);
+
+            if (insertError) {
+                alert("Erreur lors de l'ajout de l'onglet : " + insertError.message);
+                return;
+            }
+
+            // Recharger les onglets
+            tabs = await loadTabsFromSupabase(fcId, fc.title);
+            renderTabs(tabs);
+            alert(`L'onglet "${labelNom}" a été ajouté avec succès !`);
+        };
+    }
+
+    function getBannerForTitle(title) {
+        if (!title) return "https://images.alphacoders.com/605/605592.png";
+        const upperTitle = title.toUpperCase();
+        if (upperTitle.includes('VANDREAD')) return "https://images.alphacoders.com/605/605592.png";
+        if (upperTitle.includes('BLEACH')) return "https://images.alphacoders.com/605/605592.png";
+        if (upperTitle.includes('INUYASHA')) return "https://images.alphacoders.com/605/605592.png";
+        return "https://images.alphacoders.com/605/605592.png";
+    }
+
+    async function loadTabsFromSupabase(topicId, title) {
+        const { data: dbTabs, error } = await supabase
+            .from('fan_club_tabs')
+            .select('*')
+            .eq('topic_id', topicId)
+            .order('display_order', { ascending: true });
+
+        if (error || !dbTabs || dbTabs.length === 0) {
+            let defaultTabs = getDefaultTabsForTitle(title);
+            for (let i = 0; i < defaultTabs.length; i++) {
+                await supabase.from('fan_club_tabs').insert([{
+                    topic_id: topicId,
+                    tab_key: defaultTabs[i].id,
+                    tab_label: defaultTabs[i].label,
+                    display_order: i
+                }]);
+            }
+            const { data: newDbTabs } = await supabase
+                .from('fan_club_tabs')
+                .select('*')
+                .eq('topic_id', topicId)
+                .order('display_order', { ascending: true });
+            
+            return newDbTabs.map(t => ({ id: t.tab_key, label: t.tab_label }));
+        }
+
+        return dbTabs.map(t => ({ id: t.tab_key, label: t.tab_label }));
+    }
+
+    function getDefaultTabsForTitle(title) {
         if (!title) return getDefaultTabs();
         const upperTitle = title.toUpperCase();
-
         if (upperTitle.includes('VANDREAD')) {
             return [
                 { id: 'dita', label: 'Fans de Dita' },
@@ -103,91 +247,6 @@
             { id: 'theories', label: 'Théories & Avis' },
             { id: 'galerie', label: 'Galerie & Fanarts' }
         ];
-    }
-
-    async function initFanClubPage() {
-        if (!fcId) {
-            document.getElementById('fc-main-title').textContent = "Fan Club introuvable";
-            return;
-        }
-
-        // 1. Récupérer les infos du Fan Club depuis Supabase
-        const { data: fc, error } = await supabase
-            .from('topics')
-            .select('*')
-            .eq('id', fcId)
-            .single();
-
-        if (error || !fc) {
-            document.getElementById('fc-main-title').textContent = "Fan Club introuvable";
-            document.getElementById('breadcrumb-fc-name').textContent = "Erreur";
-            return;
-        }
-
-        // Afficher la bannière spécifique du Fan Club si elle existe dans la base de données (ex: fc.image ou fc.banner)
-        const bannerImgElem = document.getElementById('forum-banner-img');
-        const fanClubBanner = fc.image || fc.banner; // Adapte selon le nom de la colonne dans ta table 'topics'
-        if (fanClubBanner) {
-            bannerImgElem.src = fanClubBanner;
-        }
-
-        // Afficher les infos principales du Fan Club
-        document.getElementById('fc-main-title').textContent = `⭐ ${fc.title}`;
-        document.getElementById('breadcrumb-fc-name').textContent = fc.title;
-        document.getElementById('fc-author-info').textContent = `Créé par ${fc.author || 'Inconnu'}`;
-
-        // Gestion de la description personnalisée
-        const descElem = document.getElementById('fc-main-desc');
-        const editDescBtn = document.getElementById('btn-edit-description');
-        
-        let customDesc = localStorage.getItem(`fc_desc_${fcId}`) || fc.content || "Bienvenue dans l'espace de discussion et sous-sections thématiques de ce Fan Club.";
-        descElem.textContent = customDesc;
-        editDescBtn.style.display = 'inline-block';
-
-        editDescBtn.onclick = () => {
-            const newDesc = prompt("Modifier la description du Fan Club :", descElem.textContent);
-            if (newDesc !== null) {
-                localStorage.setItem(`fc_desc_${fcId}`, newDesc);
-                descElem.textContent = newDesc;
-            }
-        };
-
-        // Afficher le bouton d'ajout d'onglet
-        document.getElementById('btn-open-add-tab').style.display = 'inline-block';
-
-        // 2. Charger les onglets
-        let tabs = getStoredTabs(fcId, fc.title);
-        renderTabs(tabs);
-
-        // 3. Action du bouton d'ajout d'onglet à la volée
-        document.getElementById('btn-open-add-tab').onclick = () => {
-            const labelNom = prompt("Entrez le nom du nouvel onglet (ex: Les Classes de Quincy) :");
-            if (!labelNom) return;
-
-            const tabId = labelNom.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '_');
-
-            if (tabs.some(t => t.id === tabId)) {
-                alert("Cet onglet existe déjà !");
-                return;
-            }
-
-            tabs.push({ id: tabId, label: labelNom });
-            saveStoredTabs(fcId, tabs);
-            renderTabs(tabs);
-            alert(`L'onglet "${labelNom}" a été ajouté avec succès !`);
-        };
-    }
-
-    function getStoredTabs(fcId, title) {
-        const saved = localStorage.getItem(`fc_tabs_${fcId}`);
-        if (saved) {
-            try { return JSON.parse(saved); } catch(e) {}
-        }
-        return getDefaultTabsForFanClub(title);
-    }
-
-    function saveStoredTabs(fcId, tabs) {
-        localStorage.setItem(`fc_tabs_${fcId}`, JSON.stringify(tabs));
     }
 
     function renderTabs(tabs) {
