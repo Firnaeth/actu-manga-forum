@@ -10,6 +10,24 @@
 
     <div id="wrapper">
 
+        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
+        <div id="admin-bar-container" class="admin-edit-bar hidden">
+            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
+            <button class="btn-admin-edit" id="btn-toggle-admin">Modifier la Bannière</button>
+        </div>
+
+        <div id="admin-panel-form" class="admin-panel-inputs hidden">
+            <form id="form-config-header">
+                <label>Lien (URL) de l'image de bannière :</label>
+                <input type="url" id="input-forum-banner" required>
+
+                <div class="admin-form-actions">
+                    <button type="submit" class="btn-admin-edit">Enregistrer</button>
+                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
+                </div>
+            </form>
+        </div>
+
         <!-- EN-TÊTE ET NAVIGATION -->
         <div class="main-header">
             <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
@@ -42,12 +60,12 @@
 
     </div>
 
-    <!-- SCRIPT DE CHARGEMENT SUPABASE -->
+    <!-- SCRIPT DE CHARGEMENT SUPABASE & BANNIÈRE -->
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // Gestion de l'affichage connexion / déconnexion dans la nav
         const currentUsername = localStorage.getItem('forumUsername');
+        const currentUserRole = localStorage.getItem('forumUserRole');
         const profileLink = document.getElementById('nav-profile-link');
         const authLink = document.getElementById('nav-auth-link');
         
@@ -61,6 +79,42 @@
                 localStorage.clear();
                 window.location.href = 'index.html';
             };
+        }
+
+        // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
+        const adminBar = document.getElementById('admin-bar-container');
+        const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
+
+        if (isStaff && adminBar) {
+            adminBar.classList.remove('hidden');
+        }
+        
+        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.toggle('hidden');
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
+                banner: "https://images.alphacoders.com/605/605592.png" 
+            };
+            document.getElementById('input-forum-banner').value = config.banner || "https://images.alphacoders.com/605/605592.png";
+        });
+
+        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.add('hidden');
+        });
+
+        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || {};
+            config.banner = document.getElementById('input-forum-banner').value;
+            localStorage.setItem('forumHeaderConfig', JSON.stringify(config));
+            alert("Bannière mise à jour avec succès !");
+            window.location.reload();
+        });
+
+        function loadHeaderConfig() {
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
+            if (config && config.banner) {
+                document.getElementById('forum-banner-img').src = config.banner;
+            }
         }
 
         // Chargement des profils depuis Supabase
@@ -107,6 +161,7 @@
             }).join('');
         }
 
+        loadHeaderConfig();
         loadMangatheques();
     </script>
 </body>
