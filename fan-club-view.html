@@ -116,8 +116,22 @@
             adminBar.classList.remove('hidden');
         }
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const fcId = urlParams.get('id');
+
+        // Gestion de la bannière spécifique du Fan Club ou globale
         function loadHeaderConfig() {
             try {
+                // 1. Vérifier si une bannière spécifique à ce Fan Club a été enregistrée dans l'admin
+                const fanClubsBanners = JSON.parse(localStorage.getItem('fanClubsBanners')) || [];
+                const currentFcBanner = fanClubsBanners.find(item => item.id == fcId);
+                
+                if (currentFcBanner && currentFcBanner.banner) {
+                    document.getElementById('forum-banner-img').src = currentFcBanner.banner;
+                    return;
+                }
+
+                // 2. Sinon, charger la configuration globale de l'en-tête
                 const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
                 if (config && config.banner) {
                     document.getElementById('forum-banner-img').src = config.banner;
@@ -131,9 +145,6 @@
                 console.error("Erreur chargement bannière", e);
             }
         }
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const fcId = urlParams.get('id');
 
         document.getElementById('btn-new-topic').setAttribute('href', `new-topic.html?cat=fc&fc_id=${fcId || ''}`);
 
@@ -163,19 +174,19 @@
 
             const container = document.getElementById('fc-topics-container');
 
-            // 2. Extraction dynamique et propre du mot-clé à partir du titre (ex: "Fan Club Officiel : Bleach" -> "bleach")
+            // 2. Extraction propre du mot-clé pour retrouver les sujets associés
             let cleanTitle = fc.title.toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Supprime les accents
-                .replace(/fan club officiel|fan club|[:\-]/g, "")  // Nettoie les termes génériques
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/\[fan club\]|fan club officiel|fan club|[:\-]/g, "")
                 .trim();
             
             let keyword = cleanTitle.split(/\s+/)[0] || fc.id.toString();
 
-            // 3. Récupérer les sujets dont la catégorie correspond à ce fan club
+            // 3. Récupérer les sujets liés à la catégorie 'fc' ou au mot-clé du fan club
             const { data: topics, error: topicsError } = await supabase
                 .from('topics')
                 .select('*')
-                .ilike('category', `%${keyword}%`)
+                .or(`category.ilike.%${keyword}%,category.eq.fc`)
                 .order('created_at', { ascending: false });
 
             if (topicsError || !topics) {
