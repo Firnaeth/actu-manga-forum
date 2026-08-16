@@ -61,12 +61,48 @@
             font-weight: bold;
             cursor: pointer;
             border-radius: 3px;
-            text-decoration: none;
-            display: inline-block;
         }
 
         .btn-admin-edit:hover {
             background: #e2899d;
+        }
+
+        .admin-panel-inputs {
+            background: #fff5f8;
+            border: 1px solid #ffb6c1;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .admin-panel-inputs label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #c0392b;
+        }
+
+        .admin-panel-inputs input[type="url"] {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+            margin-bottom: 8px;
+        }
+
+        .admin-form-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-cancel {
+            background: #ccc;
+            border-color: #b5b5b5;
+        }
+
+        .btn-cancel:hover {
+            background: #b5b5b5;
         }
     </style>
 </head>
@@ -76,11 +112,23 @@
         <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <a href="admin-global.html" class="btn-admin-edit">Modifier Titre & Bannière</a>
+            <button class="btn-admin-edit" id="btn-toggle-admin">Modifier Titre & Bannière</button>
+        </div>
+
+        <div id="admin-panel-form" class="admin-panel-inputs hidden">
+            <form id="form-config-header">
+                <label>Lien (URL) de l'image de bannière :</label>
+                <input type="url" id="input-forum-banner" required>
+
+                <div class="admin-form-actions">
+                    <button type="submit" class="btn-admin-edit">Enregistrer</button>
+                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
+                </div>
+            </form>
         </div>
 
         <div class="main-header">
-            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner">
+            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner" style="width: 100%; height: auto; display: block;">
         </div>
 
         <nav class="forum-nav">
@@ -102,11 +150,11 @@
             <p style="margin-top: 5px;" id="fc-desc">Chargement des informations...</p>
         </div>
 
-        <table class="forum-table">
+        <table class="forum-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
             <thead>
                 <tr>
-                    <th class="cat-title" id="fc-table-title">_ Sujets de cette section _</th>
-                    <th class="stat-head" style="text-align: center; width: 150px;">AUTEUR</th>
+                    <th class="cat-title" id="fc-table-title" style="background: #f78fb3; color: white; padding: 6px; text-align: left;">_ Sujets de cette section _</th>
+                    <th class="stat-head" style="background: #f78fb3; color: white; padding: 6px; text-align: center; width: 150px;">AUTEUR</th>
                 </tr>
             </thead>
             <tbody id="fc-topics-container">
@@ -144,6 +192,27 @@
         if (isStaff && adminBar) {
             adminBar.classList.remove('hidden');
         }
+
+        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.toggle('hidden');
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
+                banner: "https://images.alphacoders.com/605/605592.png" 
+            };
+            document.getElementById('input-forum-banner').value = config.banner || "https://images.alphacoders.com/605/605592.png";
+        });
+
+        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.add('hidden');
+        });
+
+        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || {};
+            config.banner = document.getElementById('input-forum-banner').value;
+            localStorage.setItem('forumHeaderConfig', JSON.stringify(config));
+            alert("Bannière mise à jour avec succès !");
+            window.location.reload();
+        });
 
         function loadHeaderConfig() {
             const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
@@ -196,11 +265,11 @@
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
                 return `
                     <tr>
-                        <td class="forum-desc">
-                            <a href="topic-view.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                        <td class="forum-desc" style="padding: 8px;">
+                            <a href="topic-view.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em; text-decoration: none; color: #2980b9;">${t.title}</a>
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
                         </td>
-                        <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
+                        <td class="stat-cell" style="text-align: center; padding: 8px;">${t.author || 'Otaku_33'}</td>
                     </tr>
                 `;
             }).join('');
