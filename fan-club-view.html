@@ -6,6 +6,7 @@
     <title>Fan Club - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
     <style>
+    <style>
         /* --- CORRECTIF POUR LA BARRE D'ADMINISTRATION --- */
         .admin-edit-bar {
             background: #fff0f5;
@@ -62,11 +63,11 @@
             <a href="#" class="nav-link">FAQ</a>
         </nav>
 
-        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;" id="breadcrumb-container">
+        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
             <a href="index.html">Accueil</a> &raquo; <a href="fan-clubs.html">Fan Clubs</a> &raquo; <span id="bc-title">Chargement...</span>
         </div>
 
-        <div class="welcome-banner" style="text-align: center; padding: 15px;" id="fc-header-info">
+        <div class="welcome-banner" style="text-align: center; padding: 15px;">
             <h2>⭐ <span id="fc-main-title">Chargement du Fan Club...</span></h2>
             <p style="margin-top: 5px;" id="fc-desc">Chargement des informations...</p>
         </div>
@@ -74,7 +75,7 @@
         <table class="forum-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
             <thead>
                 <tr>
-                    <th class="cat-title" id="fc-table-title" style="background: #f78fb3; color: white; padding: 6px; text-align: left;">_ Sujets de cette section _</th>
+                    <th class="cat-title" style="background: #f78fb3; color: white; padding: 6px; text-align: left;">_ Sujets de cette section _</th>
                     <th class="stat-head" style="background: #f78fb3; color: white; padding: 6px; text-align: center; width: 150px;">AUTEUR</th>
                 </tr>
             </thead>
@@ -161,23 +162,35 @@
 
             const container = document.getElementById('fc-topics-container');
 
-            // 2. Récupérer les sujets dont la catégorie commence par 'fc_' (ex: fc_vandread_dita, fc_vandread_hibiki, etc.)
+            // Extraire un mot-clé propre du titre du fan club pour filtrer (ex: "Bleach" ou "Vandread")
+            // Si le titre contient "Bleach", on cherche les catégories contenant "bleach", etc.
+            const titleLower = fc.title.toLowerCase();
+            let keyword = "";
+            if (titleLower.includes("bleach")) keyword = "bleach";
+            else if (titleLower.includes("inuyasha")) keyword = "inuyasha";
+            else if (titleLower.includes("vandread")) keyword = "vandread";
+            else {
+                // Par défaut, on prend le premier mot significatif ou l'id
+                keyword = fc.id.toString();
+            }
+
+            // 2. Récupérer les sujets dont la catégorie correspond spécifiquement à ce fan club
             const { data: topics, error: topicsError } = await supabase
                 .from('topics')
                 .select('*')
-                .ilike('category', 'fc_%')
+                .ilike('category', `%${keyword}%`)
                 .order('created_at', { ascending: false });
 
-            if (topicsError || !topics || topics.length === 0) {
+            if (topicsError || !topics) {
                 container.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Aucun sujet pour le moment dans ce Fan Club.</td></tr>`;
                 return;
             }
 
-            // Filtrer pour exclure la ligne principale du Fan Club elle-même (qui a pour catégorie 'fc')
-            const subTopics = topics.filter(t => t.category !== 'fc');
+            // Filtrer pour exclure le topic principal lui-même
+            const subTopics = topics.filter(t => t.id !== fc.id);
 
             if (subTopics.length === 0) {
-                container.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Aucun sujet pour le moment dans ce Fan Club.</td></tr>`;
+                container.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Aucun sujet pour le moment dans ce Fan Club. Soyez le premier à en créer un !</td></tr>`;
                 return;
             }
 
