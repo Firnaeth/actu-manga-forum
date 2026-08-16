@@ -44,10 +44,30 @@
 
         <!-- 2. FAN CLUBS -->
         <div id="tab-fanclubs" class="admin-tab-content" style="display: none;">
+            <!-- Modification de la description / titre / bannière dans Supabase -->
+            <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7; margin-bottom: 20px;">
+                <h3>Modifier un Fan Club (Titre & Description)</h3>
+                <form id="form-edit-fanclub-db">
+                    <label style="display:block; margin:0 0 5px; font-weight:bold;">Sélectionner le Fan Club :</label>
+                    <select id="fc-select-db" class="admin-form-control" style="width:100%; padding:8px; margin-bottom:10px;" required>
+                        <option value="">-- Chargement... --</option>
+                    </select>
+
+                    <label style="display:block; margin:0 0 5px; font-weight:bold;">Nouveau titre du Fan Club :</label>
+                    <input type="text" id="fc-edit-title" class="admin-form-control" placeholder="Titre..." style="width:100%; padding:8px; margin-bottom:10px;" required>
+
+                    <label style="display:block; margin:0 0 5px; font-weight:bold;">Nouvelle description :</label>
+                    <textarea id="fc-edit-desc" class="admin-form-control" rows="3" placeholder="Description..." style="width:100%; padding:8px; margin-bottom:15px;" required></textarea>
+
+                    <button type="submit" class="btn-admin-edit">Mettre à jour le Fan Club</button>
+                </form>
+            </div>
+
+            <!-- Gestion de la bannière (LocalStorage) -->
             <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7; margin-bottom: 20px;">
                 <h3>Gestion des Bannières Fan Clubs</h3>
                 <form id="form-fanclub-banner">
-                    <label style="display:block; margin:0 0 5px; font-weight:bold;">Choisir un Fan Club existant :</label>
+                    <label style="display:block; margin:0 0 5px; font-weight:bold;">Choisir un Fan Club pour sa bannière :</label>
                     <select id="fc-select-existing" class="admin-form-control" style="width:100%; padding:8px; margin-bottom:10px;" required>
                         <option value="">-- Chargement des Fan Clubs... --</option>
                     </select>
@@ -58,8 +78,9 @@
                     <button type="submit" class="btn-admin-edit">Enregistrer la bannière</button>
                 </form>
             </div>
+            
             <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7;">
-                <h3>Fan Clubs enregistrés</h3>
+                <h3>Bannières de Fan Clubs enregistrées</h3>
                 <div id="fc-list-display"><em>Chargement...</em></div>
             </div>
         </div>
@@ -116,14 +137,14 @@
             alert("En-tête et accueil mis à jour avec succès !");
         });
 
-        // --- 2. GESTION DES FAN CLUBS (AVEC SUPABASE) ---
+        // --- 2. GESTION DES FAN CLUBS (SUPABASE & BANNIÈRES) ---
         let fanClubsBanners = JSON.parse(localStorage.getItem('fanClubsBanners')) || [];
         let allFanClubsFromDb = [];
 
-        async function loadFanClubsDropdown() {
+        async function loadFanClubsDropdowns() {
             const selectEl = document.getElementById('fc-select-existing');
+            const selectDbEl = document.getElementById('fc-select-db');
             try {
-                // Récupère les sujets de type Fan Club depuis Supabase (ex: ceux dont la catégorie ou le type correspond)
                 const { data, error } = await supabase
                     .from('topics')
                     .select('*')
@@ -135,23 +156,66 @@
                 allFanClubsFromDb = data || [];
 
                 if (allFanClubsFromDb.length === 0) {
-                    selectEl.innerHTML = '<option value="">Aucun Fan Club trouvé dans la base de données</option>';
+                    selectEl.innerHTML = '<option value="">Aucun Fan Club trouvé</option>';
+                    selectDbEl.innerHTML = '<option value="">Aucun Fan Club trouvé</option>';
                     return;
                 }
 
-                selectEl.innerHTML = '<option value="">-- Sélectionnez un Fan Club --</option>' + 
+                const optionsHtml = '<option value="">-- Sélectionnez un Fan Club --</option>' + 
                     allFanClubsFromDb.map(fc => `<option value="${fc.id}">${fc.title}</option>`).join('');
+
+                selectEl.innerHTML = optionsHtml;
+                selectDbEl.innerHTML = optionsHtml;
 
             } catch (err) {
                 console.error("Erreur chargement fan clubs:", err);
-                selectEl.innerHTML = '<option value="">Erreur de chargement des Fan Clubs</option>';
+                selectEl.innerHTML = '<option value="">Erreur de chargement</option>';
+                selectDbEl.innerHTML = '<option value="">Erreur de chargement</option>';
             }
         }
+
+        // Pré-remplir les champs quand on sélectionne un fan club pour modification
+        document.getElementById('fc-select-db').addEventListener('change', (e) => {
+            const selectedId = e.target.value;
+            const fc = allFanClubsFromDb.find(item => item.id == selectedId);
+            if (fc) {
+                document.getElementById('fc-edit-title').value = fc.title || '';
+                document.getElementById('fc-edit-desc').value = fc.content || '';
+            } else {
+                document.getElementById('fc-edit-title').value = '';
+                document.getElementById('fc-edit-desc').value = '';
+            }
+        });
+
+        // Soumission de la modification du titre/description dans Supabase
+        document.getElementById('form-edit-fanclub-db').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const selectedId = document.getElementById('fc-select-db').value;
+            const newTitle = document.getElementById('fc-edit-title').value;
+            const newDesc = document.getElementById('fc-edit-desc').value;
+
+            if (!selectedId) {
+                alert("Veuillez sélectionner un Fan Club.");
+                return;
+            }
+
+            const { error } = await supabase
+                .from('topics')
+                .update({ title: newTitle, content: newDesc })
+                .eq('id', selectedId);
+
+            if (error) {
+                alert("Erreur lors de la mise à jour : " + error.message);
+            } else {
+                alert("Fan Club mis à jour avec succès dans la base de données !");
+                loadFanClubsDropdowns();
+            }
+        });
 
         function renderFanClubs() {
             const container = document.getElementById('fc-list-display');
             if (fanClubsBanners.length === 0) {
-                container.innerHTML = "<p><em>Aucune bannière personnalisée de Fan Club enregistrée.</em></p>";
+                container.innerHTML = "<p><em>Aucune bannière personnalisée enregistrée.</em></p>";
                 return;
             }
             container.innerHTML = fanClubsBanners.map((fc, index) => `
@@ -172,14 +236,13 @@
             const selectedOption = selectEl.options[selectEl.selectedIndex];
             
             if (!selectedId) {
-                alert("Veuillez sélectionner un Fan Club valide.");
+                alert("Veuillez sélectionner un Fan Club.");
                 return;
             }
 
             const fcName = selectedOption.text;
             const bannerUrl = document.getElementById('fc-banner-url').value;
 
-            // Vérifier si une bannière existe déjà pour ce fan club pour la mettre à jour, sinon l'ajouter
             const existingIndex = fanClubsBanners.findIndex(item => item.id === selectedId);
             if (existingIndex > -1) {
                 fanClubsBanners[existingIndex].banner = bannerUrl;
@@ -195,7 +258,6 @@
             localStorage.setItem('fanClubsBanners', JSON.stringify(fanClubsBanners));
             document.getElementById('form-fanclub-banner').reset();
             renderFanClubs();
-            loadFanClubsDropdown();
             alert("Bannière de Fan Club enregistrée avec succès !");
         });
 
@@ -207,7 +269,7 @@
             }
         }
 
-        loadFanClubsDropdown();
+        loadFanClubsDropdowns();
         renderFanClubs();
 
         // --- 3. GESTION DES FORUMS & SECTIONS ---
