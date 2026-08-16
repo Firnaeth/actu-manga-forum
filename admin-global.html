@@ -44,7 +44,22 @@
 
         <!-- 2. FAN CLUBS -->
         <div id="tab-fanclubs" class="admin-tab-content" style="display: none;">
-            <!-- Modification de la description / titre / bannière dans Supabase -->
+            
+            <!-- CRÉER UN NOUVEAU FAN CLUB -->
+            <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7; margin-bottom: 20px;">
+                <h3 style="color: #27ae60;">➕ Créer un nouveau Fan Club</h3>
+                <form id="form-create-fanclub">
+                    <label style="display:block; margin:0 0 5px; font-weight:bold;">Nom / Titre du Fan Club :</label>
+                    <input type="text" id="new-fc-title" class="admin-form-control" placeholder="ex: Fan Club Officiel : Naruto" style="width:100%; padding:8px; margin-bottom:10px;" required>
+
+                    <label style="display:block; margin:0 0 5px; font-weight:bold;">Description initiale :</label>
+                    <textarea id="new-fc-desc" class="admin-form-control" rows="3" placeholder="Présentation du fan club..." style="width:100%; padding:8px; margin-bottom:15px;" required></textarea>
+
+                    <button type="submit" class="btn-admin-edit" style="background: #27ae60;">Créer le Fan Club</button>
+                </form>
+            </div>
+
+            <!-- MODIFIER UN FAN CLUB EXISTANT (Titre & Description) -->
             <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7; margin-bottom: 20px;">
                 <h3>Modifier un Fan Club (Titre & Description)</h3>
                 <form id="form-edit-fanclub-db">
@@ -63,7 +78,7 @@
                 </form>
             </div>
 
-            <!-- Gestion de la bannière (LocalStorage) -->
+            <!-- GESTION DES BANNIÈRES -->
             <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7; margin-bottom: 20px;">
                 <h3>Gestion des Bannières Fan Clubs</h3>
                 <form id="form-fanclub-banner">
@@ -174,7 +189,28 @@
             }
         }
 
-        // Pré-remplir les champs quand on sélectionne un fan club pour modification
+        // Créer un nouveau Fan Club dans Supabase
+        document.getElementById('form-create-fanclub').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('new-fc-title').value;
+            const content = document.getElementById('new-fc-desc').value;
+            const author = localStorage.getItem('forumUsername') || 'Admin_Otaku';
+
+            const { data, error } = await supabase
+                .from('topics')
+                .insert([{ title, content, category: 'Fan Club', author }])
+                .select();
+
+            if (error) {
+                alert("Erreur lors de la création du Fan Club : " + error.message);
+            } else {
+                alert("Fan Club créé avec succès !");
+                document.getElementById('form-create-fanclub').reset();
+                loadFanClubsDropdowns();
+            }
+        });
+
+        // Pré-remplir les champs pour modification
         document.getElementById('fc-select-db').addEventListener('change', (e) => {
             const selectedId = e.target.value;
             const fc = allFanClubsFromDb.find(item => item.id == selectedId);
@@ -187,7 +223,7 @@
             }
         });
 
-        // Soumission de la modification du titre/description dans Supabase
+        // Mettre à jour le Fan Club dans Supabase
         document.getElementById('form-edit-fanclub-db').addEventListener('submit', async (e) => {
             e.preventDefault();
             const selectedId = document.getElementById('fc-select-db').value;
@@ -207,7 +243,7 @@
             if (error) {
                 alert("Erreur lors de la mise à jour : " + error.message);
             } else {
-                alert("Fan Club mis à jour avec succès dans la base de données !");
+                alert("Fan Club mis à jour avec succès !");
                 loadFanClubsDropdowns();
             }
         });
