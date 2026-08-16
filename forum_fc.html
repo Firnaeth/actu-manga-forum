@@ -5,28 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fan Clubs Officiels - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- STYLE DE LA BARRE D'ADMINISTRATION --- */
+        .admin-edit-bar {
+            background: #fff0f5;
+            border: 1px dotted #ffb6c1;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-title-badge {
+            font-size: 11px;
+            color: #d9534f;
+            font-weight: bold;
+        }
+
+        .btn-admin-edit {
+            background: #f3a6b8;
+            color: white;
+            border: 1px solid #e2899d;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .btn-admin-edit:hover {
+            background: #e2899d;
+        }
+    </style>
 </head>
 <body>
     <div id="wrapper">
 
         <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
-            <div class="admin-bar-inner">
-                <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-                <button class="btn-admin-edit" id="btn-toggle-admin">Modifier la Bannière</button>
-            </div>
-        </div>
-
-        <div id="admin-panel-form" class="admin-panel-inputs hidden">
-            <form id="form-config-header">
-                <label>Lien (URL) de l'image de bannière :</label>
-                <input type="url" id="input-forum-banner" required>
-
-                <div class="admin-form-actions">
-                    <button type="submit" class="btn-admin-edit">Enregistrer</button>
-                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
-                </div>
-            </form>
+            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
+            <a href="admin-global.html" class="btn-admin-edit">Aller à la page Admin Dédiée</a>
         </div>
 
         <div class="main-header">
@@ -96,27 +115,6 @@
         if (isStaff && adminBar) {
             adminBar.classList.remove('hidden');
         }
-        
-        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
-            document.getElementById('admin-panel-form').classList.toggle('hidden');
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
-                banner: "https://images.alphacoders.com/605/605592.png" 
-            };
-            document.getElementById('input-forum-banner').value = config.banner || "https://images.alphacoders.com/605/605592.png";
-        });
-
-        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
-            document.getElementById('admin-panel-form').classList.add('hidden');
-        });
-
-        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || {};
-            config.banner = document.getElementById('input-forum-banner').value;
-            localStorage.setItem('forumHeaderConfig', JSON.stringify(config));
-            alert("Bannière mise à jour avec succès !");
-            window.location.reload();
-        });
 
         function loadHeaderConfig() {
             const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
