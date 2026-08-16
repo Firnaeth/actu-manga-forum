@@ -32,6 +32,8 @@
             font-weight: bold;
             cursor: pointer;
             border-radius: 3px;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-admin-edit:hover {
@@ -45,7 +47,7 @@
         <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <a href="admin-global.html" class="btn-admin-edit">Modifier Titre & Bannière</button>
+            <a href="admin-global.html" class="btn-admin-edit">Modifier Titre & Bannière</a>
         </div>
 
         <div class="main-header">
@@ -114,31 +116,20 @@
             adminBar.classList.remove('hidden');
         }
 
-        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
-            document.getElementById('admin-panel-form').classList.toggle('hidden');
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
-                banner: "https://images.alphacoders.com/605/605592.png" 
-            };
-            document.getElementById('input-forum-banner').value = config.banner || "https://images.alphacoders.com/605/605592.png";
-        });
-
-        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
-            document.getElementById('admin-panel-form').classList.add('hidden');
-        });
-
-        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || {};
-            config.banner = document.getElementById('input-forum-banner').value;
-            localStorage.setItem('forumHeaderConfig', JSON.stringify(config));
-            alert("Bannière mise à jour avec succès !");
-            window.location.reload();
-        });
-
+        // Charge exactement la même configuration de bannière que l'index (via forumHeaderConfig ou customBanner selon ce que tu utilises)
         function loadHeaderConfig() {
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
-            if (config && config.banner) {
-                document.getElementById('forum-banner-img').src = config.banner;
+            try {
+                const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
+                if (config && config.banner) {
+                    document.getElementById('forum-banner-img').src = config.banner;
+                    return;
+                }
+                const customBanner = localStorage.getItem('customBanner');
+                if (customBanner) {
+                    document.getElementById('forum-banner-img').src = customBanner;
+                }
+            } catch(e) {
+                console.error("Erreur chargement bannière", e);
             }
         }
 
