@@ -3,97 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fan Club - Actu Manga World</title>
-    <style>
-        body { background-color: #dce7f0; font-family: Verdana, sans-serif; font-size: 12px; margin: 0; padding: 20px; }
-        #wrapper { width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .hidden { display: none !important; }
-        
-        /* En-tête */
-        .header-banner { width: 100%; height: 200px; object-fit: cover; border-radius: 4px; }
-        
-        /* Navigation */
-        .nav { margin: 15px 0; padding: 10px; background: #f78fb3; border-radius: 4px; }
-        .nav a { color: white; margin-right: 15px; text-decoration: none; font-weight: bold; }
-        
-        /* Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #f78fb3; color: white; padding: 10px; text-align: left; }
-        td { padding: 10px; border-bottom: 1px solid #eee; }
-        
-        /* Admin */
-        #admin-panel { background: #fff0f5; padding: 15px; border: 1px solid #ffb6c1; margin-bottom: 15px; }
-    </style>
+    <title>Fan Clubs Officiels - Actu Manga World</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div id="wrapper">
-        <!-- Barre Admin -->
-        <div id="admin-panel" class="hidden">
-            <strong>⚙️ Espace Administration</strong><br>
-            <input type="text" id="new-banner-url" placeholder="Nouvelle URL de bannière" style="width: 300px;">
-            <button id="save-banner">Enregistrer</button>
+
+        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
+        <div id="admin-bar-container" class="admin-edit-bar hidden">
+            <div class="admin-bar-inner">
+                <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
+                <button class="btn-admin-edit" id="btn-toggle-admin">Modifier la Bannière</button>
+            </div>
         </div>
 
-        <img id="main-banner" src="https://images.alphacoders.com/605/605592.png" class="header-banner">
+        <div id="admin-panel-form" class="admin-panel-inputs hidden">
+            <form id="form-config-header">
+                <label>Lien (URL) de l'image de bannière :</label>
+                <input type="url" id="input-forum-banner" required>
 
-        <div class="nav">
-            <a href="index.html">Accueil</a>
-            <a href="fan-clubs.html">Fan Clubs</a>
-            <span id="user-area"></span>
+                <div class="admin-form-actions">
+                    <button type="submit" class="btn-admin-edit">Enregistrer</button>
+                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
+                </div>
+            </form>
         </div>
 
-        <h1 id="fc-title">Chargement...</h1>
-        <p id="fc-desc"></p>
+        <div class="main-header">
+            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner">
+        </div>
 
-        <table>
+        <nav class="forum-nav">
+            <a href="index.html" class="nav-link">Index</a>
+            <a href="community.html" class="nav-link">Fiches & Critiques</a>
+            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
+            <a href="#" class="nav-link">Rechercher</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
+            <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
+            <a href="#" class="nav-link">FAQ</a>
+        </nav>
+
+        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
+            <a href="index.html">Accueil</a> &raquo; <span>Fan Clubs Officiels</span>
+        </div>
+
+        <div class="welcome-banner" style="text-align: center; padding: 15px;">
+            <h2>⭐ Fan Clubs Officiels (Bleach, Inuyasha...)</h2>
+            <p style="margin-top: 5px;">Rejoignez ou créez votre propre Fan Club et portez fièrement vos bannières.</p>
+        </div>
+
+        <table class="forum-table">
             <thead>
-                <tr><th>Sujet</th><th>Auteur</th></tr>
+                <tr>
+                    <th colspan="2" class="cat-title">_ Liste des Fan Clubs _</th>
+                    <th class="stat-head" style="text-align: center;">Auteur</th>
+                    <th class="stat-head" style="text-align: center;">Réponses</th>
+                    <th class="last-post-head" style="text-align: center;">Dernier Message</th>
+                </tr>
             </thead>
-            <tbody id="topics-list">
-                <tr><td colspan="2">Chargement des sujets...</td></tr>
+            <tbody id="fc-topics-container">
+                <tr><td colspan="5" style="text-align: center; padding: 20px;"><em>Chargement des Fan Clubs...</em></td></tr>
             </tbody>
         </table>
+
+        <div style="margin-top: 15px; margin-bottom: 20px;">
+            <a href="new-topic.html?cat=fc" class="btn-admin-edit" style="text-decoration: none; padding: 8px 14px; background: #61b3e8; border: none;">+ Créer un Fan Club</a>
+        </div>
     </div>
 
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // 1. Initialisation
-        const fcId = new URLSearchParams(window.location.search).get('id');
-        const role = localStorage.getItem('forumUserRole');
+        const currentUsername = localStorage.getItem('forumUsername');
+        const currentUserRole = localStorage.getItem('forumUserRole');
 
-        // 2. Afficher interface admin si besoin
-        if (role === 'admin' || role === 'modo') {
-            document.getElementById('admin-panel').classList.remove('hidden');
+        if (currentUsername) {
+            document.getElementById('nav-profile-link').classList.remove('hidden');
+            const authLink = document.getElementById('nav-auth-link');
+            authLink.textContent = "Déconnexion";
+            authLink.setAttribute('href', '#');
+            authLink.onclick = async (e) => { 
+                e.preventDefault();
+                try { await supabase.auth.signOut(); } catch(err) { console.error(err); }
+                localStorage.clear(); 
+                window.location.reload(); 
+            };
         }
 
-        // 3. Charger et afficher le Fan Club
-        async function initPage() {
-            if (!fcId) return;
+        const adminBar = document.getElementById('admin-bar-container');
+        const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
 
-            const { data, error } = await supabase.from('topics').select('*').eq('id', fcId).single();
-            if (data) {
-                document.getElementById('fc-title').textContent = data.title;
-                document.getElementById('fc-desc').textContent = data.content;
-            }
+        if (isStaff && adminBar) {
+            adminBar.classList.remove('hidden');
         }
-
-        // 4. Gestion Bannière
-        document.getElementById('save-banner').addEventListener('click', () => {
-            const url = document.getElementById('new-banner-url').value;
-            if(url) {
-                localStorage.setItem('customBanner', url);
-                document.getElementById('main-banner').src = url;
-                alert('Bannière mise à jour !');
-            }
+        
+        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.toggle('hidden');
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
+                banner: "https://images.alphacoders.com/605/605592.png" 
+            };
+            document.getElementById('input-forum-banner').value = config.banner || "https://images.alphacoders.com/605/605592.png";
         });
 
-        // Appliquer bannière sauvegardée
-        const savedBanner = localStorage.getItem('customBanner');
-        if (savedBanner) document.getElementById('main-banner').src = savedBanner;
+        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.add('hidden');
+        });
 
-        initPage();
+        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || {};
+            config.banner = document.getElementById('input-forum-banner').value;
+            localStorage.setItem('forumHeaderConfig', JSON.stringify(config));
+            alert("Bannière mise à jour avec succès !");
+            window.location.reload();
+        });
+
+        function loadHeaderConfig() {
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
+            if (config && config.banner) {
+                document.getElementById('forum-banner-img').src = config.banner;
+            }
+        }
+
+        async function loadFcTopics() {
+            const container = document.getElementById('fc-topics-container');
+            
+            const { data: topics, error } = await supabase
+                .from('topics')
+                .select('*')
+                .eq('category', 'fc')
+                .order('created_at', { ascending: false });
+
+            if (error || !topics || topics.length === 0) {
+                container.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun Fan Club pour le moment.</td></tr>`;
+                return;
+            }
+
+            const { data: replies } = await supabase.from('replies').select('topic_id');
+
+            container.innerHTML = topics.map(t => {
+                const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
+                const topicRepliesCount = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
+                const fcSlug = t.id;
+
+                return `
+                    <tr>
+                        <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">⭐</span></td>
+                        <td class="forum-desc">
+                            <a href="fan-club-view.html?id=${fcSlug}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                            <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
+                        </td>
+                        <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
+                        <td class="stat-cell" style="text-align: center;">${topicRepliesCount}</td>
+                        <td class="last-post-cell" style="text-align: center; font-size: 0.9em;"><span>Par ${t.author || 'Otaku_33'}</span><br><small style="color: #7f8c8d;">${dateFormatted}</small></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        loadHeaderConfig();
+        loadFcTopics();
     </script>
 </body>
 </html>
