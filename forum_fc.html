@@ -6,7 +6,36 @@
     <title>Fan Club - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* --- STYLE DE LA BARRE D'ADMINISTRATION --- */
+        /* --- STYLE GÉNÉRAL & FOND --- */
+        body {
+            background-color: #dce7f0;
+            background-image: url('https://images.alphacoders.com/832/83266.jpg');
+            background-attachment: fixed;
+            background-position: center top;
+            background-repeat: no-repeat;
+            background-size: cover;
+            font-family: Verdana, Tahoma, sans-serif;
+            font-size: 11px;
+            color: #333;
+            margin: 0;
+            padding: 25px 0;
+        }
+
+        #wrapper {
+            width: 900px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 2px solid #f78fb3;
+            padding: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+        }
+
+        /* --- REGLES D'ADMINISTRATION & UTILITAIRES --- */
+        .hidden {
+            display: none !important;
+        }
+
         .admin-edit-bar {
             background: #fff0f5;
             border: 1px dotted #ffb6c1;
@@ -32,6 +61,8 @@
             font-weight: bold;
             cursor: pointer;
             border-radius: 3px;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-admin-edit:hover {
@@ -42,10 +73,10 @@
 <body>
     <div id="wrapper">
 
-        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
+        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
-            <span class="admin-title-badge">⚙️ Administration du Fan Club</span>
-            <a href="admin-global.html" class="btn-admin-edit">Accéder à l'Admin Globale</a>
+            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
+            <a href="admin-global.html" class="btn-admin-edit">Modifier Titre & Bannière</a>
         </div>
 
         <div class="main-header">
@@ -71,7 +102,6 @@
             <p style="margin-top: 5px;" id="fc-desc">Chargement des informations...</p>
         </div>
 
-        <!-- Contenu de la page Fan Club -->
         <table class="forum-table">
             <thead>
                 <tr>
@@ -122,7 +152,6 @@
             }
         }
 
-        // Récupération de l'ID du Fan Club depuis l'URL
         const urlParams = new URLSearchParams(window.location.search);
         const fcId = urlParams.get('id');
 
@@ -135,7 +164,6 @@
                 return;
             }
 
-            // Charger les détails du Fan Club (depuis la table topics)
             const { data: fc, error } = await supabase
                 .from('topics')
                 .select('*')
@@ -152,16 +180,13 @@
             document.getElementById('fc-main-title').textContent = fc.title;
             document.getElementById('fc-desc').textContent = fc.content || "Rejoignez ou créez votre propre Fan Club et portez fièrement vos bannières.";
 
-            // Charger les sujets / messages associés à ce Fan Club
             const container = document.getElementById('fc-topics-container');
             const { data: topics, error: topicsError } = await supabase
                 .from('topics')
                 .select('*')
-                .eq('category', 'fc_topic') // ou autre logique de sous-sujets selon votre base
+                .eq('category', 'fc_topic')
                 .order('created_at', { ascending: false });
 
-            // Si vous stockez les sous-sujets autrement, adaptez la requête ci-dessus. 
-            // Pour l'instant, on liste de manière sécurisée sans provoquer d'erreur 403.
             if (topicsError || !topics || topics.length === 0) {
                 container.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Aucun sujet pour le moment dans ce Fan Club.</td></tr>`;
                 return;
