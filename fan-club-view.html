@@ -40,14 +40,16 @@
     </style>
 </head>
 <body>
+
     <div id="wrapper">
 
-        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR) -->
+        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <a href="admin-global.html" class="btn-admin-edit">Modifier Titre & Bannière</a>
+            <a href="admin-global.html" class="btn-admin-edit">Aller à la page Admin Dédiée</a>
         </div>
 
+        <!-- BANNIÈRE EN-TÊTE PRINCIPALE -->
         <div class="main-header">
             <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
         </div>
@@ -161,19 +163,15 @@
 
             const container = document.getElementById('fc-topics-container');
 
-            // Extraire un mot-clé propre du titre du fan club pour filtrer (ex: "Bleach" ou "Vandread")
-            // Si le titre contient "Bleach", on cherche les catégories contenant "bleach", etc.
-            const titleLower = fc.title.toLowerCase();
-            let keyword = "";
-            if (titleLower.includes("bleach")) keyword = "bleach";
-            else if (titleLower.includes("inuyasha")) keyword = "inuyasha";
-            else if (titleLower.includes("vandread")) keyword = "vandread";
-            else {
-                // Par défaut, on prend le premier mot significatif ou l'id
-                keyword = fc.id.toString();
-            }
+            // 2. Extraction dynamique et propre du mot-clé à partir du titre (ex: "Fan Club Officiel : Bleach" -> "bleach")
+            let cleanTitle = fc.title.toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Supprime les accents
+                .replace(/fan club officiel|fan club|[:\-]/g, "")  // Nettoie les termes génériques
+                .trim();
+            
+            let keyword = cleanTitle.split(/\s+/)[0] || fc.id.toString();
 
-            // 2. Récupérer les sujets dont la catégorie correspond spécifiquement à ce fan club
+            // 3. Récupérer les sujets dont la catégorie correspond à ce fan club
             const { data: topics, error: topicsError } = await supabase
                 .from('topics')
                 .select('*')
