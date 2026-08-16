@@ -1,4 +1,4 @@
-/* ==========================================
+/* ==========================================/*
    STYLE GÉNÉRAL & FOND RETRO 2010
    ========================================== */
 body {
@@ -87,7 +87,7 @@ body {
     margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-    font-family: 'Verdana', sans-serif; /* Très typique des forums 2010 */
+    font-family: 'Verdana', sans-serif;
 }
 
 .welcome-banner h2 {
@@ -618,52 +618,63 @@ a.group-admin:hover, a.group-member:hover {
     margin-bottom: 6px;
 }
 
-/* --- REGLES D'ADMINISTRATION & UTILITAIRES --- */
+/* --- REGLES D'ADMINISTRATION & UTILITAIRES HARMONISÉS --- */
 .hidden {
     display: none !important;
 }
 
 .admin-edit-bar {
-    background: #fff0f5;
-    border: 1px dotted #ffb6c1;
-    padding: 8px 12px;
-    margin-bottom: 10px;
+    background: #ffffff;
+    border: 1px solid #f5c2c7;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.admin-bar-inner {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: #fff0f3;
+    border: 1px dashed #f5c2c7;
+    padding: 12px 15px;
+    border-radius: 4px;
 }
 
 .admin-title-badge {
-    font-size: 11px;
-    color: #d9534f;
     font-weight: bold;
+    color: #c94c68;
+    font-size: 0.9em;
 }
 
 .btn-admin-edit {
-    background: #f3a6b8;
+    background: #e8829d;
     color: white;
-    border: 1px solid #e2899d;
-    padding: 4px 10px;
-    font-size: 11px;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.85em;
     font-weight: bold;
     cursor: pointer;
-    border-radius: 3px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s;
 }
 
 .btn-admin-edit:hover {
-    background: #e2899d;
+    background: #d66b88;
 }
 
 .btn-admin-edit.btn-cancel {
-    background: #7f8c8d;
-    border-color: #666;
+    background: #95a5a6;
 }
 
 .admin-panel-inputs {
-    background: #fff0f5;
-    border: 1px dotted #ffb6c1;
-    padding: 12px;
-    margin-bottom: 10px;
+    background: #fff0f3;
+    border: 1px solid #f5c2c7;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
 }
 
 .admin-panel-inputs form {
@@ -674,18 +685,23 @@ a.group-admin:hover, a.group-member:hover {
 
 .admin-panel-inputs label {
     font-weight: bold;
-    font-size: 11px;
+    color: #c94c68;
+    font-size: 0.9em;
 }
 
 .admin-panel-inputs input {
-    padding: 6px;
-    border: 1px solid #ccc;
-    font-size: 12px;
+    padding: 8px;
+    border: 1px solid #f5c2c7;
+    border-radius: 4px;
+    font-size: 11px;
+    background: #fff;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .admin-form-actions {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     margin-top: 5px;
 }
 
@@ -751,15 +767,15 @@ a.group-admin:hover, a.group-member:hover {
 
 /* Couleurs spécifiques selon le rôle injecté par le JS */
 .rank.rank-admin {
-    background: linear-gradient(135deg, #ff416c, #ff4b2b) !important; /* Rose vif / Rouge Admin */
+    background: linear-gradient(135deg, #ff416c, #ff4b2b) !important;
 }
 
 .rank.rank-mod {
-    background: linear-gradient(135deg, #11998e, #38ef7d) !important; /* Vert Modérateur */
+    background: linear-gradient(135deg, #11998e, #38ef7d) !important;
 }
 
 .rank.rank-member {
-    background: linear-gradient(135deg, #4e54c8, #8f94fb) !important; /* Bleu Membre classique */
+    background: linear-gradient(135deg, #4e54c8, #8f94fb) !important;
 }
 
 /* Statut utilisateur */
