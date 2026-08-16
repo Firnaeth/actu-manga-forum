@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fan Clubs Officiels - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
-
     <style>
         /* --- CORRECTIF POUR LA BARRE D'ADMINISTRATION --- */
         .admin-edit-bar {
@@ -52,54 +51,7 @@
         </div>
 
         <div class="main-header">
-            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
-        </div>    <style>
-        /* --- CORRECTIF POUR LA BARRE D'ADMINISTRATION --- */
-        .admin-edit-bar {
-            background: #fff0f5;
-            border: 1px dotted #ffb6c1;
-            padding: 8px 12px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .admin-title-badge {
-            font-size: 11px;
-            color: #d9534f;
-            font-weight: bold;
-        }
-
-        .btn-admin-edit {
-            background: #f3a6b8;
-            color: white;
-            border: 1px solid #e2899d;
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 3px;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-admin-edit:hover {
-            background: #e2899d;
-        }
-    </style>
-</head>
-<body>
-    <div id="wrapper">
-
-        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR) -->
-        <div id="admin-bar-container" class="admin-edit-bar hidden">
-            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <a href="admin-global.html" class="btn-admin-edit">Modifier Titre & Bannière</a>
-        </div>
-
-        <div class="main-header">
-            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
+            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner" style="width: 100%; height: auto; display: block;">
         </div>
 
         <nav class="forum-nav">
@@ -121,13 +73,13 @@
             <p style="margin-top: 5px;">Rejoignez ou créez votre propre Fan Club et portez fièrement vos bannières.</p>
         </div>
 
-        <table class="forum-table">
+        <table class="forum-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
             <thead>
                 <tr>
-                    <th colspan="2" class="cat-title">_ Liste des Fan Clubs _</th>
-                    <th class="stat-head" style="text-align: center;">Auteur</th>
-                    <th class="stat-head" style="text-align: center;">Réponses</th>
-                    <th class="last-post-head" style="text-align: center;">Dernier Message</th>
+                    <th colspan="2" class="cat-title" style="background: #f78fb3; color: white; padding: 6px; text-align: left;">_ Liste des Fan Clubs _</th>
+                    <th class="stat-head" style="background: #f78fb3; color: white; padding: 6px; text-align: center; width: 120px;">Auteur</th>
+                    <th class="stat-head" style="background: #f78fb3; color: white; padding: 6px; text-align: center; width: 100px;">Réponses</th>
+                    <th class="last-post-head" style="background: #f78fb3; color: white; padding: 6px; text-align: center; width: 160px;">Dernier Message</th>
                 </tr>
             </thead>
             <tbody id="fc-topics-container">
@@ -165,32 +117,20 @@
         if (isStaff && adminBar) {
             adminBar.classList.remove('hidden');
         }
-        
-        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
-            document.getElementById('admin-panel-form').classList.toggle('hidden');
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
-                banner: "https://images.alphacoders.com/605/605592.png" 
-            };
-            document.getElementById('input-forum-banner').value = config.banner || "https://images.alphacoders.com/605/605592.png";
-        });
-
-        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
-            document.getElementById('admin-panel-form').classList.add('hidden');
-        });
-
-        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || {};
-            config.banner = document.getElementById('input-forum-banner').value;
-            localStorage.setItem('forumHeaderConfig', JSON.stringify(config));
-            alert("Bannière mise à jour avec succès !");
-            window.location.reload();
-        });
 
         function loadHeaderConfig() {
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
-            if (config && config.banner) {
-                document.getElementById('forum-banner-img').src = config.banner;
+            try {
+                const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
+                if (config && config.banner) {
+                    document.getElementById('forum-banner-img').src = config.banner;
+                    return;
+                }
+                const customBanner = localStorage.getItem('customBanner');
+                if (customBanner) {
+                    document.getElementById('forum-banner-img').src = customBanner;
+                }
+            } catch(e) {
+                console.error("Erreur chargement bannière", e);
             }
         }
 
@@ -217,14 +157,14 @@
 
                 return `
                     <tr>
-                        <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">⭐</span></td>
-                        <td class="forum-desc">
-                            <a href="fan-club-view.html?id=${fcSlug}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                        <td class="icon-cell" style="width: 40px; text-align: center; padding: 8px;"><span class="category-emoji">⭐</span></td>
+                        <td class="forum-desc" style="padding: 8px;">
+                            <a href="fan-club-view.html?id=${fcSlug}" class="forum-title" style="font-weight: bold; font-size: 1.1em; text-decoration: none; color: #2980b9;">${t.title}</a>
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
                         </td>
-                        <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
-                        <td class="stat-cell" style="text-align: center;">${topicRepliesCount}</td>
-                        <td class="last-post-cell" style="text-align: center; font-size: 0.9em;"><span>Par ${t.author || 'Otaku_33'}</span><br><small style="color: #7f8c8d;">${dateFormatted}</small></td>
+                        <td class="stat-cell" style="text-align: center; padding: 8px;">${t.author || 'Otaku_33'}</td>
+                        <td class="stat-cell" style="text-align: center; padding: 8px;">${topicRepliesCount}</td>
+                        <td class="last-post-cell" style="text-align: center; font-size: 0.9em; padding: 8px;"><span>Par ${t.author || 'Otaku_33'}</span><br><small style="color: #7f8c8d;">${dateFormatted}</small></td>
                     </tr>
                 `;
             }).join('');
