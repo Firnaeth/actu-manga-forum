@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fan Clubs Officiels - Actu Manga World</title>
+    <title>Fan Club - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
     <style>
         /* --- STYLE DE LA BARRE D'ADMINISTRATION --- */
@@ -44,8 +44,8 @@
 
         <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
-            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <a href="admin-global.html" class="btn-admin-edit">Aller à la page Admin Dédiée</a>
+            <span class="admin-title-badge">⚙️ Administration du Fan Club</span>
+            <a href="admin-global.html" class="btn-admin-edit">Accéder à l'Admin Globale</a>
         </div>
 
         <div class="main-header">
@@ -62,31 +62,30 @@
             <a href="#" class="nav-link">FAQ</a>
         </nav>
 
-        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
-            <a href="index.html">Accueil</a> &raquo; <span>Fan Clubs Officiels</span>
+        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;" id="breadcrumb-container">
+            <a href="index.html">Accueil</a> &raquo; <a href="fan-clubs.html">Fan Clubs</a> &raquo; <span id="bc-title">Chargement...</span>
         </div>
 
-        <div class="welcome-banner" style="text-align: center; padding: 15px;">
-            <h2>⭐ Fan Clubs Officiels (Bleach, Inuyasha...)</h2>
-            <p style="margin-top: 5px;">Rejoignez ou créez votre propre Fan Club et portez fièrement vos bannières.</p>
+        <div class="welcome-banner" style="text-align: center; padding: 15px;" id="fc-header-info">
+            <h2>⭐ <span id="fc-main-title">Chargement du Fan Club...</span></h2>
+            <p style="margin-top: 5px;" id="fc-desc">Chargement des informations...</p>
         </div>
 
+        <!-- Contenu de la page Fan Club -->
         <table class="forum-table">
             <thead>
                 <tr>
-                    <th colspan="2" class="cat-title">_ Liste des Fan Clubs _</th>
-                    <th class="stat-head" style="text-align: center;">Auteur</th>
-                    <th class="stat-head" style="text-align: center;">Réponses</th>
-                    <th class="last-post-head" style="text-align: center;">Dernier Message</th>
+                    <th class="cat-title" id="fc-table-title">_ Sujets de cette section _</th>
+                    <th class="stat-head" style="text-align: center; width: 150px;">AUTEUR</th>
                 </tr>
             </thead>
             <tbody id="fc-topics-container">
-                <tr><td colspan="5" style="text-align: center; padding: 20px;"><em>Chargement des Fan Clubs...</em></td></tr>
+                <tr><td colspan="2" style="text-align: center; padding: 20px;"><em>Chargement des sujets...</em></td></tr>
             </tbody>
         </table>
 
         <div style="margin-top: 15px; margin-bottom: 20px;">
-            <a href="new-topic.html?cat=fc" class="btn-admin-edit" style="text-decoration: none; padding: 8px 14px; background: #61b3e8; border: none;">+ Créer un Fan Club</a>
+            <a href="#" id="btn-new-topic" class="btn-admin-edit" style="text-decoration: none; padding: 8px 14px; background: #61b3e8; border: none;">+ Créer un Sujet dans cette section</a>
         </div>
     </div>
 
@@ -123,44 +122,67 @@
             }
         }
 
-        async function loadFcTopics() {
-            const container = document.getElementById('fc-topics-container');
-            
-            const { data: topics, error } = await supabase
-                .from('topics')
-                .select('*')
-                .eq('category', 'fc')
-                .order('created_at', { ascending: false });
+        // Récupération de l'ID du Fan Club depuis l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const fcId = urlParams.get('id');
 
-            if (error || !topics || topics.length === 0) {
-                container.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun Fan Club pour le moment.</td></tr>`;
+        document.getElementById('btn-new-topic').setAttribute('href', `new-topic.html?cat=fc&fc_id=${fcId || ''}`);
+
+        async function loadFanClubData() {
+            if (!fcId) {
+                document.getElementById('fc-main-title').textContent = "Fan Club introuvable";
+                document.getElementById('fc-topics-container').innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Aucun identifiant de Fan Club spécifié.</td></tr>`;
                 return;
             }
 
-            const { data: replies } = await supabase.from('replies').select('topic_id');
+            // Charger les détails du Fan Club (depuis la table topics)
+            const { data: fc, error } = await supabase
+                .from('topics')
+                .select('*')
+                .eq('id', fcId)
+                .single();
+
+            if (error || !fc) {
+                document.getElementById('fc-main-title').textContent = "Fan Club introuvable";
+                document.getElementById('fc-topics-container').innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Ce Fan Club n'existe pas ou a été supprimé.</td></tr>`;
+                return;
+            }
+
+            document.getElementById('bc-title').textContent = fc.title;
+            document.getElementById('fc-main-title').textContent = fc.title;
+            document.getElementById('fc-desc').textContent = fc.content || "Rejoignez ou créez votre propre Fan Club et portez fièrement vos bannières.";
+
+            // Charger les sujets / messages associés à ce Fan Club
+            const container = document.getElementById('fc-topics-container');
+            const { data: topics, error: topicsError } = await supabase
+                .from('topics')
+                .select('*')
+                .eq('category', 'fc_topic') // ou autre logique de sous-sujets selon votre base
+                .order('created_at', { ascending: false });
+
+            // Si vous stockez les sous-sujets autrement, adaptez la requête ci-dessus. 
+            // Pour l'instant, on liste de manière sécurisée sans provoquer d'erreur 403.
+            if (topicsError || !topics || topics.length === 0) {
+                container.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Aucun sujet pour le moment dans ce Fan Club.</td></tr>`;
+                return;
+            }
 
             container.innerHTML = topics.map(t => {
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
-                const topicRepliesCount = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
-                const fcSlug = t.id;
-
                 return `
                     <tr>
-                        <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">⭐</span></td>
                         <td class="forum-desc">
-                            <a href="fan-club-view.html?id=${fcSlug}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                            <a href="topic-view.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
                         </td>
                         <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
-                        <td class="stat-cell" style="text-align: center;">${topicRepliesCount}</td>
-                        <td class="last-post-cell" style="text-align: center; font-size: 0.9em;"><span>Par ${t.author || 'Otaku_33'}</span><br><small style="color: #7f8c8d;">${dateFormatted}</small></td>
                     </tr>
                 `;
             }).join('');
         }
 
         loadHeaderConfig();
-        loadFcTopics();
+        loadFanClubData();
     </script>
 </body>
 </html>
