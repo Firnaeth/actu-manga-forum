@@ -13,25 +13,7 @@
         <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <button class="btn-admin-edit" id="btn-toggle-admin">Modifier Titre & Bannière</button>
-        </div>
-
-        <div id="admin-panel-form" class="admin-panel-inputs hidden">
-            <form id="form-config-header">
-                <label>Titre principal du forum :</label>
-                <input type="text" id="input-forum-title" required>
-
-                <label>Description / Sous-titre :</label>
-                <input type="text" id="input-forum-subtitle" required>
-
-                <label>Lien (URL) de l'image de bannière :</label>
-                <input type="url" id="input-forum-banner" required>
-
-                <div class="admin-form-actions">
-                    <button type="submit" class="btn-admin-edit">Enregistrer</button>
-                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
-                </div>
-            </form>
+            <a href="admin-global.html" class="btn-admin-edit" style="text-decoration: none; display: inline-block;">Aller à la page Admin Dédiée</a>
         </div>
 
         <!-- BANNIÈRE EN-TÊTE PRINCIPALE -->
@@ -281,35 +263,8 @@
         if (isStaff && adminBar) {
             adminBar.classList.remove('hidden');
         }
-        
-        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
-            document.getElementById('admin-panel-form').classList.toggle('hidden');
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
-                title: "Bienvenue sur Actu Manga World", 
-                subtitle: "Toutes les sorties VF, fiches animes...", 
-                banner: "https://images.alphacoders.com/605/605592.png" 
-            };
-            document.getElementById('input-forum-title').value = config.title;
-            document.getElementById('input-forum-subtitle').value = config.subtitle;
-            document.getElementById('input-forum-banner').value = config.banner;
-        });
 
-        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
-            document.getElementById('admin-panel-form').classList.add('hidden');
-        });
-
-        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const newConfig = {
-                title: document.getElementById('input-forum-title').value,
-                subtitle: document.getElementById('input-forum-subtitle').value,
-                banner: document.getElementById('input-forum-banner').value
-            };
-            localStorage.setItem('forumHeaderConfig', JSON.stringify(newConfig));
-            alert("En-tête mis à jour avec succès !");
-            window.location.reload();
-        });
-
+        // Chargement dynamique de l'en-tête depuis le localStorage (partagé avec la page admin dédiée)
         function loadHeaderConfig() {
             const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
                 title: "Bienvenue sur Actu Manga World", 
