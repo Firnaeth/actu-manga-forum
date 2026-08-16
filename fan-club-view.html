@@ -13,45 +13,22 @@
         .btn-add-tab { background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 0.9em; }
         .btn-add-tab:hover { background: #218838; }
 
-        /* Style du panneau d'administration inspiré de l'accueil */
+        /* Style du panneau d'administration */
         .admin-panel-box { background: #fff0f3; border: 1px solid #f5c2c7; padding: 15px; border-radius: 6px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .admin-panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f5c2c7; padding-bottom: 8px; margin-bottom: 12px; }
+        .admin-panel-header { display: flex; justify-content: space-between; align-items: center; }
         .admin-panel-title { font-weight: bold; color: #842029; font-size: 0.95em; }
-        .btn-toggle-admin { background: #d63384; color: white; border: none; padding: 5px 12px; border-radius: 4px; font-size: 0.85em; font-weight: bold; cursor: pointer; }
+        .btn-toggle-admin { background: #d63384; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-size: 0.85em; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
         .btn-toggle-admin:hover { background: #b02a65; }
-        .admin-form-group { margin-bottom: 10px; }
-        .admin-form-group label { display: block; font-size: 0.85em; font-weight: bold; color: #555; margin-bottom: 3px; }
-        .admin-form-control { width: 100%; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9em; box-sizing: border-box; }
-        .admin-buttons-bar { display: flex; gap: 8px; margin-top: 12px; }
-        .btn-save-admin { background: #198754; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
-        .btn-save-admin:hover { background: #157347; }
-        .btn-cancel-admin { background: #6c757d; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
-        .btn-cancel-admin:hover { background: #5c636a; }
     </style>
 </head>
 <body>
 
 <div id="wrapper">
-    <!-- PANNEAU D'ADMINISTRATION DU FAN CLUB (Style Accueil) -->
+    <!-- PANNEAU D'ADMINISTRATION (Redirection directe vers admin-global.html) -->
     <div class="admin-panel-box" id="fc-admin-panel" style="display: none;">
         <div class="admin-panel-header">
-            <span class="admin-panel-title">⚙️ Administration de l'en-tête du Fan Club</span>
-            <button id="btn-toggle-form" class="btn-toggle-admin">Modifier le Fan Club</button>
-        </div>
-        
-        <div id="admin-form-container" style="display: none;">
-            <div class="admin-form-group">
-                <label>Description / Sous-titre du Fan Club :</label>
-                <textarea id="input-fc-desc" class="admin-form-control" rows="2"></textarea>
-            </div>
-            <div class="admin-form-group">
-                <label>Lien (URL) de l'image de bannière :</label>
-                <input type="text" id="input-fc-banner" class="admin-form-control">
-            </div>
-            <div class="admin-buttons-bar">
-                <button id="btn-save-admin" class="btn-save-admin">Enregistrer</button>
-                <button id="btn-cancel-admin" class="btn-cancel-admin">Annuler</button>
-            </div>
+            <span class="admin-panel-title">⚙️ Administration du Fan Club</span>
+            <a href="#" id="btn-toggle-form" class="btn-toggle-admin">Accéder à l'Admin Globale</a>
         </div>
     </div>
 
@@ -125,10 +102,12 @@
             return;
         }
 
-        // Afficher le panneau d'administration
+        // Afficher le panneau d'administration et configurer le lien direct vers admin-global.html
         document.getElementById('fc-admin-panel').style.display = 'block';
+        const toggleBtn = document.getElementById('btn-toggle-form');
+        toggleBtn.setAttribute('href', `admin-global.html?fc_id=${fcId}`);
 
-        // Gestion de la bannière personnalisée
+        // Gestion de la bannière personnalisée (depuis localStorage)
         const bannerImgElem = document.getElementById('forum-banner-img');
         const customBanner = localStorage.getItem(`fc_banner_${fcId}`);
         const activeBanner = customBanner || getBannerForTitle(fc.title);
@@ -144,57 +123,10 @@
         let customDesc = localStorage.getItem(`fc_desc_${fcId}`) || fc.content || "Bienvenue dans l'espace de discussion et sous-sections thématiques de ce Fan Club.";
         descElem.textContent = customDesc;
 
-        // Remplir les champs du formulaire d'administration
-        const inputDesc = document.getElementById('input-fc-desc');
-        const inputBanner = document.getElementById('input-fc-banner');
-        inputDesc.value = customDesc;
-        inputBanner.value = activeBanner;
-
-        // Gestion de l'affichage du formulaire déroulant
-        const toggleBtn = document.getElementById('btn-toggle-form');
-        const formContainer = document.getElementById('admin-form-container');
-
-        toggleBtn.onclick = () => {
-            if (formContainer.style.display === 'none') {
-                formContainer.style.display = 'block';
-                toggleBtn.textContent = 'Fermer';
-            } else {
-                formContainer.style.display = 'none';
-                toggleBtn.textContent = 'Modifier le Fan Club';
-            }
-        };
-
-        // Bouton Enregistrer
-        document.getElementById('btn-save-admin').onclick = () => {
-            const newDesc = inputDesc.value.trim();
-            const newBanner = inputBanner.value.trim();
-
-            if (newDesc) {
-                localStorage.setItem(`fc_desc_${fcId}`, newDesc);
-                descElem.textContent = newDesc;
-            }
-            if (newBanner) {
-                localStorage.setItem(`fc_banner_${fcId}`, newBanner);
-                bannerImgElem.src = newBanner;
-            }
-
-            formContainer.style.display = 'none';
-            toggleBtn.textContent = 'Modifier le Fan Club';
-            alert("Modifications enregistrées avec succès !");
-        };
-
-        // Bouton Annuler
-        document.getElementById('btn-cancel-admin').onclick = () => {
-            inputDesc.value = descElem.textContent;
-            inputBanner.value = bannerImgElem.src;
-            formContainer.style.display = 'none';
-            toggleBtn.textContent = 'Modifier le Fan Club';
-        };
-
         // Afficher le bouton vert d'ajout d'onglet
         document.getElementById('btn-open-add-tab').style.display = 'inline-block';
 
-        // 2. Charger les onglets depuis la table SQL 'fan_club_tabs'
+        // 2. Charger les onglets depuis la table SQL 'fan_club_tabs' (avec sécurité anti-disparition)
         let tabs = await loadTabsFromSupabase(fcId, fc.title);
         renderTabs(tabs);
 
