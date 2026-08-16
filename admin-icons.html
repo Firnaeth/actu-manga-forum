@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Configuration des Icônes</title>
+</head>
+<body>
+    <h2>Configuration des Icônes Générales</h2>
+    <div id="form-icons">
+        <label>Nouveaux messages (URL):</label><br>
+        <input type="text" id="icon-unread" style="width: 80%;"><br><br>
+        
+        <label>Messages lus (URL):</label><br>
+        <input type="text" id="icon-read" style="width: 80%;"><br><br>
+        
+        <label>Sujet verrouillé (URL):</label><br>
+        <input type="text" id="icon-locked" style="width: 80%;"><br><br>
+        
+        <label>Annonce / Post-it (URL):</label><br>
+        <input type="text" id="icon-sticky" style="width: 80%;"><br><br>
+        
+        <button onclick="saveIcons()">Enregistrer les icônes</button>
+    </div>
+
+    <script>
+        // Charger les icônes existantes
+        const saved = JSON.parse(localStorage.getItem('forumIcons') || '{}');
+        document.getElementById('icon-unread').value = saved.unread || '';
+        document.getElementById('icon-read').value = saved.read || '';
+        document.getElementById('icon-locked').value = saved.locked || '';
+        document.getElementById('icon-sticky').value = saved.sticky || '';
+
+        function saveIcons() {
+            const config = {
+                unread: document.getElementById('icon-unread').value,
+                read: document.getElementById('icon-read').value,
+                locked: document.getElementById('icon-locked').value,
+                sticky: document.getElementById('icon-sticky').value
+            };
+            localStorage.setItem('forumIcons', JSON.stringify(config));
+            alert('Icônes enregistrées !');
+        }
+    </script>
+</body>
+</html>
