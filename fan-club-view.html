@@ -182,11 +182,11 @@
             
             let keyword = cleanTitle.split(/\s+/)[0] || fc.id.toString();
 
-            // 3. Récupérer les sujets liés à la catégorie 'fc' ou au mot-clé du fan club
+            // 3. Récupérer uniquement les sujets associés à ce Fan Club précis via son mot-clé
             const { data: topics, error: topicsError } = await supabase
                 .from('topics')
                 .select('*')
-                .or(`category.ilike.%${keyword}%,category.eq.fc`)
+                .ilike('category', `%${keyword}%`)
                 .order('created_at', { ascending: false });
 
             if (topicsError || !topics) {
