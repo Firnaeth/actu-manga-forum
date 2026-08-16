@@ -4,88 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page-title">Actu Manga World - The Ultimate Otaku Network</title>
-    <style>
-        /* --- STYLE GÉNÉRAL & FOND --- */
-        body {
-            background-color: #dce7f0;
-            background-image: url('https://images.alphacoders.com/832/83266.jpg');
-            background-attachment: fixed;
-            background-position: center top;
-            background-repeat: no-repeat;
-            background-size: cover;
-            font-family: Verdana, Tahoma, sans-serif;
-            font-size: 11px;
-            color: #333;
-            margin: 0;
-            padding: 25px 0;
-        }
-
-        #wrapper {
-            width: 900px;
-            margin: 0 auto;
-            background-color: rgba(255, 255, 255, 0.95);
-            border: 2px solid #f78fb3;
-            padding: 15px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-            border-radius: 6px;
-        }
-
-        /* --- REGLES D'ADMINISTRATION & UTILITAIRES --- */
-        .hidden {
-            display: none !important;
-        }
-
-        .admin-edit-bar {
-            background: #fff0f5;
-            border: 1px dotted #ffb6c1;
-            padding: 8px 12px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .admin-title-badge {
-            font-size: 11px;
-            color: #d9534f;
-            font-weight: bold;
-        }
-
-        .btn-admin-edit {
-            background: #f3a6b8;
-            color: white;
-            border: 1px solid #e2899d;
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 3px;
-            text-decoration: none;
-        }
-
-        .btn-admin-edit:hover {
-            background: #e2899d;
-        }
-
-        /* --- CLASSES POUR LE RESTE DU FORUM --- */
-        .header-banner {
-    width: 100%;
-    max-height: 180px; /* Ajuste cette valeur si tu la veux un peu plus grande ou plus petite */
-    object-fit: cover;
-    display: block;
-}
-        .forum-nav { background: #f8a5c2; padding: 10px; display: flex; gap: 15px; }
-        .nav-link { color: white; text-decoration: none; font-weight: bold; }
-        .news-container { margin: 20px 0; }
-        .welcome-banner { background: white; padding: 15px; border-bottom: 2px solid #f78fb3; }
-        .news-flex { display: flex; gap: 15px; margin-top: 15px; }
-        .staff-box, .news-scroll { background: #fdfdfd; padding: 10px; border: 1px solid #ddd; }
-        .forum-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .cat-title { background: #f78fb3; color: white; padding: 8px; text-align: left; }
-        .stat-head, .last-post-head { width: 80px; text-align: center; }
-        .stat-cell { text-align: center; }
-        .online-box { margin-top: 20px; background: #fff0f5; padding: 10px; border: 1px solid #f78fb3; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -94,7 +13,7 @@
         <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <a href="admin-global.html" class="btn-admin-edit">Modifier Titre & Bannière</a>
+            <a href="admin-global.html" class="btn-admin-edit" style="text-decoration: none; display: inline-block;">Aller à la page Admin Dédiée</a>
         </div>
 
         <!-- BANNIÈRE EN-TÊTE PRINCIPALE -->
@@ -108,7 +27,11 @@
             <a href="community.html" class="nav-link">Fiches & Critiques</a>
             <a href="contest-view.html" class="nav-link">Concours Dessin</a>
             <a href="#" class="nav-link">Rechercher</a>
+
+            <!-- LIEN PROFIL (Masqué si non connecté) -->
             <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
+
+            <!-- BOUTON D'INSCRIPTION OU DÉCONNEXION -->
             <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
             <a href="#" class="nav-link">FAQ</a>
         </nav>
@@ -124,10 +47,15 @@
             </div>
 
             <div class="news-flex">
+                <!-- Staff Box -->
                 <div class="staff-box">
                     <div class="mini-title">Staff & Membres</div>
-                    <div class="staff-avatars" id="staff-avatars-container"></div>
+                    <div class="staff-avatars" id="staff-avatars-container">
+                        <!-- Rempli dynamiquement par Supabase -->
+                    </div>
                 </div>
+
+                <!-- News Box Scrollable -->
                 <div class="news-scroll">
                     <div class="mini-title">Dernières Actualités & Événements</div>
                     <ul id="latest-news-list">
@@ -181,7 +109,7 @@
             </tbody>
         </table>
 
-        <!-- CATÉGORIE 2 -->
+        <!-- CATÉGORIE 2 : ESPACE COMMUNAUTÉ & CRÉATIONS -->
         <table class="forum-table">
             <thead>
                 <tr>
@@ -206,7 +134,7 @@
                     <td class="icon-cell"><span class="category-emoji">📊</span></td>
                     <td class="forum-desc">
                         <a href="mangatheques.html" class="forum-title">Mangathèques & Profils MyAnimeList</a>
-                        <p>Partagez vos profils MyAnimeList et vos collections en images !</p>
+                        <p>Partagez vos profils MyAnimeList, vos statistiques et vos plus belles collections en images !</p>
                     </td>
                     <td class="stat-cell" id="count-mangatheques">--</td>
                     <td class="stat-cell">--</td>
@@ -216,7 +144,7 @@
                     <td class="icon-cell"><span class="category-emoji">🎨</span></td>
                     <td class="forum-desc">
                         <a href="forum_graphisme.html" class="forum-title">Atelier Graphique & Signatures</a>
-                        <p>Partagez vos créations et bannières de profil !</p>
+                        <p>Partagez vos créations, demandez des userbars et montrez vos bannières de profil !</p>
                     </td>
                     <td class="stat-cell" id="count-graphisme">--</td>
                     <td class="stat-cell">--</td>
@@ -226,7 +154,7 @@
                     <td class="icon-cell"><span class="category-emoji">⭐</span></td>
                     <td class="forum-desc">
                         <a href="forum_fc.html" class="forum-title">Fan Clubs Officiels (Bleach, Inuyasha...)</a>
-                        <p>Rejoignez ou créez votre propre Fan Club.</p>
+                        <p>Rejoignez ou créez votre propre Fan Club et portez fièrement vos bannières.</p>
                     </td>
                     <td class="stat-cell" id="count-fc">--</td>
                     <td class="stat-cell">--</td>
@@ -259,7 +187,7 @@
             </tbody>
         </table>
 
-        <!-- ZONE DÉTENTE -->
+        <!-- ZONE DÉTENTE & DISCUSSIONS DIVERSES -->
         <table class="forum-table">
             <thead>
                 <tr>
@@ -295,7 +223,7 @@
 
     </div>
 
-    <!-- SCRIPT SUPABASE -->
+    <!-- SCRIPT GLOBAL SUPABASE POUR L'INDEX -->
     <script type="module">
         import { supabase } from './supabase.js';
 
@@ -318,6 +246,7 @@
             authLink.onclick = window.logout;
         }
 
+        // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
         const adminBar = document.getElementById('admin-bar-container');
         const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
 
@@ -325,6 +254,7 @@
             adminBar.classList.remove('hidden');
         }
 
+        // Chargement dynamique de l'en-tête depuis le localStorage (partagé avec la page admin dédiée)
         function loadHeaderConfig() {
             const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
                 title: "Bienvenue sur Actu Manga World", 
