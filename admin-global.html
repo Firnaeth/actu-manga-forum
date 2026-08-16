@@ -3,124 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administration Générale - Actu Manga World</title>
+    <title>Administration Globale - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
-        #wrapper { max-width: 900px; margin: 30px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        
-        /* Style exact du panneau d'administration */
-        .admin-panel-box { background: #fff0f3; border: 1px solid #f5c2c7; padding: 20px; border-radius: 6px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .admin-panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f5c2c7; padding-bottom: 12px; margin-bottom: 15px; }
-        .admin-panel-title { font-weight: bold; color: #842029; font-size: 1em; }
-        
-        .btn-toggle-admin { background: #f28b9c; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-size: 0.85em; font-weight: bold; cursor: pointer; }
-        .btn-toggle-admin:hover { background: #d63384; }
-
-        .admin-form-group { margin-bottom: 15px; }
-        .admin-form-group label { display: block; font-size: 0.9em; font-weight: bold; color: #555; margin-bottom: 5px; }
-        .admin-form-control { width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.95em; box-sizing: border-box; background: #fff; }
-        
-        .admin-buttons-bar { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-save-admin { background: #f28b9c; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9em; }
-        .btn-save-admin:hover { background: #d63384; }
-        .btn-cancel-admin { background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9em; }
-        .btn-cancel-admin:hover { background: #5c636a; }
-
-        .back-link { display: inline-block; margin-bottom: 15px; color: #d63384; text-decoration: none; font-weight: bold; font-size: 0.9em; }
-        .back-link:hover { text-decoration: underline; }
-    </style>
 </head>
 <body>
 
-<div id="wrapper">
-    <a href="index.html" class="back-link">&larr; Retour à l'accueil du forum</a>
+    <div id="wrapper" style="max-width: 900px; margin: 20px auto; padding: 20px;">
 
-    <!-- PANNEAU D'ADMINISTRATION GLOBAL -->
-    <div class="admin-panel-box">
-        <div class="admin-panel-header">
-            <span class="admin-panel-title">⚙️ Administration de l'en-tête du forum</span>
-            <button id="btn-toggle-form" class="btn-toggle-admin">Modifier Titre &amp; Bannière</button>
+        <a href="index.html" class="nav-link" style="display: inline-block; margin-bottom: 20px; text-decoration: none;">&larr; Retour à l'accueil</a>
+
+        <div class="admin-edit-bar" style="margin-bottom: 20px;">
+            <span class="admin-title-badge">⚙️ Panneau d'Administration Central</span>
         </div>
-        
-        <div id="admin-form-container" style="display: none;">
-            <div class="admin-form-group">
-                <label>Titre principal du forum :</label>
-                <input type="text" id="input-forum-title" class="admin-form-control">
+
+        <!-- ONGLETS : 1. ACCUEIL (GLOBAL) - 2. FAN CLUBS - 3. FORUMS -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="btn-admin-edit tab-btn active" onclick="switchTab('header')" id="btn-tab-header" style="background: #e0a899;">1. Accueil & En-tête</button>
+            <button class="btn-admin-edit tab-btn" onclick="switchTab('fanclubs')" id="btn-tab-fanclubs">2. Fan Clubs</button>
+            <button class="btn-admin-edit tab-btn" onclick="switchTab('forums')" id="btn-tab-forums">3. Gestion Forums</button>
+        </div>
+
+        <!-- 1. ACCUEIL ET EN-TÊTE -->
+        <div id="tab-header" class="admin-tab-content">
+            <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7;">
+                <h3>Configuration de l'Accueil</h3>
+                <form id="form-config-header">
+                    <label style="display:block; margin:10px 0 5px; font-weight:bold;">Titre du forum :</label>
+                    <input type="text" id="input-forum-title" class="admin-form-control" style="width:100%; padding:8px; margin-bottom:15px;" required>
+                    
+                    <label style="display:block; margin:0 0 5px; font-weight:bold;">Sous-titre / Description :</label>
+                    <input type="text" id="input-forum-subtitle" class="admin-form-control" style="width:100%; padding:8px; margin-bottom:15px;" required>
+                    
+                    <label style="display:block; margin:0 0 5px; font-weight:bold;">URL de la Bannière principale :</label>
+                    <input type="url" id="input-forum-banner" class="admin-form-control" style="width:100%; padding:8px; margin-bottom:15px;" required>
+                    
+                    <button type="submit" class="btn-admin-edit">Enregistrer les modifications Accueil</button>
+                </form>
             </div>
-            <div class="admin-form-group">
-                <label>Description / Sous-titre :</label>
-                <input type="text" id="input-forum-desc" class="admin-form-control">
+        </div>
+
+        <!-- 2. FAN CLUBS -->
+        <div id="tab-fanclubs" class="admin-tab-content" style="display: none;">
+            <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7; margin-bottom: 20px;">
+                <h3>Gestion des Bannières Fan Clubs</h3>
+                <form id="form-fanclub-banner">
+                    <input type="text" id="fc-name" class="admin-form-control" placeholder="Nom du Fan Club (ex: Fan Club Bleach)" style="width:100%; padding:8px; margin-bottom:10px;" required>
+                    <input type="url" id="fc-banner-url" class="admin-form-control" placeholder="URL de la bannière dédiée" style="width:100%; padding:8px; margin-bottom:15px;" required>
+                    <button type="submit" class="btn-admin-edit">Enregistrer la bannière</button>
+                </form>
             </div>
-            <div class="admin-form-group">
-                <label>Lien (URL) de l'image de bannière :</label>
-                <input type="text" id="input-forum-banner" class="admin-form-control">
+            <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7;">
+                <h3>Fan Clubs enregistrés</h3>
+                <div id="fc-list-display"></div>
             </div>
-            <div class="admin-buttons-bar">
-                <button id="btn-save-admin" class="btn-save-admin">Enregistrer</button>
-                <button id="btn-cancel-admin" class="btn-cancel-admin">Annuler</button>
+        </div>
+
+        <!-- 3. FORUMS (STRUCTURE) -->
+        <div id="tab-forums" class="admin-tab-content" style="display: none;">
+            <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7; margin-bottom: 20px;">
+                <h3>Ajouter une section Forum</h3>
+                <form id="form-add-forum">
+                    <input type="text" id="new-forum-title" class="admin-form-control" placeholder="Titre de la section" style="width:100%; padding:8px; margin-bottom:10px;" required>
+                    <input type="text" id="new-forum-desc" class="admin-form-control" placeholder="Description du forum" style="width:100%; padding:8px; margin-bottom:10px;" required>
+                    <input type="text" id="new-forum-icon" class="admin-form-control" placeholder="Emoji (ex: 🚀)" style="width:100%; padding:8px; margin-bottom:15px;" required>
+                    <button type="submit" class="btn-admin-edit">Créer la section</button>
+                </form>
+            </div>
+            <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7;">
+                <h3>Forums personnalisés existants</h3>
+                <div id="custom-forums-list"></div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    // Récupérer les valeurs actuelles depuis le localStorage (ou valeurs par défaut)
-    const defaultTitle = "Bienvenue sur Actu Manga World : The Ultimate Otaku Network";
-    const defaultDesc = "Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !";
-    const defaultBanner = "https://nsm09.casimages.com/img/2026/08/15//26081506144111099118782252.png";
+    <script>
+        // --- LOGIQUE DE NAVIGATION DES ONGLETS ---
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(el => el.style.background = '');
+            document.getElementById('tab-' + tabName).style.display = 'block';
+            document.getElementById('btn-tab-' + tabName).style.background = '#e0a899';
+        };
 
-    const currentTitle = localStorage.getItem('forum_main_title') || defaultTitle;
-    const currentDesc = localStorage.getItem('forum_main_desc') || defaultDesc;
-    const currentBanner = localStorage.getItem('forum_main_banner') || defaultBanner;
-
-    // Remplir les champs du formulaire
-    const inputTitle = document.getElementById('input-forum-title');
-    const inputDesc = document.getElementById('input-forum-desc');
-    const inputBanner = document.getElementById('input-forum-banner');
-
-    inputTitle.value = currentTitle;
-    inputDesc.value = currentDesc;
-    inputBanner.value = currentBanner;
-
-    // Gestion de l'affichage du formulaire déroulant
-    const toggleBtn = document.getElementById('btn-toggle-form');
-    const formContainer = document.getElementById('admin-form-container');
-
-    toggleBtn.onclick = () => {
-        if (formContainer.style.display === 'none') {
-            formContainer.style.display = 'block';
-            toggleBtn.textContent = 'Fermer';
-        } else {
-            formContainer.style.display = 'none';
-            toggleBtn.textContent = 'Modifier Titre & Bannière';
-        }
-    };
-
-    // Bouton Enregistrer
-    document.getElementById('btn-save-admin').onclick = () => {
-        const newTitle = inputTitle.value.trim();
-        const newDesc = inputDesc.value.trim();
-        const newBanner = inputBanner.value.trim();
-
-        if (newTitle) localStorage.setItem('forum_main_title', newTitle);
-        if (newDesc) localStorage.setItem('forum_main_desc', newDesc);
-        if (newBanner) localStorage.setItem('forum_main_banner', newBanner);
-
-        formContainer.style.display = 'none';
-        toggleBtn.textContent = 'Modifier Titre & Bannière';
-        alert("Modifications globales enregistrées avec succès !");
-    };
-
-    // Bouton Annuler
-    document.getElementById('btn-cancel-admin').onclick = () => {
-        inputTitle.value = localStorage.getItem('forum_main_title') || defaultTitle;
-        inputDesc.value = localStorage.getItem('forum_main_desc') || defaultDesc;
-        inputBanner.value = localStorage.getItem('forum_main_banner') || defaultBanner;
+        // --- 1. GESTION DE L'EN-TÊTE ET DE L'ACCUEIL ---
+        const defaultConfig = { 
+            title: "Bienvenue sur Actu Manga World : The Ultimate Otaku Network", 
+            subtitle: "Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !", 
+            banner: "https://images.alphacoders.com/605/605592.png" 
+        };
+        const currentConfig = JSON.parse(localStorage.getItem('forumHeaderConfig')) || defaultConfig;
         
-        formContainer.style.display = 'none';
-        toggleBtn.textContent = 'Modifier Titre & Bannière';
-    };
-</script>
+        document.getElementById('input-forum-title').value = currentConfig.title;
+        document.getElementById('input-forum-subtitle').value = currentConfig.subtitle;
+        document.getElementById('input-forum-banner').value = currentConfig.banner;
+
+        document.getElementById('form-config-header').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newConfig = {
+                title: document.getElementById('input-forum-title').value,
+                subtitle: document.getElementById('input-forum-subtitle').value,
+                banner: document.getElementById('input-forum-banner').value
+            };
+            localStorage.setItem('forumHeaderConfig', JSON.stringify(newConfig));
+            alert("En-tête et accueil mis à jour avec succès !");
+        });
+
+        // --- 2. GESTION DES FAN CLUBS ---
+        let fanClubsBanners = JSON.parse(localStorage.getItem('fanClubsBanners')) || [];
+
+        function renderFanClubs() {
+            const container = document.getElementById('fc-list-display');
+            if (fanClubsBanners.length === 0) {
+                container.innerHTML = "<p><em>Aucune bannière de Fan Club enregistrée.</em></p>";
+                return;
+            }
+            container.innerHTML = fanClubsBanners.map((fc, index) => `
+                <div style="border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${fc.name}</strong><br>
+                        <img src="${fc.banner}" alt="${fc.name}" style="height: 40px; margin-top: 5px; border-radius: 4px; display: block; object-fit: cover;">
+                    </div>
+                    <button onclick="deleteFanClub(${index})" style="background: #c0392b; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Supprimer</button>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('form-fanclub-banner').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newFC = {
+                name: document.getElementById('fc-name').value,
+                banner: document.getElementById('fc-banner-url').value
+            };
+            fanClubsBanners.push(newFC);
+            localStorage.setItem('fanClubsBanners', JSON.stringify(fanClubsBanners));
+            document.getElementById('form-fanclub-banner').reset();
+            renderFanClubs();
+            alert("Bannière de Fan Club enregistrée avec succès !");
+        });
+
+        window.deleteFanClub = function(index) {
+            if(confirm("Voulez-vous supprimer cette bannière de Fan Club ?")) {
+                fanClubsBanners.splice(index, 1);
+                localStorage.setItem('fanClubsBanners', JSON.stringify(fanClubsBanners));
+                renderFanClubs();
+            }
+        }
+        renderFanClubs();
+
+        // --- 3. GESTION DES FORUMS & SECTIONS ---
+        let customForums = JSON.parse(localStorage.getItem('customForumsList')) || [];
+
+        function renderCustomForums() {
+            const container = document.getElementById('custom-forums-list');
+            if (customForums.length === 0) {
+                container.innerHTML = "<p><em>Aucun forum personnalisé pour l'instant.</em></p>";
+                return;
+            }
+            container.innerHTML = customForums.map((f, index) => `
+                <div style="border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${f.icon} ${f.title}</strong><br>
+                        <small style="color: #666;">${f.desc}</small>
+                    </div>
+                    <button onclick="deleteCustomForum(${index})" style="background: #c0392b; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Supprimer</button>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('form-add-forum').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newForum = {
+                title: document.getElementById('new-forum-title').value,
+                desc: document.getElementById('new-forum-desc').value,
+                icon: document.getElementById('new-forum-icon').value
+            };
+            customForums.push(newForum);
+            localStorage.setItem('customForumsList', JSON.stringify(customForums));
+            document.getElementById('form-add-forum').reset();
+            renderCustomForums();
+            alert("Section de forum ajoutée avec succès !");
+        });
+
+        window.deleteCustomForum = function(index) {
+            if(confirm("Voulez-vous vraiment supprimer ce forum ?")) {
+                customForums.splice(index, 1);
+                localStorage.setItem('customForumsList', JSON.stringify(customForums));
+                renderCustomForums();
+            }
+        }
+        renderCustomForums();
+    </script>
 </body>
 </html>
