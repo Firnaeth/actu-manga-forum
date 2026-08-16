@@ -5,24 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fan Clubs Officiels - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Style exact du panneau d'administration de l'en-tête (style modèle) */
+        .admin-panel-box {
+            background: #ffffff;
+            border: 1px solid #f5c2c7;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .admin-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff0f3;
+            border: 1px dashed #f5c2c7;
+            padding: 12px 15px;
+            border-radius: 4px;
+        }
+        .admin-panel-title {
+            font-weight: bold;
+            color: #c94c68;
+            font-size: 0.9em;
+        }
+        .btn-toggle-admin {
+            background: #e8829d;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .btn-toggle-admin:hover {
+            background: #d66b88;
+        }
+        .admin-panel-inputs {
+            background: #fff0f3;
+            border: 1px solid #f5c2c7;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     <div id="wrapper">
 
         <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
-        <div id="admin-bar-container" class="admin-edit-bar hidden">
-            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <button class="btn-admin-edit" id="btn-toggle-admin">Modifier la Bannière</button>
+        <div id="admin-bar-container" class="admin-panel-box hidden">
+            <div class="admin-panel-header">
+                <span class="admin-panel-title">⚙️ Administration de l'en-tête</span>
+                <button class="btn-toggle-admin" id="btn-toggle-admin">Modifier la Bannière</button>
+            </div>
         </div>
 
         <div id="admin-panel-form" class="admin-panel-inputs hidden">
             <form id="form-config-header">
-                <label>Lien (URL) de l'image de bannière :</label>
-                <input type="url" id="input-forum-banner" required>
+                <label style="font-weight: bold; color: #c94c68; font-size: 0.9em;">Lien (URL) de l'image de bannière :</label>
+                <input type="url" id="input-forum-banner" style="width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 10px; border: 1px solid #f5c2c7; border-radius: 4px;" required>
 
-                <div class="admin-form-actions">
-                    <button type="submit" class="btn-admin-edit">Enregistrer</button>
-                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
+                <div class="admin-form-actions" style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn-toggle-admin">Enregistrer</button>
+                    <button type="button" class="btn-toggle-admin btn-cancel" id="btn-cancel-admin" style="background: #6c757d;">Annuler</button>
                 </div>
             </form>
         </div>
@@ -65,7 +114,7 @@
         </table>
 
         <div style="margin-top: 15px; margin-bottom: 20px;">
-            <a href="new-topic.html?cat=fc" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em;">+ Créer un Fan Club</a>
+            <a href="new-topic.html?cat=fc" class="btn-toggle-admin" style="text-decoration: none; padding: 8px 14px; background: #61b3e8;">+ Créer un Fan Club</a>
         </div>
     </div>
 
@@ -142,9 +191,7 @@
             container.innerHTML = topics.map(t => {
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
                 const topicRepliesCount = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
-
-                // TRANSITION : Le lien pointe maintenant vers le conteneur fan-club-view.html en passant l'ID (ou le titre converti en identifiant)
-                const fcSlug = t.id; // Ou tu peux utiliser un identifiant basé sur le nom
+                const fcSlug = t.id;
 
                 return `
                     <tr>
