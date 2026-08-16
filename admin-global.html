@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration Générale - Actu Manga World</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
+        #wrapper { max-width: 900px; margin: 30px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        
+        /* Style exact du panneau d'administration */
+        .admin-panel-box { background: #fff0f3; border: 1px solid #f5c2c7; padding: 20px; border-radius: 6px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .admin-panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f5c2c7; padding-bottom: 12px; margin-bottom: 15px; }
+        .admin-panel-title { font-weight: bold; color: #842029; font-size: 1em; }
+        
+        .btn-toggle-admin { background: #f28b9c; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-size: 0.85em; font-weight: bold; cursor: pointer; }
+        .btn-toggle-admin:hover { background: #d63384; }
+
+        .admin-form-group { margin-bottom: 15px; }
+        .admin-form-group label { display: block; font-size: 0.9em; font-weight: bold; color: #555; margin-bottom: 5px; }
+        .admin-form-control { width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.95em; box-sizing: border-box; background: #fff; }
+        
+        .admin-buttons-bar { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-save-admin { background: #f28b9c; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9em; }
+        .btn-save-admin:hover { background: #d63384; }
+        .btn-cancel-admin { background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9em; }
+        .btn-cancel-admin:hover { background: #5c636a; }
+
+        .back-link { display: inline-block; margin-bottom: 15px; color: #d63384; text-decoration: none; font-weight: bold; font-size: 0.9em; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div id="wrapper">
+    <a href="index.html" class="back-link">&larr; Retour à l'accueil du forum</a>
+
+    <!-- PANNEAU D'ADMINISTRATION GLOBAL -->
+    <div class="admin-panel-box">
+        <div class="admin-panel-header">
+            <span class="admin-panel-title">⚙️ Administration de l'en-tête du forum</span>
+            <button id="btn-toggle-form" class="btn-toggle-admin">Modifier Titre &amp; Bannière</button>
+        </div>
+        
+        <div id="admin-form-container" style="display: none;">
+            <div class="admin-form-group">
+                <label>Titre principal du forum :</label>
+                <input type="text" id="input-forum-title" class="admin-form-control">
+            </div>
+            <div class="admin-form-group">
+                <label>Description / Sous-titre :</label>
+                <input type="text" id="input-forum-desc" class="admin-form-control">
+            </div>
+            <div class="admin-form-group">
+                <label>Lien (URL) de l'image de bannière :</label>
+                <input type="text" id="input-forum-banner" class="admin-form-control">
+            </div>
+            <div class="admin-buttons-bar">
+                <button id="btn-save-admin" class="btn-save-admin">Enregistrer</button>
+                <button id="btn-cancel-admin" class="btn-cancel-admin">Annuler</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Récupérer les valeurs actuelles depuis le localStorage (ou valeurs par défaut)
+    const defaultTitle = "Bienvenue sur Actu Manga World : The Ultimate Otaku Network";
+    const defaultDesc = "Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !";
+    const defaultBanner = "https://nsm09.casimages.com/img/2026/08/15//26081506144111099118782252.png";
+
+    const currentTitle = localStorage.getItem('forum_main_title') || defaultTitle;
+    const currentDesc = localStorage.getItem('forum_main_desc') || defaultDesc;
+    const currentBanner = localStorage.getItem('forum_main_banner') || defaultBanner;
+
+    // Remplir les champs du formulaire
+    const inputTitle = document.getElementById('input-forum-title');
+    const inputDesc = document.getElementById('input-forum-desc');
+    const inputBanner = document.getElementById('input-forum-banner');
+
+    inputTitle.value = currentTitle;
+    inputDesc.value = currentDesc;
+    inputBanner.value = currentBanner;
+
+    // Gestion de l'affichage du formulaire déroulant
+    const toggleBtn = document.getElementById('btn-toggle-form');
+    const formContainer = document.getElementById('admin-form-container');
+
+    toggleBtn.onclick = () => {
+        if (formContainer.style.display === 'none') {
+            formContainer.style.display = 'block';
+            toggleBtn.textContent = 'Fermer';
+        } else {
+            formContainer.style.display = 'none';
+            toggleBtn.textContent = 'Modifier Titre & Bannière';
+        }
+    };
+
+    // Bouton Enregistrer
+    document.getElementById('btn-save-admin').onclick = () => {
+        const newTitle = inputTitle.value.trim();
+        const newDesc = inputDesc.value.trim();
+        const newBanner = inputBanner.value.trim();
+
+        if (newTitle) localStorage.setItem('forum_main_title', newTitle);
+        if (newDesc) localStorage.setItem('forum_main_desc', newDesc);
+        if (newBanner) localStorage.setItem('forum_main_banner', newBanner);
+
+        formContainer.style.display = 'none';
+        toggleBtn.textContent = 'Modifier Titre & Bannière';
+        alert("Modifications globales enregistrées avec succès !");
+    };
+
+    // Bouton Annuler
+    document.getElementById('btn-cancel-admin').onclick = () => {
+        inputTitle.value = localStorage.getItem('forum_main_title') || defaultTitle;
+        inputDesc.value = localStorage.getItem('forum_main_desc') || defaultDesc;
+        inputBanner.value = localStorage.getItem('forum_main_banner') || defaultBanner;
+        
+        formContainer.style.display = 'none';
+        toggleBtn.textContent = 'Modifier Titre & Bannière';
+    };
+</script>
+</body>
+</html>
