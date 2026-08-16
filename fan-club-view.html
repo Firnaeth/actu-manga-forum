@@ -6,7 +6,6 @@
     <title>Fan Club - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* --- CORRECTIF POUR LA BARRE D'ADMINISTRATION --- */
         .admin-edit-bar {
             background: #fff0f5;
             border: 1px dotted #ffb6c1;
@@ -51,7 +50,7 @@
         </div>
 
         <div class="main-header">
-            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
+            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière" class="header-banner" style="width: 100%; height: auto; display: block;">
         </div>
 
         <nav class="forum-nav">
@@ -116,7 +115,6 @@
             adminBar.classList.remove('hidden');
         }
 
-        // Charge exactement la même configuration de bannière que l'index (via forumHeaderConfig ou customBanner selon ce que tu utilises)
         function loadHeaderConfig() {
             try {
                 const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
@@ -145,6 +143,7 @@
                 return;
             }
 
+            // 1. Récupérer le Fan Club principal
             const { data: fc, error } = await supabase
                 .from('topics')
                 .select('*')
@@ -162,10 +161,12 @@
             document.getElementById('fc-desc').textContent = fc.content || "Rejoignez ou créez votre propre Fan Club et portez fièrement vos bannières.";
 
             const container = document.getElementById('fc-topics-container');
+
+            // 2. Récupérer les sujets dont la catégorie commence par 'fc_' (ex: fc_vandread_dita, fc_vandread_hibiki, etc.)
             const { data: topics, error: topicsError } = await supabase
                 .from('topics')
                 .select('*')
-                .eq('category', 'fc_topic')
+                .ilike('category', 'fc_%')
                 .order('created_at', { ascending: false });
 
             if (topicsError || !topics || topics.length === 0) {
@@ -173,7 +174,15 @@
                 return;
             }
 
-            container.innerHTML = topics.map(t => {
+            // Filtrer pour exclure la ligne principale du Fan Club elle-même (qui a pour catégorie 'fc')
+            const subTopics = topics.filter(t => t.category !== 'fc');
+
+            if (subTopics.length === 0) {
+                container.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px;">Aucun sujet pour le moment dans ce Fan Club.</td></tr>`;
+                return;
+            }
+
+            container.innerHTML = subTopics.map(t => {
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
                 return `
                     <tr>
