@@ -295,15 +295,15 @@
             authLink.onclick = window.logout;
         }
 
-        // --- CHARGEMENT DES ICÔNES DEPUIS LE LOCALSTORAGE ---
+        // --- CHARGEMENT DES ICÔNES DEPUIS LE LOCALSTORAGE (MIS À JOUR EN HD) ---
         function loadForumIcons() {
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
             
-            const defUnread = "https://nsm09.casimages.com/img/2026/08/18//mini_26081810350511099118782768.png";
-            const defRead = "https://nsm09.casimages.com/img/2026/08/18//mini_26081810350411099118782767.png";
-            const defLocked = "https://nsm09.casimages.com/img/2026/08/18//mini_26081810350411099118782765.png";
-            const defSticky = "https://nsm09.casimages.com/img/2026/08/18//mini_26081810350411099118782766.png";
-            const defPopular = "https://nsm09.casimages.com/img/2026/08/18//mini_26081810350511099118782769.png";
+            const defUnread = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
+            const defRead = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png";
+            const defLocked = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782771.png";
+            const defSticky = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782773.png";
+            const defPopular = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782772.png";
 
             const iconMapping = {
                 'icon-planning': iconsConfig.unread || defUnread,
