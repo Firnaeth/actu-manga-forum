@@ -39,17 +39,17 @@
             background: #e2899d;
         }
 
-        /* --- STYLE ADAPTÉ POUR TES NOUVELLES ICÔNES (Liseré de 3px) --- */
+        /* --- STYLE ADAPTÉ POUR NOUVELLES ICÔNES (Liseré de 3px) --- */
         .forum-icon-img {
-            width: 42px;  /* 48px total - 6px (3px de chaque côté) */
-            height: 42px;
-            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Remplit tout le cadre de manière homogène */
             display: block;
-            margin: 0 auto; /* Centre l'image proprement dans la cellule */
         }
 
         .icon-cell {
-            width: 60px;
+            width: 48px;
+            height: 48px;
             text-align: center;
             vertical-align: middle;
             padding: 3px; /* Réduit le padding de la cellule pour laisser plus de place à l'icône */
