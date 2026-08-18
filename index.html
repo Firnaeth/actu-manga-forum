@@ -341,8 +341,12 @@
             const defUnread = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
             const defRead = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png";
             
-            // Récupération des IDs de derniers sujets vus/lus enregistrés dans le localStorage
-            const readLastTopics = JSON.parse(localStorage.getItem('forumReadLastTopics')) || {};
+            // Récupération de l'icône spécifique d'annonce configurée dans l'admin globale (si existante)
+            const announcementIconUnread = iconsConfig.announcementUnread || iconsConfig.unread || defUnread;
+            const announcementIconRead = iconsConfig.announcementRead || iconsConfig.read || defRead;
+
+            // Récupération de tous les sujets individuels lus
+            const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
 
             const categories = ['planning', 'licences', 'conventions', 'manga', 'mangatheques', 'graphisme', 'fc', 'gaming', 'general'];
             
@@ -365,31 +369,39 @@
                         `;
                     }
 
-                    // Logique dynamique Non Lu / Lu avec conversion sécurisée en String
+                    // --- VÉRIFICATION DYNAMIQUE : Tous les sujets de la catégorie sont-ils lus ? ---
+                    const allCatRead = catTopics.every(t => readTopics[t.id] === true);
+
                     if (iconEl) {
-                        if (String(readLastTopics[cat]) === String(latest.id)) {
-                            iconEl.src = iconsConfig.read || defRead; // Lu
+                        // Si c'est l'une des 3 rubriques de la première catégorie (planning, licences, conventions), on utilise l'icône d'annonce
+                        if (cat === 'planning' || cat === 'licences' || cat === 'conventions') {
+                            iconEl.src = allCatRead ? announcementIconRead : announcementIconUnread;
                         } else {
-                            iconEl.src = iconsConfig.unread || defUnread; // Non lu
+                            iconEl.src = allCatRead ? (iconsConfig.read || defRead) : (iconsConfig.unread || defUnread);
                         }
                     }
                 } else {
                     if (lastCellEl) lastCellEl.textContent = "Aucun sujet";
-                    if (iconEl) iconEl.src = iconsConfig.read || defRead;
+                    if (iconEl) {
+                        if (cat === 'planning' || cat === 'licences' || cat === 'conventions') {
+                            iconEl.src = announcementIconRead;
+                        } else {
+                            iconEl.src = iconsConfig.read || defRead;
+                        }
+                    }
                 }
             });
 
-            // Écouteur sécurisé avec délai pour l'écriture dans le localStorage avant redirection
+            // Écouteur pour marquer le sujet cliqué comme lu et rediriger
             document.querySelectorAll('.cat-topic-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault(); 
                     const targetUrl = e.currentTarget.getAttribute('href');
-                    const cat = e.currentTarget.getAttribute('data-cat');
                     const topicId = e.currentTarget.getAttribute('data-topicid');
 
-                    let readLastTopics = JSON.parse(localStorage.getItem('forumReadLastTopics')) || {};
-                    readLastTopics[cat] = topicId;
-                    localStorage.setItem('forumReadLastTopics', JSON.stringify(readLastTopics));
+                    let readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
+                    readTopics[topicId] = true;
+                    localStorage.setItem('forumReadTopics', JSON.stringify(readTopics));
 
                     setTimeout(() => {
                         window.location.href = targetUrl;
