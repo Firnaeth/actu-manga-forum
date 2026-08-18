@@ -16,7 +16,7 @@
             <span class="admin-title-badge">⚙️ Panneau d'Administration Central</span>
         </div>
 
-        <!-- ONGLETS : 1. ACCUEIL (GLOBAL) - 2. FAN CLUBS - 3. FORUMS -->
+        <!-- ONGLETS -->
         <div style="display: flex; gap: 10px; margin-bottom: 20px;">
             <button class="btn-admin-edit tab-btn active" onclick="switchTab('header')" id="btn-tab-header" style="background: #e0a899;">1. Accueil & En-tête</button>
             <button class="btn-admin-edit tab-btn" onclick="switchTab('fanclubs')" id="btn-tab-fanclubs">2. Fan Clubs</button>
@@ -59,7 +59,7 @@
                 </form>
             </div>
 
-            <!-- MODIFIER UN FAN CLUB EXISTANT (Titre & Description) -->
+            <!-- MODIFIER UN FAN CLUB EXISTANT -->
             <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7; margin-bottom: 20px;">
                 <h3>Modifier un Fan Club (Titre & Description)</h3>
                 <form id="form-edit-fanclub-db">
@@ -105,7 +105,6 @@
             <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7; margin-bottom: 20px;">
                 <h3>📂 Gestion des Catégories du Forum</h3>
                 
-                <!-- Menu déroulant des catégories existantes -->
                 <div style="margin-bottom: 20px;">
                     <label for="existing-categories-select" style="display:block; margin:0 0 5px; font-weight:bold;">Catégories actuellement enregistrées :</label>
                     <select id="existing-categories-select" class="admin-form-control" style="width:100%; padding:8px;">
@@ -127,7 +126,6 @@
                 </form>
             </div>
 
-            <!-- Tableau récapitulatif des catégories -->
             <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7;">
                 <h3>Liste des Catégories (Supabase)</h3>
                 <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
@@ -149,7 +147,7 @@
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // --- LOGIQUE DE NAVIGATION DES ONGLETS ---
+        // --- NAVIGATION DES ONGLETS ---
         window.switchTab = function(tabName) {
             document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.tab-btn').forEach(el => el.style.background = '');
@@ -180,7 +178,7 @@
             alert("En-tête et accueil mis à jour avec succès !");
         });
 
-        // --- 2. GESTION DES FAN CLUBS (SUPABASE & BANNIÈRES) ---
+        // --- 2. GESTION DES FAN CLUBS ---
         let fanClubsBanners = JSON.parse(localStorage.getItem('fanClubsBanners')) || [];
         let allFanClubsFromDb = [];
 
@@ -217,17 +215,15 @@
             }
         }
 
-        // Créer un nouveau Fan Club dans Supabase
         document.getElementById('form-create-fanclub').addEventListener('submit', async (e) => {
             e.preventDefault();
             const title = document.getElementById('new-fc-title').value;
             const content = document.getElementById('new-fc-desc').value;
             const author = localStorage.getItem('forumUsername') || 'Admin_Otaku';
 
-            const { data, error } = await supabase
+            const { error } = await supabase
                 .from('topics')
-                .insert([{ title, content, category: 'Fan Club', author }])
-                .select();
+                .insert([{ title, content, category: 'Fan Club', author }]);
 
             if (error) {
                 alert("Erreur lors de la création du Fan Club : " + error.message);
@@ -238,7 +234,6 @@
             }
         });
 
-        // Pré-remplir les champs pour modification
         document.getElementById('fc-select-db').addEventListener('change', (e) => {
             const selectedId = e.target.value;
             const fc = allFanClubsFromDb.find(item => item.id == selectedId);
@@ -251,7 +246,6 @@
             }
         });
 
-        // Mettre à jour le Fan Club dans Supabase
         document.getElementById('form-edit-fanclub-db').addEventListener('submit', async (e) => {
             e.preventDefault();
             const selectedId = document.getElementById('fc-select-db').value;
@@ -293,6 +287,14 @@
             `).join('');
         }
 
+        window.deleteFanClub = function(index) {
+            if(confirm("Voulez-vous supprimer cette bannière personnalisée ?")) {
+                fanClubsBanners.splice(index, 1);
+                localStorage.setItem('fanClubsBanners', JSON.stringify(fanClubsBanners));
+                renderFanClubs();
+            }
+        };
+
         document.getElementById('form-fanclub-banner').addEventListener('submit', (e) => {
             e.preventDefault();
             const selectEl = document.getElementById('fc-select-existing');
@@ -325,14 +327,6 @@
             alert("Bannière de Fan Club enregistrée avec succès !");
         });
 
-        window.deleteFanClub = function(index) {
-            if(confirm("Voulez-vous supprimer cette bannière personnalisée ?")) {
-                fanClubsBanners.splice(index, 1);
-                localStorage.setItem('fanClubsBanners', JSON.stringify(fanClubsBanners));
-                renderFanClubs();
-            }
-        }
-
         loadFanClubsDropdowns();
         renderFanClubs();
 
@@ -359,11 +353,9 @@
                 return;
             }
 
-            // Remplir le menu déroulant (en utilisant cat.name et cat.description)
             selectCategories.innerHTML = `<option value="">-- Sélectionnez une catégorie (${categories.length}) --</option>` +
                 categories.map(cat => `<option value="${cat.id}">${cat.name} (${cat.description || ''})</option>`).join('');
 
-            // Remplir le tableau avec les colonnes exactes de la base (`name`, `description`)
             tbodyCategories.innerHTML = categories.map(cat => `
                 <tr>
                     <td style="padding: 10px; border: 1px solid #ddd;"><strong>${cat.name}</strong></td>
@@ -375,7 +367,17 @@
             `).join('');
         }
 
-        // Ajouter une catégorie dans Supabase (en insérant dans 'name' et 'description')
+        window.deleteCategory = async function(id) {
+            if (confirm("Voulez-vous vraiment supprimer cette catégorie de Supabase ?")) {
+                const { error } = await supabase.from('categories').delete().eq('id', id);
+                if (error) {
+                    alert("Erreur lors de la suppression : " + error.message);
+                } else {
+                    loadAdminCategories();
+                }
+            }
+        };
+
         document.getElementById('form-add-category').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('new-cat-name').value.trim();
@@ -399,19 +401,6 @@
             }
         });
 
-        // Supprimer une catégorie de Supabase
-        window.deleteCategory = async function(id) {
-            if (confirm("Voulez-vous vraiment supprimer cette catégorie de Supabase ?")) {
-                const { error } = await supabase.from('categories').delete().eq('id', id);
-                if (error) {
-                    alert("Erreur lors de la suppression : " + error.message);
-                } else {
-                    loadAdminCategories();
-                }
-            }
-        };
-
-        // Charger les catégories au démarrage de l'onglet
         loadAdminCategories();
     </script>
 </body>
