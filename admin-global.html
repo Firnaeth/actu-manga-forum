@@ -359,14 +359,14 @@
                 return;
             }
 
-            // Remplir le menu déroulant (en utilisant cat.title et cat.description)
+            // Remplir le menu déroulant (en utilisant cat.name et cat.description)
             selectCategories.innerHTML = `<option value="">-- Sélectionnez une catégorie (${categories.length}) --</option>` +
-                categories.map(cat => `<option value="${cat.id}">${cat.title} (${cat.description || ''})</option>`).join('');
+                categories.map(cat => `<option value="${cat.id}">${cat.name} (${cat.description || ''})</option>`).join('');
 
-            // Remplir le tableau avec les colonnes exactes de la base (`title`, `description`)
+            // Remplir le tableau avec les colonnes exactes de la base (`name`, `description`)
             tbodyCategories.innerHTML = categories.map(cat => `
                 <tr>
-                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>${cat.title}</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>${cat.name}</strong></td>
                     <td style="padding: 10px; border: 1px solid #ddd; color: #666;">${cat.description || '-'}</td>
                     <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
                         <button type="button" onclick="window.deleteCategory(${cat.id})" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Suppr.</button>
@@ -375,20 +375,20 @@
             `).join('');
         }
 
-        // Ajouter une catégorie dans Supabase (en insérant dans 'title' et 'description')
+        // Ajouter une catégorie dans Supabase (en insérant dans 'name' et 'description')
         document.getElementById('form-add-category').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const title = document.getElementById('new-cat-name').value.trim();
+            const name = document.getElementById('new-cat-name').value.trim();
             const description = document.getElementById('new-cat-slug').value.trim();
 
-            if (!title || !description) {
+            if (!name || !description) {
                 alert("Veuillez remplir tous les champs.");
                 return;
             }
 
             const { error } = await supabase
                 .from('categories')
-                .insert([{ title, description }]);
+                .insert([{ name, description }]);
 
             if (error) {
                 alert("Erreur lors de l'ajout : " + error.message);
