@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coin Arcade & Jeux Vidéo - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- STYLE POUR AVOIR UN LISERÉ DE 1PX AUTOUR DE L'ICÔNE --- */
+        .forum-icon-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border: 1px solid #ffffff;
+            box-sizing: content-box;
+        }
+
+        .icon-cell {
+            width: 48px;
+            text-align: center;
+            vertical-align: middle;
+            padding: 4px;
+        }
+    </style>
 </head>
 <body>
     <div id="wrapper">
@@ -144,15 +162,29 @@
             // Récupérer les réponses pour calculer le nombre de messages
             const { data: replies } = await supabase.from('replies').select('topic_id');
 
+            // Récupération des icônes du LocalStorage avec liens de secours stables
+            const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
+            const defUnread = "https://i.imgur.com/7g4X0Wu.png"; 
+            const defRead = "https://i.imgur.com/8359y6B.png";   
+
+            // Récupération des sujets lus enregistrés dans le localStorage (ex: ID des sujets consultés)
+            const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
+
             container.innerHTML = topics.map(t => {
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
                 const topicRepliesCount = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
 
+                // Détermination de l'icône Lu / Non Lu pour chaque sujet individuel
+                const isRead = readTopics[t.id] === true;
+                const iconSrc = isRead ? (iconsConfig.read || defRead) : (iconsConfig.unread || defUnread);
+
                 return `
                     <tr>
-                        <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">🕹️</span></td>
+                        <td class="icon-cell">
+                            <img src="${iconSrc}" alt="Icône" class="forum-icon-img" data-topicid="${t.id}">
+                        </td>
                         <td class="forum-desc">
-                            <a href="topic.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                            <a href="topic.html?id=${t.id}" class="forum-title topic-link" data-topicid="${t.id}" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
                         </td>
                         <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
@@ -161,6 +193,16 @@
                     </tr>
                 `;
             }).join('');
+
+            // Écouteur pour marquer le sujet comme lu lorsqu'on clique dessus
+            document.querySelectorAll('.topic-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const topicId = e.target.getAttribute('data-topicid');
+                    let readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
+                    readTopics[topicId] = true;
+                    localStorage.setItem('forumReadTopics', JSON.stringify(readTopics));
+                });
+            });
         }
 
         loadHeaderConfig();
