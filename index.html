@@ -39,20 +39,21 @@
             background: #e2899d;
         }
 
-        /* --- STYLE ADAPTÉ POUR NOUVELLES ICÔNES (Liseré de 3px) --- */
+/* --- STYLE POUR AVOIR UN LISERÉ DE 3PX AUTOUR DE L'ICÔNE --- */
         .forum-icon-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Remplit tout le cadre de manière homogène */
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
             display: block;
+            border: 3px solid #ffffff; /* C'est ce qui crée ton liseré blanc de 3px */
+            box-sizing: content-box;
         }
 
         .icon-cell {
             width: 48px;
-            height: 48px;
             text-align: center;
             vertical-align: middle;
-            padding: 3px; /* Réduit le padding de la cellule pour laisser plus de place à l'icône */
+            padding: 4px;
         }
     </style>
 </head>
