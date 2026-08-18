@@ -6,14 +6,46 @@
     <title>Coin Arcade & Jeux Vidéo - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* --- STYLE POUR AVOIR UN LISERÉ DE 1PX AUTOUR DE L'ICÔNE --- */
+        /* --- CORRECTIF POUR LA BARRE D'ADMINISTRATION --- */
+        .admin-edit-bar {
+            background: #fff0f5;
+            border: 1px dotted #ffb6c1;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-title-badge {
+            font-size: 11px;
+            color: #d9534f;
+            font-weight: bold;
+        }
+
+        .btn-admin-edit {
+            background: #f3a6b8;
+            color: white;
+            border: 1px solid #e2899d;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+            text-decoration: none;
+        }
+
+        .btn-admin-edit:hover {
+            background: #e2899d;
+        }
+
+        /* --- STYLE POUR LES ICÔNES DE SUJETS (IDENTIQUE À INDEX) --- */
         .forum-icon-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
             display: block;
-            border: 1px solid #ffffff;
-            box-sizing: content-box;
+            margin: 0 auto;
         }
 
         .icon-cell {
@@ -115,7 +147,7 @@
         if (isStaff && adminBar) {
             adminBar.classList.remove('hidden');
         }
-        
+
         document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
             document.getElementById('admin-panel-form').classList.toggle('hidden');
             const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
@@ -146,7 +178,7 @@
 
         async function loadGamingTopics() {
             const container = document.getElementById('gaming-topics-container');
-            
+
             // On récupère depuis la table globale 'topics' filtrée par la catégorie 'gaming'
             const { data: topics, error } = await supabase
                 .from('topics')
@@ -162,12 +194,12 @@
             // Récupérer les réponses pour calculer le nombre de messages
             const { data: replies } = await supabase.from('replies').select('topic_id');
 
-            // Récupération des icônes du LocalStorage avec liens de secours stables
+            // Récupération des icônes du LocalStorage (Mêmes liens casimages par défaut que index.html)
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
-            const defUnread = "https://i.imgur.com/7g4X0Wu.png"; 
-            const defRead = "https://i.imgur.com/8359y6B.png";   
+            const defUnread = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
+            const defRead = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png";
 
-            // Récupération des sujets lus enregistrés dans le localStorage (ex: ID des sujets consultés)
+            // Récupération des sujets lus enregistrés dans le localStorage
             const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
 
             container.innerHTML = topics.map(t => {
