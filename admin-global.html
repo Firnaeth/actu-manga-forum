@@ -134,7 +134,7 @@
                     <thead>
                         <tr style="background: #f8f8f8; text-align: left;">
                             <th style="padding: 10px; border: 1px solid #ddd;">Nom</th>
-                            <th style="padding: 10px; border: 1px solid #ddd;">Slug</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Description / Slug</th>
                             <th style="padding: 10px; border: 1px solid #ddd; text-align: center; width: 100px;">Action</th>
                         </tr>
                     </thead>
@@ -341,10 +341,11 @@
         const selectCategories = document.getElementById('existing-categories-select');
 
         async function loadAdminCategories() {
+            // Note: On adapte la requête pour utiliser 'title' (le nom de colonne dans ta table Supabase)
             const { data: categories, error } = await supabase
                 .from('categories')
                 .select('*')
-                .order('created_at', { ascending: true });
+                .order('id', { ascending: true });
 
             if (error) {
                 console.error("Erreur chargement catégories :", error);
@@ -359,15 +360,15 @@
                 return;
             }
 
-            // Remplir le menu déroulant
+            // Remplir le menu déroulant (en utilisant cat.title et cat.description)
             selectCategories.innerHTML = `<option value="">-- Sélectionnez une catégorie (${categories.length}) --</option>` +
-                categories.map(cat => `<option value="${cat.slug}">${cat.name} (${cat.slug})</option>`).join('');
+                categories.map(cat => `<option value="${cat.id}">${cat.title} (${cat.description || ''})</option>`).join('');
 
-            // Remplir le tableau
+            // Remplir le tableau avec les colonnes exactes de ta base (`title`, `description`)
             tbodyCategories.innerHTML = categories.map(cat => `
                 <tr>
-                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>${cat.name}</strong></td>
-                    <td style="padding: 10px; border: 1px solid #ddd; color: #666;">${cat.slug}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>${cat.title}</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd; color: #666;">${cat.description || '-'}</td>
                     <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
                         <button type="button" onclick="window.deleteCategory(${cat.id})" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Suppr.</button>
                     </td>
@@ -375,20 +376,20 @@
             `).join('');
         }
 
-        // Ajouter une catégorie dans Supabase
+        // Ajouter une catégorie dans Supabase (en insérant dans 'title' et 'description')
         document.getElementById('form-add-category').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = document.getElementById('new-cat-name').value.trim();
-            const slug = document.getElementById('new-cat-slug').value.trim().toLowerCase().replace(/\s+/g, '-');
+            const title = document.getElementById('new-cat-name').value.trim();
+            const description = document.getElementById('new-cat-slug').value.trim();
 
-            if (!name || !slug) {
+            if (!title || !description) {
                 alert("Veuillez remplir tous les champs.");
                 return;
             }
 
             const { error } = await supabase
                 .from('categories')
-                .insert([{ name, slug }]);
+                .insert([{ title, description }]);
 
             if (error) {
                 alert("Erreur lors de l'ajout : " + error.message);
