@@ -5,71 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planning des Sorties VF - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* --- CORRECTIF POUR LA BARRE D'ADMINISTRATION --- */
-        .admin-edit-bar {
-            background: #fff0f5;
-            border: 1px dotted #ffb6c1;
-            padding: 8px 12px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .admin-title-badge {
-            font-size: 11px;
-            color: #d9534f;
-            font-weight: bold;
-        }
-
-        .btn-admin-edit {
-            background: #f3a6b8;
-            color: white;
-            border: 1px solid #e2899d;
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 3px;
-            text-decoration: none;
-        }
-
-        .btn-admin-edit:hover {
-            background: #e2899d;
-        }
-
-/* --- STYLE POUR AVOIR UN LISERÉ DE 3PX AUTOUR DE L'ICÔNE --- */
-        .forum-icon-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            border: 1px solid #ffffff; /* C'est ce qui crée ton liseré blanc de 1px */
-            box-sizing: content-box;
-        }
-
-        .icon-cell {
-            width: 48px;
-            text-align: center;
-            vertical-align: middle;
-            padding: 4px;
-        }
-    </style>
 </head>
 <body>
     <div id="wrapper">
 
-        <!-- PANNEAU D'ÉDITION EN-TÊTE -->
+        <!-- PANNEAU D'ÉDITION EN-TÊTE (IDENTIQUE À L'INDEX) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
-            <span class="admin-title-badge"><img src="admin-icons/gear.png" class="admin-icon" alt=""> Administration de l'en-tête</span>
-            <button class="btn-admin-edit" id="btn-toggle-admin">Modifier la Bannière</button>
+            <span class="admin-title-badge">⚙️ Administration du Forum</span>
+            <button class="btn-admin-edit" id="btn-toggle-admin">Gestion Globale</button>
         </div>
 
         <div id="admin-panel-form" class="admin-panel-inputs hidden">
             <form id="form-config-header">
                 <label>Lien (URL) de l'image de bannière :</label>
                 <input type="url" id="input-forum-banner" required>
+
                 <div class="admin-form-actions">
                     <button type="submit" class="btn-admin-edit">Enregistrer</button>
                     <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
@@ -82,22 +32,24 @@
             <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Planning" class="header-banner">
         </div>
 
+        <!-- NAVIGATION (IDENTIQUE À L'INDEX) -->
         <nav class="forum-nav">
-            <a href="index.html" class="nav-link"><img src="admin-icons/home.png" class="admin-icon">Index</a>
-            <a href="community.html" class="nav-link"><img src="admin-icons/chat.png" class="admin-icon">Fiches & Critiques</a>
-            <a href="contest-view.html" class="nav-link"><img src="admin-icons/art.png" class="admin-icon">Concours Dessin</a>
-            <a href="#" class="nav-link"><img src="admin-icons/search.png" class="admin-icon">Rechercher</a>
-            <a href="profile.html" id="nav-profile-link" class="nav-link hidden"><img src="admin-icons/user.png" class="admin-icon">Mon Profil</a>
-            <a href="register.html" id="nav-auth-link" class="nav-link highlight"><img src="admin-icons/login.png" class="admin-icon">S'enregistrer</a>
-            <a href="#" class="nav-link"><img src="admin-icons/faq.png" class="admin-icon">FAQ</a>
+            <a href="index.html" class="nav-link">Index</a>
+            <a href="community.html" class="nav-link">Fiches & Critiques</a>
+            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
+            <a href="#" class="nav-link">Rechercher</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
+            <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
+            <a href="#" class="nav-link">FAQ</a>
         </nav>
 
         <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
             <a href="index.html">Accueil</a> &raquo; <span>Planning des Sorties VF</span>
         </div>
 
+        <!-- EN-TÊTE DE LA SECTION -->
         <div class="welcome-banner" style="text-align: center; padding: 15px;">
-            <h2><img src="admin-icons/calendar.png" class="admin-icon" style="width:30px; height:30px;"> Planning des Sorties VF</h2>
+            <h2>🗓️ Planning des Sorties VF</h2>
             <p style="margin-top: 5px;">Calendrier mois par mois des éditeurs.</p>
         </div>
 
@@ -115,8 +67,9 @@
             </tbody>
         </table>
 
+        <!-- BOUTON CRÉER UN SUJET -->
         <div style="margin-top: 15px; margin-bottom: 20px;">
-            <a href="new-topic.html?cat=planning" class="btn-admin-edit">+ Créer un Sujet</a>
+            <a href="new-topic.html?cat=planning" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">+ Créer un Sujet</a>
         </div>
     </div>
 
@@ -130,7 +83,7 @@
 
         if (currentUsername) {
             profileLink.classList.remove('hidden');
-            authLink.innerHTML = '<img src="admin-icons/logout.png" class="admin-icon"> Déconnexion';
+            authLink.textContent = "Déconnexion";
             authLink.setAttribute('href', '#');
             authLink.onclick = async (e) => { 
                 e.preventDefault();
@@ -140,18 +93,50 @@
             };
         }
 
+        // --- GESTION DES PRIVILÈGES STAFF ---
         const adminBar = document.getElementById('admin-bar-container');
         const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
 
-        if (isStaff && adminBar) adminBar.classList.remove('hidden');
+        if (isStaff && adminBar) {
+            adminBar.classList.remove('hidden');
+        }
         
         document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
             document.getElementById('admin-panel-form').classList.toggle('hidden');
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
+                banner: "https://images.alphacoders.com/605/605592.png" 
+            };
+            document.getElementById('input-forum-banner').value = config.banner || "https://images.alphacoders.com/605/605592.png";
         });
+
+        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.add('hidden');
+        });
+
+        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || {};
+            config.banner = document.getElementById('input-forum-banner').value;
+            localStorage.setItem('forumHeaderConfig', JSON.stringify(config));
+            alert("Bannière mise à jour avec succès !");
+            window.location.reload();
+        });
+
+        function loadHeaderConfig() {
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
+            if (config && config.banner) {
+                document.getElementById('forum-banner-img').src = config.banner;
+            }
+        }
 
         async function loadPlanningTopics() {
             const container = document.getElementById('planning-topics-container');
-            const { data: topics, error } = await supabase.from('topics').select('*').eq('category', 'planning').order('created_at', { ascending: false });
+            
+            const { data: topics, error } = await supabase
+                .from('topics')
+                .select('*')
+                .eq('category', 'planning')
+                .order('created_at', { ascending: false });
 
             if (error || !topics || topics.length === 0) {
                 container.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun planning pour le moment.</td></tr>`;
@@ -162,18 +147,20 @@
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
                 return `
                     <tr>
-                        <td class="icon-cell" style="width: 40px; text-align: center;"><img src="admin-icons/calendar.png" class="admin-icon"></td>
+                        <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">🗓️</span></td>
                         <td class="forum-desc">
                             <a href="topic.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                            <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
                         </td>
                         <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
                         <td class="stat-cell" style="text-align: center;">--</td>
-                        <td class="last-post-cell" style="text-align: center; font-size: 0.9em;">${dateFormatted}</td>
+                        <td class="last-post-cell" style="text-align: center; font-size: 0.9em;"><span>Par ${t.author || 'Otaku_33'}</span><br><small style="color: #7f8c8d;">${dateFormatted}</small></td>
                     </tr>
                 `;
             }).join('');
         }
 
+        loadHeaderConfig();
         loadPlanningTopics();
     </script>
 </body>
