@@ -100,20 +100,48 @@
             </div>
         </div>
 
-        <!-- 3. FORUMS (STRUCTURE) -->
+        <!-- 3. FORUMS (CATÉGORIES SUPABASE) -->
         <div id="tab-forums" class="admin-tab-content" style="display: none;">
             <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7; margin-bottom: 20px;">
-                <h3>Ajouter une section Forum</h3>
-                <form id="form-add-forum">
-                    <input type="text" id="new-forum-title" class="admin-form-control" placeholder="Titre de la section" style="width:100%; padding:8px; margin-bottom:10px;" required>
-                    <input type="text" id="new-forum-desc" class="admin-form-control" placeholder="Description du forum" style="width:100%; padding:8px; margin-bottom:10px;" required>
-                    <input type="text" id="new-forum-icon" class="admin-form-control" placeholder="Emoji (ex: 🚀)" style="width:100%; padding:8px; margin-bottom:15px;" required>
-                    <button type="submit" class="btn-admin-edit">Créer la section</button>
+                <h3>📂 Gestion des Catégories du Forum</h3>
+                
+                <!-- Menu déroulant des catégories existantes -->
+                <div style="margin-bottom: 20px;">
+                    <label for="existing-categories-select" style="display:block; margin:0 0 5px; font-weight:bold;">Catégories actuellement enregistrées :</label>
+                    <select id="existing-categories-select" class="admin-form-control" style="width:100%; padding:8px;">
+                        <option value="">-- Chargement des catégories... --</option>
+                    </select>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+                <h4 style="color: #27ae60; margin-bottom: 10px;">➕ Ajouter une nouvelle catégorie</h4>
+                <form id="form-add-category">
+                    <label style="display:block; margin:0 0 5px; font-weight:bold;">Nom de la catégorie :</label>
+                    <input type="text" id="new-cat-name" class="admin-form-control" placeholder="ex: Actualités & Sorties" style="width:100%; padding:8px; margin-bottom:10px;" required>
+
+                    <label style="display:block; margin:0 0 5px; font-weight:bold;">Identifiant unique (Slug) :</label>
+                    <input type="text" id="new-cat-slug" class="admin-form-control" placeholder="ex: actualites" style="width:100%; padding:8px; margin-bottom:15px;" required>
+
+                    <button type="submit" class="btn-admin-edit" style="background: #27ae60;">Ajouter la catégorie</button>
                 </form>
             </div>
+
+            <!-- Tableau récapitulatif des catégories -->
             <div class="admin-panel-inputs" style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #f5c2c7;">
-                <h3>Forums personnalisés existants</h3>
-                <div id="custom-forums-list"></div>
+                <h3>Liste des Catégories (Supabase)</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr style="background: #f8f8f8; text-align: left;">
+                            <th style="padding: 10px; border: 1px solid #ddd;">Nom</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Slug</th>
+                            <th style="padding: 10px; border: 1px solid #ddd; text-align: center; width: 100px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-categories-list">
+                        <tr><td colspan="3" style="text-align: center; padding: 10px;">Chargement...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -308,48 +336,83 @@
         loadFanClubsDropdowns();
         renderFanClubs();
 
-        // --- 3. GESTION DES FORUMS & SECTIONS ---
-        let customForums = JSON.parse(localStorage.getItem('customForumsList')) || [];
+        // --- 3. GESTION DES CATÉGORIES (SUPABASE) ---
+        const tbodyCategories = document.getElementById('admin-categories-list');
+        const selectCategories = document.getElementById('existing-categories-select');
 
-        function renderCustomForums() {
-            const container = document.getElementById('custom-forums-list');
-            if (customForums.length === 0) {
-                container.innerHTML = "<p><em>Aucun forum personnalisé pour l'instant.</em></p>";
+        async function loadAdminCategories() {
+            const { data: categories, error } = await supabase
+                .from('categories')
+                .select('*')
+                .order('created_at', { ascending: true });
+
+            if (error) {
+                console.error("Erreur chargement catégories :", error);
+                tbodyCategories.innerHTML = `<tr><td colspan="3" style="text-align: center; color: red; padding: 10px;">Erreur de chargement</td></tr>`;
+                selectCategories.innerHTML = `<option value="">Erreur de chargement</option>`;
                 return;
             }
-            container.innerHTML = customForums.map((f, index) => `
-                <div style="border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong>${f.icon} ${f.title}</strong><br>
-                        <small style="color: #666;">${f.desc}</small>
-                    </div>
-                    <button type="button" onclick="window.deleteCustomForum(${index})" style="background: #c0392b; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Supprimer</button>
-                </div>
+
+            if (!categories || categories.length === 0) {
+                selectCategories.innerHTML = `<option value="">-- Aucune catégorie enregistrée --</option>`;
+                tbodyCategories.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 10px;">Aucune catégorie trouvée.</td></tr>`;
+                return;
+            }
+
+            // Remplir le menu déroulant
+            selectCategories.innerHTML = `<option value="">-- Sélectionnez une catégorie (${categories.length}) --</option>` +
+                categories.map(cat => `<option value="${cat.slug}">${cat.name} (${cat.slug})</option>`).join('');
+
+            // Remplir le tableau
+            tbodyCategories.innerHTML = categories.map(cat => `
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>${cat.name}</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd; color: #666;">${cat.slug}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                        <button type="button" onclick="window.deleteCategory(${cat.id})" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Suppr.</button>
+                    </td>
+                </tr>
             `).join('');
         }
 
-        document.getElementById('form-add-forum').addEventListener('submit', (e) => {
+        // Ajouter une catégorie dans Supabase
+        document.getElementById('form-add-category').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const newForum = {
-                title: document.getElementById('new-forum-title').value,
-                desc: document.getElementById('new-forum-desc').value,
-                icon: document.getElementById('new-forum-icon').value
-            };
-            customForums.push(newForum);
-            localStorage.setItem('customForumsList', JSON.stringify(customForums));
-            document.getElementById('form-add-forum').reset();
-            renderCustomForums();
-            alert("Section de forum ajoutée avec succès !");
+            const name = document.getElementById('new-cat-name').value.trim();
+            const slug = document.getElementById('new-cat-slug').value.trim().toLowerCase().replace(/\s+/g, '-');
+
+            if (!name || !slug) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            const { error } = await supabase
+                .from('categories')
+                .insert([{ name, slug }]);
+
+            if (error) {
+                alert("Erreur lors de l'ajout : " + error.message);
+            } else {
+                alert("Catégorie ajoutée avec succès !");
+                document.getElementById('form-add-category').reset();
+                loadAdminCategories();
+            }
         });
 
-        window.deleteCustomForum = function(index) {
-            if(confirm("Voulez-vous vraiment supprimer ce forum ?")) {
-                customForums.splice(index, 1);
-                localStorage.setItem('customForumsList', JSON.stringify(customForums));
-                renderCustomForums();
+        // Supprimer une catégorie de Supabase
+        window.deleteCategory = async function(id) {
+            if (confirm("Voulez-vous vraiment supprimer cette catégorie de Supabase ?")) {
+                const { error } = await supabase.from('categories').delete().eq('id', id);
+                if (error) {
+                    alert("Erreur lors de la suppression : " + error.message);
+                } else {
+                    loadAdminCategories();
+                }
             }
-        }
-        renderCustomForums();
+        };
+
+        // Charger les catégories au démarrage de l'onglet
+        loadAdminCategories();
     </script>
 </body>
 </html>
