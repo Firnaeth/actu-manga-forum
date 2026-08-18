@@ -341,7 +341,6 @@
         const selectCategories = document.getElementById('existing-categories-select');
 
         async function loadAdminCategories() {
-            // Note: On adapte la requête pour utiliser 'title' (le nom de colonne dans ta table Supabase)
             const { data: categories, error } = await supabase
                 .from('categories')
                 .select('*')
@@ -364,7 +363,7 @@
             selectCategories.innerHTML = `<option value="">-- Sélectionnez une catégorie (${categories.length}) --</option>` +
                 categories.map(cat => `<option value="${cat.id}">${cat.title} (${cat.description || ''})</option>`).join('');
 
-            // Remplir le tableau avec les colonnes exactes de ta base (`title`, `description`)
+            // Remplir le tableau avec les colonnes exactes de la base (`title`, `description`)
             tbodyCategories.innerHTML = categories.map(cat => `
                 <tr>
                     <td style="padding: 10px; border: 1px solid #ddd;"><strong>${cat.title}</strong></td>
