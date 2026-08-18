@@ -297,36 +297,6 @@
             authLink.onclick = window.logout;
         }
 
-        // --- CHARGEMENT DES ICÔNES DEPUIS LE LOCALSTORAGE ---
-        function loadForumIcons() {
-            const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
-            
-            const defUnread = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
-            const defRead = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png";
-            const defLocked = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782771.png";
-            const defSticky = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782773.png";
-            const defPopular = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782772.png";
-
-            const iconMapping = {
-                'icon-planning': iconsConfig.unread || defUnread,
-                'icon-licences': iconsConfig.locked || defLocked,
-                'icon-conventions': iconsConfig.sticky || defSticky,
-                'icon-manga': iconsConfig.popular || defPopular,
-                'icon-mangatheques': iconsConfig.read || defRead,
-                'icon-graphisme': iconsConfig.unread || defUnread,
-                'icon-fc': iconsConfig.popular || defPopular,
-                'icon-gaming': iconsConfig.unread || defUnread,
-                'icon-general': iconsConfig.read || defRead
-            };
-
-            for (const [id, url] of Object.entries(iconMapping)) {
-                const imgEl = document.getElementById(id);
-                if (imgEl) {
-                    imgEl.src = url;
-                }
-            }
-        }
-
         // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
         const adminBar = document.getElementById('admin-bar-container');
         const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
@@ -366,12 +336,21 @@
                 newsListEl.innerHTML = "<li><em>Aucun sujet publié pour le moment.</em></li>";
             }
 
+            // Récupération des icônes du LocalStorage
+            const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
+            const defUnread = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
+            const defRead = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png";
+            
+            // Récupération des IDs de derniers sujets vus/lus enregistrés dans le localStorage
+            const readLastTopics = JSON.parse(localStorage.getItem('forumReadLastTopics')) || {};
+
             const categories = ['planning', 'licences', 'conventions', 'manga', 'mangatheques', 'graphisme', 'fc', 'gaming', 'general'];
             
             categories.forEach(cat => {
                 const catTopics = topics.filter(t => t.category === cat);
                 const countEl = document.getElementById(`count-${cat}`);
                 const lastCellEl = document.getElementById(`last-${cat}-cell`);
+                const iconEl = document.getElementById(`icon-${cat}`);
 
                 if (countEl) countEl.textContent = catTopics.length;
 
@@ -381,13 +360,34 @@
                         const dateFormatted = new Date(latest.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit'});
                         const author = latest.author || 'Otaku_33';
                         lastCellEl.innerHTML = `
-                            <a href="topic.html?id=${latest.id}">${latest.title}</a><br>
+                            <a href="topic.html?id=${latest.id}" class="cat-topic-link" data-cat="${cat}" data-topicid="${latest.id}">${latest.title}</a><br>
                             <span style="font-size: 0.85em; color: #7f8c8d;">Le ${dateFormatted} par <span style="color: #c0392b;">${author}</span></span>
                         `;
                     }
+
+                    // Logique dynamique Non Lu / Lu basée sur l'ID du dernier sujet de la catégorie
+                    if (iconEl) {
+                        if (readLastTopics[cat] === latest.id) {
+                            iconEl.src = iconsConfig.read || defRead; // Lu
+                        } else {
+                            iconEl.src = iconsConfig.unread || defUnread; // Non lu
+                        }
+                    }
                 } else {
-                    if (lastCellEl) lastCellEl.textContent = "Aucun sujet";
+                    if (lastCellEl) lastCell_text = lastCellEl.textContent = "Aucun sujet";
+                    if (iconEl) iconEl.src = iconsConfig.read || defRead;
                 }
+            });
+
+            // Écouteur pour marquer la catégorie comme "lue" lorsqu'on clique sur le dernier sujet
+            document.querySelectorAll('.cat-topic-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const cat = e.target.getAttribute('data-cat');
+                    const topicId = e.target.getAttribute('data-topicid');
+                    let readLastTopics = JSON.parse(localStorage.getItem('forumReadLastTopics')) || {};
+                    readLastTopics[cat] = topicId;
+                    localStorage.setItem('forumReadLastTopics', JSON.stringify(readLastTopics));
+                });
             });
         }
 
@@ -419,7 +419,6 @@
         }
 
         // --- EXECUTION DES FONCTIONS AU CHARGEMENT ---
-        loadForumIcons();
         loadHeaderConfig();
         loadForumData();
         loadOnlineUsers();
