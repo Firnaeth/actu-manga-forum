@@ -365,9 +365,9 @@
                         `;
                     }
 
-                    // Logique dynamique Non Lu / Lu basée sur l'ID du dernier sujet de la catégorie
+                    // Logique dynamique Non Lu / Lu avec conversion sécurisée en String
                     if (iconEl) {
-                        if (readLastTopics[cat] === latest.id) {
+                        if (String(readLastTopics[cat]) === String(latest.id)) {
                             iconEl.src = iconsConfig.read || defRead; // Lu
                         } else {
                             iconEl.src = iconsConfig.unread || defUnread; // Non lu
@@ -379,14 +379,21 @@
                 }
             });
 
-            // Écouteur pour marquer la catégorie comme "lue" lorsqu'on clique sur le dernier sujet
+            // Écouteur sécurisé avec délai pour l'écriture dans le localStorage avant redirection
             document.querySelectorAll('.cat-topic-link').forEach(link => {
                 link.addEventListener('click', (e) => {
-                    const cat = e.target.getAttribute('data-cat');
-                    const topicId = e.target.getAttribute('data-topicid');
+                    e.preventDefault(); 
+                    const targetUrl = e.currentTarget.getAttribute('href');
+                    const cat = e.currentTarget.getAttribute('data-cat');
+                    const topicId = e.currentTarget.getAttribute('data-topicid');
+
                     let readLastTopics = JSON.parse(localStorage.getItem('forumReadLastTopics')) || {};
                     readLastTopics[cat] = topicId;
                     localStorage.setItem('forumReadLastTopics', JSON.stringify(readLastTopics));
+
+                    setTimeout(() => {
+                        window.location.href = targetUrl;
+                    }, 50);
                 });
             });
         }
