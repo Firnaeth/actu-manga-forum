@@ -180,13 +180,7 @@
             }
         }
 
-        // --- CHARGEMENT DES ICÔNES DEPUIS LE LOCALSTORAGE (IDENTIQUE À L'INDEX) ---
-        function getPlanningIconUrl() {
-            const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
-            const defUnread = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
-            return iconsConfig.unread || defUnread;
-        }
-
+        // --- CHARGEMENT DYNAMIQUE DES ICÔNES (LU / NON LU PAR SUJET) ---
         async function loadPlanningTopics() {
             const container = document.getElementById('planning-topics-container');
             
@@ -201,15 +195,26 @@
                 return;
             }
 
-            const iconUrl = getPlanningIconUrl();
+            const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
+            const defUnread = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
+            const defRead = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png";
+
+            const unreadIcon = iconsConfig.unread || defUnread;
+            const readIcon = iconsConfig.read || defRead;
+
+            // Récupération des IDs de sujets lus enregistrés dans le localStorage
+            const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
 
             container.innerHTML = topics.map(t => {
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
+                const isRead = readTopics[t.id] === true;
+                const currentIcon = isRead ? readIcon : unreadIcon;
+
                 return `
                     <tr>
-                        <td class="icon-cell"><img src="${iconUrl}" alt="Icône" class="forum-icon-img"></td>
+                        <td class="icon-cell"><img src="${currentIcon}" alt="Icône" class="forum-icon-img"></td>
                         <td class="forum-desc">
-                            <a href="topic.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                            <a href="topic.html?id=${t.id}" class="forum-title planning-topic-link" data-topicid="${t.id}" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
                         </td>
                         <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
@@ -218,6 +223,16 @@
                     </tr>
                 `;
             }).join('');
+
+            // Écouteur pour marquer le sujet individuel comme "lu" au clic
+            document.querySelectorAll('.planning-topic-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const topicId = e.target.getAttribute('data-topicid');
+                    let readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
+                    readTopics[topicId] = true;
+                    localStorage.setItem('forumReadTopics', JSON.stringify(readTopics));
+                });
+            });
         }
 
         loadHeaderConfig();
