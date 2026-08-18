@@ -37,6 +37,13 @@
         .btn-admin-edit:hover {
             background: #e2899d;
         }
+
+        /* Style pour harmoniser les icônes du forum */
+        .forum-icon-img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body>
@@ -110,7 +117,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="icon-cell"><span class="category-emoji">🗓️</span></td>
+                    <td class="icon-cell"><img id="icon-planning" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="planning.html" id="link-latest-planning" class="forum-title">Planning des Sorties VF</a>
                         <p>Calendrier mois par mois des éditeurs géré depuis Supabase.</p>
@@ -120,7 +127,7 @@
                     <td class="last-post-cell" id="last-planning-cell">Aucun planning</td>
                 </tr>
                 <tr>
-                    <td class="icon-cell"><span class="category-emoji">🚧</span></td>
+                    <td class="icon-cell"><img id="icon-licences" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="annonces.html" id="link-latest-licences" class="forum-title">Annonces</a>
                         <p>🚧 MODULE EN CONSTRUCTION 🚧</p>
@@ -130,7 +137,7 @@
                     <td class="last-post-cell" id="last-licences-cell">Aucune annonce</td>
                 </tr>
                 <tr>
-                    <td class="icon-cell"><span class="category-emoji">🎟️</span></td>
+                    <td class="icon-cell"><img id="icon-conventions" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="news.html" class="forum-title">Planning des Conventions & Projets</a>
                         <p>Retrouvez le calendrier des conventions et plannings à venir.</p>
@@ -154,7 +161,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="icon-cell"><span class="category-emoji">📄</span></td>
+                    <td class="icon-cell"><img id="icon-manga" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="community.html" class="forum-title">Fiches & Critiques (Mangas & Animes)</a>
                         <p>Découvre et crée des fiches sur tes Mangas et Animes préférés !</p>
@@ -164,7 +171,7 @@
                     <td class="last-post-cell" id="last-manga-cell">Aucun sujet</td>
                 </tr>
                 <tr>
-                    <td class="icon-cell"><span class="category-emoji">📊</span></td>
+                    <td class="icon-cell"><img id="icon-mangatheques" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="mangatheques.html" class="forum-title">Mangathèques & Profils MyAnimeList</a>
                         <p>Partagez vos profils MyAnimeList, vos statistiques et vos plus belles collections en images !</p>
@@ -174,7 +181,7 @@
                     <td class="last-post-cell" id="last-mangatheques-cell">Aucun sujet</td>
                 </tr>
                 <tr>
-                    <td class="icon-cell"><span class="category-emoji">🎨</span></td>
+                    <td class="icon-cell"><img id="icon-graphisme" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="forum_graphisme.html" class="forum-title">Atelier Graphique & Signatures</a>
                         <p>Partagez vos créations, demandez des userbars et montrez vos bannières de profil !</p>
@@ -184,7 +191,7 @@
                     <td class="last-post-cell" id="last-graphisme-cell">Aucun sujet</td>
                 </tr>
                 <tr>
-                    <td class="icon-cell"><span class="category-emoji">⭐</span></td>
+                    <td class="icon-cell"><img id="icon-fc" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="forum_fc.html" class="forum-title">Fan Clubs Officiels (Bleach, Inuyasha...)</a>
                         <p>Rejoignez ou créez votre propre Fan Club et portez fièrement vos bannières.</p>
@@ -208,7 +215,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="icon-cell"><span class="category-emoji">🕹️</span></td>
+                    <td class="icon-cell"><img id="icon-gaming" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="gaming.html" id="link-latest-gaming" class="forum-title">Coin Arcade & Jeux Vidéo</a>
                         <p>Discussions et retours sur les jeux vidéo.</p>
@@ -232,7 +239,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="icon-cell"><span class="category-emoji">☕</span></td>
+                    <td class="icon-cell"><img id="icon-general" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="general.html" id="link-latest-general" class="forum-title">Le QG des Discussions</a>
                         <p>Pour parler de tout et de rien : ciné, musique, vie quotidienne...</p>
@@ -279,6 +286,22 @@
             authLink.onclick = window.logout;
         }
 
+        // --- CHARGEMENT DES ICÔNES DEPUIS LE LOCALSTORAGE ---
+        function loadForumIcons() {
+            const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
+            // Par défaut, si l'icône "unread" est configurée, on l'applique à toutes les catégories par défaut sur l'index
+            const defaultIcon = iconsConfig.unread || "https://nsm09.casimages.com/img/2026/08/18//mini_26081810350511099118782768.png";
+            
+            const iconIds = ['icon-planning', 'icon-licences', 'icon-conventions', 'icon-manga', 'icon-mangatheques', 'icon-graphisme', 'icon-fc', 'icon-gaming', 'icon-general'];
+            
+            iconIds.forEach(id => {
+                const imgEl = document.getElementById(id);
+                if (imgEl) {
+                    imgEl.src = defaultIcon;
+                }
+            });
+        }
+
         // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
         const adminBar = document.getElementById('admin-bar-container');
         const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
@@ -287,7 +310,7 @@
             adminBar.classList.remove('hidden');
         }
 
-        // Chargement dynamique de l'en-tête depuis le localStorage (partagé avec la page admin dédiée)
+        // Chargement dynamique de l'en-tête depuis le localStorage
         function loadHeaderConfig() {
             const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
                 title: "Bienvenue sur Actu Manga World", 
@@ -370,6 +393,7 @@
             }
         }
 
+        loadForumIcons();
         loadHeaderConfig();
         loadForumData();
         loadOnlineUsers();
