@@ -128,7 +128,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="icon-cell"><img id="icon-planning" src="" alt="Icône" class="forum-icon-img"></td>
+                    <td class="icon-cell"><img id="icon-planning" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782773.png" alt="Icône Annonce" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="planning.html" id="link-latest-planning" class="forum-title">Planning des Sorties VF</a>
                         <p>Calendrier mois par mois des éditeurs géré depuis Supabase.</p>
@@ -138,7 +138,7 @@
                     <td class="last-post-cell" id="last-planning-cell">Aucun planning</td>
                 </tr>
                 <tr>
-                    <td class="icon-cell"><img id="icon-licences" src="" alt="Icône" class="forum-icon-img"></td>
+                    <td class="icon-cell"><img id="icon-licences" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782771.png" alt="Icône Annonce" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="annonces.html" id="link-latest-licences" class="forum-title">Annonces</a>
                         <p>🚧 MODULE EN CONSTRUCTION 🚧</p>
@@ -148,7 +148,7 @@
                     <td class="last-post-cell" id="last-licences-cell">Aucune annonce</td>
                 </tr>
                 <tr>
-                    <td class="icon-cell"><img id="icon-conventions" src="" alt="Icône" class="forum-icon-img"></td>
+                    <td class="icon-cell"><img id="icon-conventions" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782773.png" alt="Icône Annonce" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="news.html" class="forum-title">Planning des Conventions & Projets</a>
                         <p>Retrouvez le calendrier des conventions et plannings à venir.</p>
@@ -336,14 +336,19 @@
                 newsListEl.innerHTML = "<li><em>Aucun sujet publié pour le moment.</em></li>";
             }
 
-            // Récupération des icônes du LocalStorage
+            // Récupération des icônes du LocalStorage pour les autres rubriques dynamiques
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
             const defUnread = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
             const defRead = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png";
             
-            // Récupération de l'icône spécifique d'annonce configurée dans l'admin globale (si existante)
-            const announcementIconUnread = iconsConfig.announcementUnread || iconsConfig.unread || defUnread;
-            const announcementIconRead = iconsConfig.announcementRead || iconsConfig.read || defRead;
+            // Liens statiques fixes pour les icônes d'annonces de la Catégorie 1
+            const staticAnnouncementIcon = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
+
+            // Forcer l'affichage statique immédiat pour les 3 premières icônes d'annonces
+            ['planning', 'licences', 'conventions'].forEach(cat => {
+                const iconEl = document.getElementById(`icon-${cat}`);
+                if (iconEl) iconEl.src = staticAnnouncementIcon;
+            });
 
             // Récupération de tous les sujets individuels lus
             const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
@@ -369,26 +374,14 @@
                         `;
                     }
 
-                    // --- VÉRIFICATION DYNAMIQUE : Tous les sujets de la catégorie sont-ils lus ? ---
+                    // Gestion dynamique uniquement pour les autres catégories (hors Catégorie 1 gérée en statique)
                     const allCatRead = catTopics.every(t => readTopics[t.id] === true);
 
-                    if (iconEl) {
-                        // Si c'est l'une des 3 rubriques de la première catégorie (planning, licences, conventions), on utilise l'icône d'annonce
-                        if (cat === 'planning' || cat === 'licences' || cat === 'conventions') {
-                            iconEl.src = allCatRead ? announcementIconRead : announcementIconUnread;
-                        } else {
-                            iconEl.src = allCatRead ? (iconsConfig.read || defRead) : (iconsConfig.unread || defUnread);
-                        }
+                    if (iconEl && cat !== 'planning' && cat !== 'licences' && cat !== 'conventions') {
+                        iconEl.src = allCatRead ? (iconsConfig.read || defRead) : (iconsConfig.unread || defUnread);
                     }
                 } else {
                     if (lastCellEl) lastCellEl.textContent = "Aucun sujet";
-                    if (iconEl) {
-                        if (cat === 'planning' || cat === 'licences' || cat === 'conventions') {
-                            iconEl.src = announcementIconRead;
-                        } else {
-                            iconEl.src = iconsConfig.read || defRead;
-                        }
-                    }
                 }
             });
 
