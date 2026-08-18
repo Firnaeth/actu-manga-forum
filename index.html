@@ -39,11 +39,19 @@
             background: #e2899d;
         }
 
-        /* Style pour harmoniser les icônes du forum */
+        /* --- STYLE ADAPTÉ POUR TES NOUVELLES ICÔNES CARRÉES --- */
         .forum-icon-img {
-            width: 32px;
-            height: 32px;
+            width: 48px;
+            height: 48px;
             object-fit: contain;
+            display: block;
+        }
+
+        .icon-cell {
+            width: 60px;
+            text-align: center;
+            vertical-align: middle;
+            padding: 5px;
         }
     </style>
 </head>
@@ -408,6 +416,7 @@
             }
         }
 
+        // --- EXECUTION DES FONCTIONS AU CHARGEMENT ---
         loadForumIcons();
         loadHeaderConfig();
         loadForumData();
