@@ -32,8 +32,9 @@
         // On remplit avec le localStorage s'il existe, sinon on garde la valeur par défaut
         document.getElementById('icon-unread').value = saved.unread || document.getElementById('icon-unread').value;
         document.getElementById('icon-read').value = saved.read || document.getElementById('icon-read').value;
-        document.getElementById('icon-locked').value = saved.locked || '';
-        document.getElementById('icon-sticky').value = saved.sticky || '';
+        document.getElementById('icon-locked').value = saved.locked || document.getElementById('icon-locked').value;
+        document.getElementById('icon-sticky').value = saved.sticky || document.getElementById('icon-sticky').value;
+        document.getElementById('icon-popular').value = saved.popular || document.getElementById('icon-popular').value;
 
         function saveIcons() {
             const config = {
