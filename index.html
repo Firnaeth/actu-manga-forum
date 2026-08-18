@@ -32,6 +32,7 @@
             font-weight: bold;
             cursor: pointer;
             border-radius: 3px;
+            text-decoration: none;
         }
 
         .btn-admin-edit:hover {
@@ -52,8 +53,8 @@
 
         <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
-            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <a href="admin-global.html" class="btn-admin-edit">Aller à la page Admin Dédiée</a>
+            <span class="admin-title-badge">⚙️ Administration du Forum</span>
+            <a href="admin-global.html" class="btn-admin-edit">Gestion Globale</a>
         </div>
 
         <!-- BANNIÈRE EN-TÊTE PRINCIPALE -->
@@ -289,17 +290,31 @@
         // --- CHARGEMENT DES ICÔNES DEPUIS LE LOCALSTORAGE ---
         function loadForumIcons() {
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
-            // Par défaut, si l'icône "unread" est configurée, on l'applique à toutes les catégories par défaut sur l'index
-            const defaultIcon = iconsConfig.unread || "https://nsm09.casimages.com/img/2026/08/18//mini_26081810350511099118782768.png";
             
-            const iconIds = ['icon-planning', 'icon-licences', 'icon-conventions', 'icon-manga', 'icon-mangatheques', 'icon-graphisme', 'icon-fc', 'icon-gaming', 'icon-general'];
-            
-            iconIds.forEach(id => {
+            const defUnread = "https://nsm09.casimages.com/img/2026/08/18//mini_26081810350511099118782768.png";
+            const defRead = "https://nsm09.casimages.com/img/2026/08/18//mini_26081810350411099118782767.png";
+            const defLocked = "https://nsm09.casimages.com/img/2026/08/18//mini_26081810350411099118782765.png";
+            const defSticky = "https://nsm09.casimages.com/img/2026/08/18//mini_26081810350411099118782766.png";
+            const defPopular = "https://nsm09.casimages.com/img/2026/08/18//mini_26081810350511099118782769.png";
+
+            const iconMapping = {
+                'icon-planning': iconsConfig.unread || defUnread,
+                'icon-licences': iconsConfig.locked || defLocked,
+                'icon-conventions': iconsConfig.sticky || defSticky,
+                'icon-manga': iconsConfig.popular || defPopular,
+                'icon-mangatheques': iconsConfig.read || defRead,
+                'icon-graphisme': iconsConfig.unread || defUnread,
+                'icon-fc': iconsConfig.popular || defPopular,
+                'icon-gaming': iconsConfig.unread || defUnread,
+                'icon-general': iconsConfig.read || defRead
+            };
+
+            for (const [id, url] of Object.entries(iconMapping)) {
                 const imgEl = document.getElementById(id);
                 if (imgEl) {
-                    imgEl.src = defaultIcon;
+                    imgEl.src = url;
                 }
-            });
+            }
         }
 
         // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
