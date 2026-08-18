@@ -8,10 +8,10 @@
     <h2>Configuration des Icônes Générales</h2>
     <div id="form-icons">
         <label>Nouveaux messages (URL):</label><br>
-        <input type="text" id="icon-unread" style="width: 80%;"><br><br>
+        <input type="text" id="icon-unread" style="width: 80%;><br><br>
         
         <label>Messages lus (URL):</label><br>
-        <input type="text" id="icon-read" style="width: 80%;"><br><br>
+        <input type="text" id="icon-read" style="width: 80%;" value="https://nsm09.casimages.com/img/2026/08/18//mini_26081810350411099118782767.png"><br><br>
         
         <label>Sujet verrouillé (URL):</label><br>
         <input type="text" id="icon-locked" style="width: 80%;"><br><br>
@@ -25,8 +25,10 @@
     <script>
         // Charger les icônes existantes
         const saved = JSON.parse(localStorage.getItem('forumIcons') || '{}');
+        
+        // On remplit avec le localStorage s'il existe, sinon on garde la valeur par défaut pour "read"
         document.getElementById('icon-unread').value = saved.unread || '';
-        document.getElementById('icon-read').value = saved.read || '';
+        document.getElementById('icon-read').value = saved.read || document.getElementById('icon-read').value;
         document.getElementById('icon-locked').value = saved.locked || '';
         document.getElementById('icon-sticky').value = saved.sticky || '';
 
