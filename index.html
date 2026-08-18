@@ -39,19 +39,20 @@
             background: #e2899d;
         }
 
-        /* --- STYLE ADAPTÉ POUR TES NOUVELLES ICÔNES CARRÉES --- */
+        /* --- STYLE ADAPTÉ POUR TES NOUVELLES ICÔNES (Liseré de 3px) --- */
         .forum-icon-img {
-            width: 48px;
-            height: 48px;
+            width: 42px;  /* 48px total - 6px (3px de chaque côté) */
+            height: 42px;
             object-fit: contain;
             display: block;
+            margin: 0 auto; /* Centre l'image proprement dans la cellule */
         }
 
         .icon-cell {
             width: 60px;
             text-align: center;
             vertical-align: middle;
-            padding: 5px;
+            padding: 3px; /* Réduit le padding de la cellule pour laisser plus de place à l'icône */
         }
     </style>
 </head>
