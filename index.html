@@ -23,6 +23,11 @@
             font-weight: bold;
         }
 
+        .admin-buttons-group {
+            display: flex;
+            gap: 6px;
+        }
+
         .btn-admin-edit {
             background: #f3a6b8;
             color: white;
@@ -33,6 +38,7 @@
             cursor: pointer;
             border-radius: 3px;
             text-decoration: none;
+            display: inline-block;
         }
 
         .btn-admin-edit:hover {
@@ -64,7 +70,10 @@
         <!-- PANNEAU D'ÉDITION EN-TÊTE -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration du Forum</span>
-            <a href="admin-global.html" class="btn-admin-edit">Gestion Globale</a>
+            <div class="admin-buttons-group">
+                <a href="admin-icons.html" class="btn-admin-edit">Gérer les Icônes</a>
+                <a href="admin-global.html" class="btn-admin-edit">Gestion Globale</a>
+            </div>
         </div>
 
         <div class="main-header">
@@ -318,11 +327,15 @@
                 newsListEl.innerHTML = "<li><em>Aucun sujet publié pour le moment.</em></li>";
             }
 
+            // --- RÉCUPÉRATION DES ICÔNES CONFIGURÉES DEPUIS admin-icons.html ---
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
             
-            // MISE À JOUR AVEC LES VRAIES URLS DE admin-icons.html
+            // Valeurs par défaut de secours si admin-icons.html n'a pas encore été configuré
             const defUnread = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png"; // Nouveaux messages
             const defRead = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783010.png";   // Messages lus
+            
+            const activeUnreadIcon = iconsConfig.unread || defUnread;
+            const activeReadIcon = iconsConfig.read || defRead;
             
             const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
 
@@ -351,10 +364,10 @@
                         `;
                     }
 
-                    // Logique dynamique de l'icône : appliquée à planning, gaming et general
+                    // Logique dynamique de l'icône : utilise les icônes dynamiques de admin-icons.html
                     if (categoriesDynamiques.includes(cat) && iconEl) {
                         const allCatRead = catTopics.every(t => readTopics[t.id] === true);
-                        iconEl.src = allCatRead ? (iconsConfig.read || defRead) : (iconsConfig.unread || defUnread);
+                        iconEl.src = allCatRead ? activeReadIcon : activeUnreadIcon;
                     }
                 } else {
                     if (lastCellEl) lastCellEl.textContent = "Aucun sujet";
