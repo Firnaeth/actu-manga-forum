@@ -198,8 +198,6 @@
 
             // Récupération des réponses pour le compteur
             const { data: replies } = await supabase.from('replies').select('topic_id');
-
-            const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
             
             // Récupération automatique des icônes depuis admin-icons.html
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
