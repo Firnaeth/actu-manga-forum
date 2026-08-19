@@ -8,19 +8,25 @@
     <h2>Configuration des Icônes Générales</h2>
     <div id="form-icons">
         <label>Nouveaux messages (URL):</label><br>
-        <input type="text" id="icon-unread" style="width: 80%;" value="https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png"><br><br>
+        <input type="text" id="icon-unread" style="width: 80%;" value="https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png"><br><br>
         
         <label>Messages lus (URL):</label><br>
-        <input type="text" id="icon-read" style="width: 80%;" value="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png"><br><br>
+        <input type="text" id="icon-read" style="width: 80%;" value="https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783010.png"><br><br>
         
         <label>Sujet verrouillé (URL):</label><br>
-        <input type="text" id="icon-locked" style="width: 80%;" value="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782771.png"><br><br>
+        <input type="text" id="icon-locked" style="width: 80%;" value="https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783011.png"><br><br>
         
         <label>Annonce / Post-it (URL):</label><br>
-        <input type="text" id="icon-sticky" style="width: 80%;" value="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782773.png"><br><br>
+        <input type="text" id="icon-sticky" style="width: 80%;" value="https://nsm09.casimages.com/img/2026/08/19//26081902204011099118783013.png"><br><br>
 
         <label>Populaire (URL):</label><br>
-        <input type="text" id="icon-popular" style="width: 80%;" value="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782772.png"><br><br>
+        <input type="text" id="icon-popular" style="width: 80%;" value="https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783012.png"><br><br>
+
+        <label>Atelier / Signature (URL):</label><br>
+        <input type="text" id="icon-graph" style="width: 80%;" value="https://nsm09.casimages.com/img/2026/08/19//26081902204111099118783014.png"><br><br>
+
+        <label>Fan Club (URL):</label><br>
+        <input type="text" id="icon-club" style="width: 80%;" value="https://nsm09.casimages.com/img/2026/08/19//26081902204111099118783015.png"><br><br>
         
         <button onclick="saveIcons()">Enregistrer les icônes</button>
     </div>
@@ -35,6 +41,8 @@
         document.getElementById('icon-locked').value = saved.locked || document.getElementById('icon-locked').value;
         document.getElementById('icon-sticky').value = saved.sticky || document.getElementById('icon-sticky').value;
         document.getElementById('icon-popular').value = saved.popular || document.getElementById('icon-popular').value;
+        document.getElementById('icon-graph').value = saved.graph || document.getElementById('icon-graph').value;
+        document.getElementById('icon-club').value = saved.club || document.getElementById('icon-club').value;
 
         function saveIcons() {
             const config = {
@@ -42,11 +50,15 @@
                 read: document.getElementById('icon-read').value,
                 locked: document.getElementById('icon-locked').value,
                 sticky: document.getElementById('icon-sticky').value,
-                popular: document.getElementById('icon-popular').value
+                popular: document.getElementById('icon-popular').value,
+                graph: document.getElementById('icon-graph').value,
+                club: document.getElementById('icon-club').value
             };
             localStorage.setItem('forumIcons', JSON.stringify(config));
             alert('Icônes enregistrées !');
-        }
+            // Optionnel : recharger la page ou rediriger vers l'index
+            // window.location.href = 'index.html'; 
+        }    
     </script>
 </body>
 </html>
