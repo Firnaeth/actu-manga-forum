@@ -23,11 +23,6 @@
             font-weight: bold;
         }
 
-        .admin-buttons-group {
-            display: flex;
-            gap: 6px;
-        }
-
         .btn-admin-edit {
             background: #f3a6b8;
             color: white;
@@ -38,7 +33,6 @@
             cursor: pointer;
             border-radius: 3px;
             text-decoration: none;
-            display: inline-block;
         }
 
         .btn-admin-edit:hover {
@@ -56,7 +50,7 @@
         }
 
         .icon-cell {
-            width: 51px;
+            width: 48px;
             text-align: center;
             vertical-align: middle;
             padding: 4px;
@@ -67,12 +61,10 @@
 
     <div id="wrapper">
 
-        <!-- PANNEAU D'ÉDITION EN-TÊTE -->
+        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
-            <span class="admin-title-badge">⚙️ Administration du Forum</span>
-            <div class="admin-buttons-group">
-                <a href="admin-global.html" class="btn-admin-edit">Gestion Globale</a>
-            </div>
+            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
+            <a href="admin-global.html" class="btn-admin-edit">>Modifier la Bannière</a>
         </div>
 
         <div class="main-header">
