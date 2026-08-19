@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -209,10 +208,10 @@
             // Récupérer les réponses pour calculer le nombre de messages
             const { data: replies } = await supabase.from('replies').select('topic_id');
 
-            // Récupération des icônes du LocalStorage (Mêmes liens casimages par défaut)
+            // Récupération des icônes du LocalStorage avec les nouvelles URL par défaut
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
-            const defUnread = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
-            const defRead = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png";
+            const defUnread = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png"; // Nouveaux messages
+            const defRead = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783010.png";   // Messages lus
 
             // Récupération des sujets lus enregistrés dans le localStorage
             const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
