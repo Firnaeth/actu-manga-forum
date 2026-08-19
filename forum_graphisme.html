@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atelier Graphique & Signatures - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- STYLE POUR LES ICÔNES DU TABLEAU --- */
+        .forum-icon-img {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            display: block;
+            border: 1px solid #ffffff;
+            box-sizing: content-box;
+        }
+
+        .icon-cell {
+            width: 48px;
+            text-align: center;
+            vertical-align: middle;
+            padding: 4px;
+        }
+    </style>
 </head>
 <body>
     <div id="wrapper">
@@ -125,7 +143,7 @@
             }
         }
 
-        // Chargement des sujets de l'atelier graphique avec comptage dynamique des réponses
+        // Chargement des sujets de l'atelier graphique avec les icônes dynamiques
         async function loadGraphismeTopics() {
             const container = document.getElementById('graphisme-topics-container');
             
@@ -142,15 +160,28 @@
 
             const { data: replies } = await supabase.from('replies').select('topic_id');
 
+            // Récupération des icônes admin ou définition des valeurs par défaut
+            const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
+            const defUnread = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
+            const defRead = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png";
+
+            const unreadIcon = iconsConfig.unread || defUnread;
+            const readIcon = iconsConfig.read || defRead;
+
+            const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
+
             container.innerHTML = topics.map(t => {
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
                 const topicRepliesCount = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
+                
+                const isRead = readTopics[t.id] === true;
+                const currentIcon = isRead ? readIcon : unreadIcon;
 
                 return `
                     <tr>
-                        <td class="icon-cell" style="width: 40px; text-align: center;"><span class="category-emoji">🎨</span></td>
+                        <td class="icon-cell"><img src="${currentIcon}" alt="Icône" class="forum-icon-img"></td>
                         <td class="forum-desc">
-                            <a href="topic.html?id=${t.id}" class="forum-title" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                            <a href="topic.html?id=${t.id}" class="forum-title graphisme-topic-link" data-topicid="${t.id}" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
                         </td>
                         <td class="stat-cell" style="text-align: center;">${t.author || 'Otaku_33'}</td>
@@ -159,6 +190,16 @@
                     </tr>
                 `;
             }).join('');
+
+            // Marquer le sujet comme lu au clic
+            document.querySelectorAll('.graphisme-topic-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const topicId = e.target.getAttribute('data-topicid');
+                    let readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
+                    readTopics[topicId] = true;
+                    localStorage.setItem('forumReadTopics', JSON.stringify(readTopics));
+                });
+            });
         }
 
         loadHeaderConfig();
