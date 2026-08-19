@@ -201,9 +201,10 @@
 
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
             
-            // Tes icônes spécifiques pour le planning
-            const defUnread = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
-            const defRead = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png";
+            // Récupération automatique des icônes depuis admin-icons.html
+            const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
+            const defUnread = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png";
+            const defRead = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783010.png";
 
             const unreadIcon = iconsConfig.unread || defUnread;
             const readIcon = iconsConfig.read || defRead;
