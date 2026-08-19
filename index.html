@@ -41,8 +41,8 @@
 
         /* --- STYLE POUR AVOIR UN LISERÉ DE 1PX AUTOUR DE L'ICÔNE --- */
         .forum-icon-img {
-            width: 100%;
-            height: 100%;
+            width: 48px;
+            height: 48px;
             object-fit: cover;
             display: block;
             border: 1px solid #ffffff;
@@ -61,62 +61,45 @@
 
     <div id="wrapper">
 
-        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
+        <!-- PANNEAU D'ÉDITION EN-TÊTE -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration du Forum</span>
             <a href="admin-global.html" class="btn-admin-edit">Gestion Globale</a>
         </div>
 
-        <!-- BANNIÈRE EN-TÊTE PRINCIPALE -->
         <div class="main-header">
             <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
         </div>
 
-        <!-- BARRE DE NAVIGATION VINTAGE -->
         <nav class="forum-nav">
             <a href="index.html" class="nav-link">Index</a>
             <a href="community.html" class="nav-link">Fiches & Critiques</a>
             <a href="contest-view.html" class="nav-link">Concours Dessin</a>
             <a href="#" class="nav-link">Rechercher</a>
-
-            <!-- LIEN PROFIL (Masqué si non connecté) -->
             <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
-
-            <!-- BOUTON D'INSCRIPTION OU DÉCONNEXION -->
             <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
             <a href="#" class="nav-link">FAQ</a>
         </nav>
 
-        <!-- ANNONCE & ACTUALITÉS -->
         <div class="news-container">
             <div class="welcome-banner">
                 <h2 id="forum-title-display">Bienvenue sur Actu Manga World : The Ultimate Otaku Network</h2>
                 <p id="forum-subtitle-display">Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !</p>
-                <p style="font-style: italic; color: #555; margin-top: 10px;">
-                    <small>Ici, nous sommes comme en 2010. Retrouvez l'esprit des forums d'antan !</small>
-                </p>
             </div>
 
             <div class="news-flex">
-                <!-- Staff Box -->
                 <div class="staff-box">
                     <div class="mini-title">Staff & Membres</div>
-                    <div class="staff-avatars" id="staff-avatars-container">
-                        <!-- Rempli dynamiquement par Supabase -->
-                    </div>
+                    <div class="staff-avatars" id="staff-avatars-container"></div>
                 </div>
-
-                <!-- News Box Scrollable -->
                 <div class="news-scroll">
                     <div class="mini-title">Dernières Actualités & Événements</div>
-                    <ul id="latest-news-list">
-                        <li><em>Chargement des actualités...</em></li>
-                    </ul>
+                    <ul id="latest-news-list"><li><em>Chargement...</em></li></ul>
                 </div>
             </div>
         </div>
 
-        <!-- CATÉGORIE 1 : Icônes d'annonces en dur -->
+        <!-- TABLEAUX FORUM -->
         <table class="forum-table">
             <thead>
                 <tr>
@@ -128,19 +111,19 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="icon-cell"><img id="icon-planning" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782773.png" alt="Icône" class="forum-icon-img"></td>
+                    <td class="icon-cell"><img id="icon-planning" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
-                        <a href="planning.html" id="link-latest-planning" class="forum-title">Planning des Sorties VF</a>
-                        <p>Calendrier mois par mois des éditeurs géré depuis Supabase.</p>
+                        <a href="planning.html" class="forum-title">Planning des Sorties VF</a>
+                        <p>Calendrier mois par mois des éditeurs.</p>
                     </td>
                     <td class="stat-cell" id="count-planning">--</td>
                     <td class="stat-cell">--</td>
                     <td class="last-post-cell" id="last-planning-cell">Aucun planning</td>
                 </tr>
                 <tr>
-                    <td class="icon-cell"><img id="icon-licences" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782771.png" alt="Icône" class="forum-icon-img"></td>
+                    <td class="icon-cell"><img id="icon-licences" src="https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783011.png" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
-                        <a href="annonces.html" id="link-latest-licences" class="forum-title">Annonces</a>
+                        <a href="annonces.html" class="forum-title">Annonces</a>
                         <p>🚧 MODULE EN CONSTRUCTION 🚧</p>
                     </td>
                     <td class="stat-cell" id="count-licences">--</td>
@@ -148,10 +131,10 @@
                     <td class="last-post-cell" id="last-licences-cell">Aucune annonce</td>
                 </tr>
                 <tr>
-                    <td class="icon-cell"><img id="icon-conventions" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782773.png" alt="Icône" class="forum-icon-img"></td>
+                    <td class="icon-cell"><img id="icon-conventions" src="https://nsm09.casimages.com/img/2026/08/19//26081902204011099118783013.png" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="news.html" class="forum-title">Planning des Conventions & Projets</a>
-                        <p>Retrouvez le calendrier des conventions et plannings à venir.</p>
+                        <p>Calendrier des conventions.</p>
                     </td>
                     <td class="stat-cell" id="count-conventions">--</td>
                     <td class="stat-cell">--</td>
@@ -160,7 +143,6 @@
             </tbody>
         </table>
 
-        <!-- CATÉGORIE 2 : ESPACE COMMUNAUTÉ & CRÉATIONS -->
         <table class="forum-table">
             <thead>
                 <tr>
@@ -172,40 +154,40 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="icon-cell"><img id="icon-manga" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png" alt="Icône" class="forum-icon-img"></td>
+                    <td class="icon-cell"><img id="icon-manga" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="community.html" class="forum-title">Fiches & Critiques (Mangas & Animes)</a>
-                        <p>Découvre et crée des fiches sur tes Mangas et Animes préférés !</p>
+                        <p>Découvre et crée des fiches !</p>
                     </td>
                     <td class="stat-cell" id="count-manga">--</td>
                     <td class="stat-cell">--</td>
                     <td class="last-post-cell" id="last-manga-cell">Aucun sujet</td>
                 </tr>
                 <tr>
-                    <td class="icon-cell"><img id="icon-mangatheques" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png" alt="Icône" class="forum-icon-img"></td>
+                    <td class="icon-cell"><img id="icon-mangatheques" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="mangatheques.html" class="forum-title">Mangathèques & Profils MyAnimeList</a>
-                        <p>Partagez vos profils MyAnimeList, vos statistiques et vos plus belles collections en images !</p>
+                        <p>Partagez vos collections !</p>
                     </td>
                     <td class="stat-cell" id="count-mangatheques">--</td>
                     <td class="stat-cell">--</td>
                     <td class="last-post-cell" id="last-mangatheques-cell">Aucun sujet</td>
                 </tr>
                 <tr>
-                    <td class="icon-cell"><img id="icon-graphisme" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png" alt="Icône" class="forum-icon-img"></td>
+                    <td class="icon-cell"><img id="icon-graphisme" src="https://nsm09.casimages.com/img/2026/08/19//26081902204111099118783014.png" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="forum_graphisme.html" class="forum-title">Atelier Graphique & Signatures</a>
-                        <p>Partagez vos créations, demandez des userbars et montrez vos bannières de profil !</p>
+                        <p>Partagez vos créations.</p>
                     </td>
                     <td class="stat-cell" id="count-graphisme">--</td>
                     <td class="stat-cell">--</td>
                     <td class="last-post-cell" id="last-graphisme-cell">Aucun sujet</td>
                 </tr>
                 <tr>
-                    <td class="icon-cell"><img id="icon-fc" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png" alt="Icône" class="forum-icon-img"></td>
+                    <td class="icon-cell"><img id="icon-fc" src="https://nsm09.casimages.com/img/2026/08/19//26081902204111099118783015.png" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="forum_fc.html" class="forum-title">Fan Clubs Officiels (Bleach, Inuyasha...)</a>
-                        <p>Rejoignez ou créez votre propre Fan Club et portez fièrement vos bannières.</p>
+                        <p>Rejoignez ou créez votre Fan Club.</p>
                     </td>
                     <td class="stat-cell" id="count-fc">--</td>
                     <td class="stat-cell">--</td>
@@ -214,7 +196,7 @@
             </tbody>
         </table>
 
-        <!-- CATÉGORIE 3 -->
+        <!-- TABLEAU GAMING -->
         <table class="forum-table">
             <thead>
                 <tr>
@@ -228,7 +210,7 @@
                 <tr>
                     <td class="icon-cell"><img id="icon-gaming" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
-                        <a href="gaming.html" id="link-latest-gaming" class="forum-title">Coin Arcade & Jeux Vidéo</a>
+                        <a href="gaming.html" class="forum-title">Coin Arcade & Jeux Vidéo</a>
                         <p>Discussions et retours sur les jeux vidéo.</p>
                     </td>
                     <td class="stat-cell" id="count-gaming">--</td>
@@ -238,7 +220,7 @@
             </tbody>
         </table>
 
-        <!-- ZONE DÉTENTE & DISCUSSIONS DIVERSES -->
+        <!-- TABLEAU GENERAL -->
         <table class="forum-table">
             <thead>
                 <tr>
@@ -252,8 +234,8 @@
                 <tr>
                     <td class="icon-cell"><img id="icon-general" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
-                        <a href="general.html" id="link-latest-general" class="forum-title">Le QG des Discussions</a>
-                        <p>Pour parler de tout et de rien : ciné, musique, vie quotidienne...</p>
+                        <a href="general.html" class="forum-title">Le QG des Discussions</a>
+                        <p>Pour parler de tout et de rien...</p>
                     </td>
                     <td class="stat-cell" id="count-general">--</td>
                     <td class="stat-cell">--</td>
@@ -342,10 +324,10 @@
             
             const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
 
-            // On ne gère dynamiquement QUE les catégories en dessous de la première catégorie
-            const categories = ['manga', 'mangatheques', 'graphisme', 'fc', 'gaming', 'general'];
+            // --- CATÉGORIES DYNAMIQUES (CHANGENT D'ICÔNE SI LU / NON LU) ---
+            const categoriesDynamiques = ['planning', 'gaming', 'general'];
             
-            // Mettre à jour les compteurs et derniers messages pour TOUTES les catégories (y compris planning, licences, conventions pour les stats)
+            // TOUTES LES CATÉGORIES DU FORUM POUR LES STATS ET DERNIERS MESSAGES
             const allCats = ['planning', 'licences', 'conventions', 'manga', 'mangatheques', 'graphisme', 'fc', 'gaming', 'general'];
 
             allCats.forEach(cat => {
@@ -362,13 +344,13 @@
                         const dateFormatted = new Date(latest.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit'});
                         const author = latest.author || 'Otaku_33';
                         lastCellEl.innerHTML = `
-                            <a href="topic.html?id=${latest.id}" class="cat-topic-link" data-cat="${cat}" data-topicid="${latest.id}">${latest.title}</a><br>
+                            <a href="topic.html?id=${latest.id}" class="cat-topic-link" data-topicid="${latest.id}">${latest.title}</a><br>
                             <span style="font-size: 0.85em; color: #7f8c8d;">Le ${dateFormatted} par <span style="color: #c0392b;">${author}</span></span>
                         `;
                     }
 
-                    // Logique dynamique uniquement pour les catégories normales (pas les 3 annonces du haut)
-                    if (categories.includes(cat) && iconEl) {
+                    // Logique dynamique de l'icône : appliquée à planning, gaming et general
+                    if (categoriesDynamiques.includes(cat) && iconEl) {
                         const allCatRead = catTopics.every(t => readTopics[t.id] === true);
                         iconEl.src = allCatRead ? (iconsConfig.read || defRead) : (iconsConfig.unread || defUnread);
                     }
