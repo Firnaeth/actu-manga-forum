@@ -208,7 +208,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="icon-cell"><img id="icon-gaming" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png" alt="Icône" class="forum-icon-img"></td>
+                    <td class="icon-cell"><img id="icon-gaming" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="gaming.html" class="forum-title">Coin Arcade & Jeux Vidéo</a>
                         <p>Discussions et retours sur les jeux vidéo.</p>
@@ -232,7 +232,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="icon-cell"><img id="icon-general" src="https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png" alt="Icône" class="forum-icon-img"></td>
+                    <td class="icon-cell"><img id="icon-general" src="" alt="Icône" class="forum-icon-img"></td>
                     <td class="forum-desc">
                         <a href="general.html" class="forum-title">Le QG des Discussions</a>
                         <p>Pour parler de tout et de rien...</p>
@@ -319,8 +319,10 @@
             }
 
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
-            const defUnread = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
-            const defRead = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png";
+            
+            // MISE À JOUR AVEC LES VRAIES URLS DE admin-icons.html
+            const defUnread = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png"; // Nouveaux messages
+            const defRead = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783010.png";   // Messages lus
             
             const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
 
