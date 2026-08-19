@@ -23,6 +23,11 @@
             font-weight: bold;
         }
 
+        .admin-buttons-group {
+            display: flex;
+            gap: 6px;
+        }
+
         .btn-admin-edit {
             background: #f3a6b8;
             color: white;
@@ -33,6 +38,7 @@
             cursor: pointer;
             border-radius: 3px;
             text-decoration: none;
+            display: inline-block;
         }
 
         .btn-admin-edit:hover {
@@ -62,8 +68,11 @@
 
         <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
-            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <a href="admin-global.html" class="btn-admin-edit">Modifier la Bannière</a>
+            <span class="admin-title-badge">⚙️ Administration du Forum</span>
+            <div class="admin-buttons-group">
+                <a href="admin-icons.html" class="btn-admin-edit">Gérer les Icônes</a>
+                <a href="admin-global.html" class="btn-admin-edit">Gestion Globale</a>
+            </div>
         </div>
 
         <div id="admin-panel-form" class="admin-panel-inputs hidden">
@@ -195,10 +204,13 @@
             // Récupérer les réponses pour calculer le nombre de messages
             const { data: replies } = await supabase.from('replies').select('topic_id');
 
-            // Récupération des icônes du LocalStorage (avec tes nouvelles URL par défaut)
+            // Récupération des icônes du LocalStorage (depuis admin-icons.html)
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
             const defUnread = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png";
             const defRead = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783010.png";
+
+            const activeUnreadIcon = iconsConfig.unread || defUnread;
+            const activeReadIcon = iconsConfig.read || defRead;
 
             // Récupération des sujets lus enregistrés dans le localStorage
             const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
@@ -209,7 +221,7 @@
 
                 // Détermination de l'icône Lu / Non Lu pour chaque sujet individuel
                 const isRead = readTopics[t.id] === true;
-                const iconSrc = isRead ? (iconsConfig.read || defRead) : (iconsConfig.unread || defUnread);
+                const iconSrc = isRead ? activeReadIcon : activeUnreadIcon;
 
                 return `
                     <tr>
