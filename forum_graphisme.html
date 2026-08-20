@@ -6,7 +6,40 @@
     <title>Atelier Graphique & Signatures - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* --- STYLE POUR LES ICÔNES DU TABLEAU --- */
+        /* --- CORRECTIF POUR LA BARRE D'ADMINISTRATION --- */
+        .admin-edit-bar {
+            background: #fff0f5;
+            border: 1px dotted #ffb6c1;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-title-badge {
+            font-size: 11px;
+            color: #d9534f;
+            font-weight: bold;
+        }
+
+        .btn-admin-edit {
+            background: #f3a6b8;
+            color: white;
+            border: 1px solid #e2899d;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+            text-decoration: none;
+        }
+
+        .btn-admin-edit:hover {
+            background: #e2899d;
+        }
+
+        /* --- STYLE POUR AVOIR UN LISERÉ DE 1PX AUTOUR DE L'ICÔNE --- */
         .forum-icon-img {
             width: 48px;
             height: 48px;
@@ -25,12 +58,13 @@
     </style>
 </head>
 <body>
+
     <div id="wrapper">
 
         <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <a href="admin-global.html" class="btn-admin-edit">Modifier la Bannière</a>
+            <a href="admin-global.html" class="btn-admin-edit">>Modifier la Bannière</a>
         </div>
 
         <div id="admin-panel-form" class="admin-panel-inputs hidden">
