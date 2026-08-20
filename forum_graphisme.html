@@ -143,7 +143,7 @@
             }
         }
 
-        // Chargement des sujets de l'atelier graphique avec les icônes dynamiques
+        // Chargement des sujets de l'atelier graphique avec les icônes Lu / Non Lu dynamiques
         async function loadGraphismeTopics() {
             const container = document.getElementById('graphisme-topics-container');
             
@@ -160,10 +160,12 @@
 
             const { data: replies } = await supabase.from('replies').select('topic_id');
 
-            // Récupération des icônes admin ou définition des valeurs par défaut
+            // Récupération des icônes de ton panneau d'administration (localStorage)
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
-            const defUnread = "https://nsm09.casimages.com/img/2026/08/18//26081811360911099118782774.png";
-            const defRead = "https://nsm09.casimages.com/img/2026/08/18//26081811360811099118782770.png";
+            
+            // Liens par défaut au cas où le localStorage serait vide
+            const defUnread = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png"; // Non lu
+            const defRead = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783010.png";   // Lu
 
             const unreadIcon = iconsConfig.unread || defUnread;
             const readIcon = iconsConfig.read || defRead;
@@ -174,12 +176,13 @@
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
                 const topicRepliesCount = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
                 
+                // Vérifie si le sujet a été lu par l'utilisateur
                 const isRead = readTopics[t.id] === true;
                 const currentIcon = isRead ? readIcon : unreadIcon;
 
                 return `
                     <tr>
-                        <td class="icon-cell"><img src="${currentIcon}" alt="Icône" class="forum-icon-img"></td>
+                        <td class="icon-cell"><img src="${currentIcon}" alt="Statut du sujet" class="forum-icon-img"></td>
                         <td class="forum-desc">
                             <a href="topic.html?id=${t.id}" class="forum-title graphisme-topic-link" data-topicid="${t.id}" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
                             <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Créé le ${dateFormatted}</p>
@@ -191,7 +194,7 @@
                 `;
             }).join('');
 
-            // Marquer le sujet comme lu au clic
+            // Marquer le sujet comme lu au clic et basculer l'icône
             document.querySelectorAll('.graphisme-topic-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     const topicId = e.target.getAttribute('data-topicid');
