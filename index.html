@@ -185,17 +185,17 @@
                 newsListEl.innerHTML = "<li><em>Aucun sujet publié pour le moment.</em></li>";
             }
 
-            // 2. Charger les Catégories depuis Supabase (triées par position)
+            // 2. Charger les Catégories depuis Supabase (triées par display_order)
             const { data: categories, error: catError } = await supabase
                 .from('categories')
                 .select('*')
-                .order('position', { ascending: true });
+                .order('display_order', { ascending: true });
 
-            // 3. Charger les Sous-Catégories depuis Supabase (triées par position)
+            // 3. Charger les Sous-Catégories depuis Supabase (triées par display_order ou position selon ta table subcategories)
             const { data: subcategories, error: subError } = await supabase
                 .from('subcategories')
                 .select('*')
-                .order('position', { ascending: true });
+                .order('display_order', { ascending: true });
 
             const forumContainer = document.getElementById('dynamic-forums-container');
             if (catError || !categories || categories.length === 0) {
