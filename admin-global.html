@@ -121,7 +121,10 @@
                     <input type="text" id="new-cat-name" class="admin-form-control" placeholder="ex: Actualités & Sorties" style="width:100%; padding:8px; margin-bottom:10px;" required>
 
                     <label style="display:block; margin:0 0 5px; font-weight:bold;">Identifiant unique (Slug) :</label>
-                    <input type="text" id="new-cat-slug" class="admin-form-control" placeholder="ex: actualites" style="width:100%; padding:8px; margin-bottom:15px;" required>
+                    <input type="text" id="new-cat-slug" class="admin-form-control" placeholder="ex: actualites" style="width:100%; padding:8px; margin-bottom:10px;" required>
+
+                    <label style="display:block; margin:0 0 5px; font-weight:bold;">Ordre d'affichage (ex: 1, 2, 3...) :</label>
+                    <input type="number" id="new-cat-order" class="admin-form-control" value="0" style="width:100%; padding:8px; margin-bottom:15px;" required>
 
                     <button type="submit" class="btn-admin-edit" style="background: #27ae60;">Ajouter la catégorie</button>
                 </form>
@@ -132,13 +135,14 @@
                 <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
                     <thead>
                         <tr style="background: #f8f8f8; text-align: left;">
+                            <th style="padding: 10px; border: 1px solid #ddd; width: 60px; text-align: center;">Ordre</th>
                             <th style="padding: 10px; border: 1px solid #ddd;">Nom</th>
                             <th style="padding: 10px; border: 1px solid #ddd;">Description / Slug</th>
                             <th style="padding: 10px; border: 1px solid #ddd; text-align: center; width: 100px;">Action</th>
                         </tr>
                     </thead>
                     <tbody id="admin-categories-list">
-                        <tr><td colspan="3" style="text-align: center; padding: 10px;">Chargement...</td></tr>
+                        <tr><td colspan="4" style="text-align: center; padding: 10px;">Chargement...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -153,7 +157,10 @@
                     <input type="text" id="new-subcat-name" class="admin-form-control" placeholder="ex: Tutoriels & Signatures" style="width:100%; padding:8px; margin-bottom:10px;" required>
 
                     <label style="display:block; margin:0 0 5px; font-weight:bold;">Identifiant unique (Slug) :</label>
-                    <input type="text" id="new-subcat-slug" class="admin-form-control" placeholder="ex: tutoriels" style="width:100%; padding:8px; margin-bottom:15px;" required>
+                    <input type="text" id="new-subcat-slug" class="admin-form-control" placeholder="ex: tutoriels" style="width:100%; padding:8px; margin-bottom:10px;" required>
+
+                    <label style="display:block; margin:0 0 5px; font-weight:bold;">Ordre d'affichage (ex: 1, 2, 3...) :</label>
+                    <input type="number" id="new-subcat-order" class="admin-form-control" value="0" style="width:100%; padding:8px; margin-bottom:15px;" required>
 
                     <button type="submit" class="btn-admin-edit" style="background: #27ae60;">Ajouter la sous-catégorie</button>
                 </form>
@@ -164,13 +171,14 @@
                 <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
                     <thead>
                         <tr style="background: #f8f8f8; text-align: left;">
+                            <th style="padding: 10px; border: 1px solid #ddd; width: 60px; text-align: center;">Ordre</th>
                             <th style="padding: 10px; border: 1px solid #ddd;">Nom</th>
                             <th style="padding: 10px; border: 1px solid #ddd;">Description / Slug</th>
                             <th style="padding: 10px; border: 1px solid #ddd; text-align: center; width: 100px;">Action</th>
                         </tr>
                     </thead>
                     <tbody id="admin-subcategories-list">
-                        <tr><td colspan="3" style="text-align: center; padding: 10px;">Chargement...</td></tr>
+                        <tr><td colspan="4" style="text-align: center; padding: 10px;">Chargement...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -364,7 +372,7 @@
         loadFanClubsDropdowns();
         renderFanClubs();
 
-        // --- 3. GESTION DES CATÉGORIES (SUPABASE) ---
+        // --- 3. GESTION DES CATÉGORIES (SUPABASE - TRIÉES PAR ORDRE) ---
         const tbodyCategories = document.getElementById('admin-categories-list');
         const selectCategories = document.getElementById('existing-categories-select');
 
@@ -372,26 +380,27 @@
             const { data: categories, error } = await supabase
                 .from('categories')
                 .select('*')
-                .order('id', { ascending: true });
+                .order('display_order', { ascending: true }); // Tri par ordre
 
             if (error) {
                 console.error("Erreur chargement catégories :", error);
-                tbodyCategories.innerHTML = `<tr><td colspan="3" style="text-align: center; color: red; padding: 10px;">Erreur de chargement</td></tr>`;
+                tbodyCategories.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red; padding: 10px;">Erreur de chargement</td></tr>`;
                 selectCategories.innerHTML = `<option value="">Erreur de chargement</option>`;
                 return;
             }
 
             if (!categories || categories.length === 0) {
                 selectCategories.innerHTML = `<option value="">-- Aucune catégorie enregistrée --</option>`;
-                tbodyCategories.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 10px;">Aucune catégorie trouvée.</td></tr>`;
+                tbodyCategories.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 10px;">Aucune catégorie trouvée.</td></tr>`;
                 return;
             }
 
             selectCategories.innerHTML = `<option value="">-- Sélectionnez une catégorie (${categories.length}) --</option>` +
-                categories.map(cat => `<option value="${cat.id}">${cat.name} (${cat.description || ''})</option>`).join('');
+                categories.map(cat => `<option value="${cat.id}">[${cat.display_order || 0}] ${cat.name}</option>`).join('');
 
             tbodyCategories.innerHTML = categories.map(cat => `
                 <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${cat.display_order || 0}</td>
                     <td style="padding: 10px; border: 1px solid #ddd;"><strong>${cat.name}</strong></td>
                     <td style="padding: 10px; border: 1px solid #ddd; color: #666;">${cat.description || '-'}</td>
                     <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
@@ -416,6 +425,7 @@
             e.preventDefault();
             const name = document.getElementById('new-cat-name').value.trim();
             const description = document.getElementById('new-cat-slug').value.trim();
+            const display_order = parseInt(document.getElementById('new-cat-order').value) || 0;
 
             if (!name || !description) {
                 alert("Veuillez remplir tous les champs.");
@@ -424,7 +434,7 @@
 
             const { error } = await supabase
                 .from('categories')
-                .insert([{ name, description }]);
+                .insert([{ name, description, display_order }]);
 
             if (error) {
                 alert("Erreur lors de l'ajout : " + error.message);
@@ -437,28 +447,29 @@
 
         loadAdminCategories();
 
-        // --- 4. GESTION DES SOUS-CATÉGORIES (SUPABASE) ---
+        // --- 4. GESTION DES SOUS-CATÉGORIES (SUPABASE - TRIÉES PAR ORDRE) ---
         const tbodySubcategories = document.getElementById('admin-subcategories-list');
 
         async function loadAdminSubcategories() {
             const { data: subcategories, error } = await supabase
                 .from('subcategories')
                 .select('*')
-                .order('id', { ascending: true });
+                .order('display_order', { ascending: true }); // Tri par ordre
 
             if (error) {
                 console.error("Erreur chargement sous-catégories :", error);
-                tbodySubcategories.innerHTML = `<tr><td colspan="3" style="text-align: center; color: red; padding: 10px;">Erreur de chargement (Vérifiez si la table 'subcategories' existe sur Supabase)</td></tr>`;
+                tbodySubcategories.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red; padding: 10px;">Erreur de chargement (Vérifiez la table 'subcategories')</td></tr>`;
                 return;
             }
 
             if (!subcategories || subcategories.length === 0) {
-                tbodySubcategories.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 10px;">Aucune sous-catégorie trouvée.</td></tr>`;
+                tbodySubcategories.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 10px;">Aucune sous-catégorie trouvée.</td></tr>`;
                 return;
             }
 
             tbodySubcategories.innerHTML = subcategories.map(sub => `
                 <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${sub.display_order || 0}</td>
                     <td style="padding: 10px; border: 1px solid #ddd;"><strong>${sub.name}</strong></td>
                     <td style="padding: 10px; border: 1px solid #ddd; color: #666;">${sub.description || '-'}</td>
                     <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
@@ -483,6 +494,7 @@
             e.preventDefault();
             const name = document.getElementById('new-subcat-name').value.trim();
             const description = document.getElementById('new-subcat-slug').value.trim();
+            const display_order = parseInt(document.getElementById('new-subcat-order').value) || 0;
 
             if (!name || !description) {
                 alert("Veuillez remplir tous les champs.");
@@ -491,7 +503,7 @@
 
             const { error } = await supabase
                 .from('subcategories')
-                .insert([{ name, description }]);
+                .insert([{ name, description, display_order }]);
 
             if (error) {
                 alert("Erreur lors de l'ajout : " + error.message);
