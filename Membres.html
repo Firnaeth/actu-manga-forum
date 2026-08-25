@@ -3,26 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Présentation des membres - Actu Manga World</title>
+    <title>Membres & Présentations - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* --- CORRECTIF POUR LA BARRE D'ADMINISTRATION --- */
-        .admin-edit-bar {
-            background: #fff0f5;
-            border: 1px dotted #ffb6c1;
-            padding: 8px 12px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .forum-icon-img {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            display: block;
+            border: 1px solid #ffffff;
+            box-sizing: content-box;
         }
-
-        .admin-title-badge {
-            font-size: 11px;
-            color: #d9534f;
-            font-weight: bold;
+        .icon-cell {
+            width: 48px;
+            text-align: center;
+            vertical-align: middle;
+            padding: 4px;
         }
-
         .btn-admin-edit {
             background: #f3a6b8;
             color: white;
@@ -35,26 +32,8 @@
             text-decoration: none;
             display: inline-block;
         }
-
         .btn-admin-edit:hover {
             background: #e2899d;
-        }
-
-        /* --- STYLE POUR AVOIR UN LISERÉ DE 1PX AUTOUR DE L'ICÔNE --- */
-        .forum-icon-img {
-            width: 48px;
-            height: 48px;
-            object-fit: cover;
-            display: block;
-            border: 1px solid #ffffff;
-            box-sizing: content-box;
-        }
-
-        .icon-cell {
-            width: 48px;
-            text-align: center;
-            vertical-align: middle;
-            padding: 4px;
         }
     </style>
 </head>
@@ -62,59 +41,51 @@
 
     <div id="wrapper">
 
-        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
-        <div id="admin-bar-container" class="admin-edit-bar hidden">
-            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <a href="admin-global.html" class="btn-admin-edit">Modifier la Bannière</a>
-        </div>
-
-        <div id="admin-panel-form" class="admin-panel-inputs hidden">
-            <form id="form-config-header">
-                <label>Lien (URL) de l'image de bannière :</label>
-                <input type="url" id="input-forum-banner" required>
-
-                <div class="admin-form-actions">
-                    <button type="submit" class="btn-admin-edit">Enregistrer</button>
-                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- BANNIÈRE EN-TÊTE -->
-        <div class="main-header">
-            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
-        </div>
-
-        <!-- BARRE DE NAVIGATION VINTAGE -->
+        <!-- BARRE DE NAVIGATION -->
         <nav class="forum-nav">
             <a href="index.html" class="nav-link">Index</a>
             <a href="community.html" class="nav-link">Fiches & Critiques</a>
             <a href="contest-view.html" class="nav-link">Concours Dessin</a>
-            <a href="#" class="nav-link">Rechercher</a>
-            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil</a>
             <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
-            <a href="#" class="nav-link">FAQ</a>
         </nav>
 
         <!-- FIL D'ARIANE -->
         <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
-            <a href="index.html">Accueil</a> &raquo; <span>Présentation des membres</span>
+            <a href="index.html">Accueil</a> &raquo; <span>Membres & Présentations</span>
         </div>
 
-        <!-- EN-TÊTE DE LA SECTION -->
+        <!-- EN-TÊTE -->
         <div class="welcome-banner" style="text-align: center; padding: 15px;">
-            <h2>👋 Présentation des membres</h2>
-            <p style="margin-top: 5px;">Viens te présenter à la communauté : qui es-tu, quels sont tes mangas préférés ?</p>
+            <h2>👥 Espace Membres & Présentations</h2>
+            <p style="margin-top: 5px;">Consulte l'annuaire des inscrits et viens te présenter à la communauté !</p>
         </div>
 
-        <!-- TABLEAU DES PRÉSENTATIONS -->
+        <!-- 1. PREMIER TABLEAU : ANNUAIRE DE LA COMMUNAUTÉ -->
+        <table class="forum-table" style="margin-bottom: 25px;">
+            <thead>
+                <tr>
+                    <th colspan="2" class="cat-title">📖 Annuaire de la Communauté</th>
+                    <th class="stat-head" style="text-align: center;">RÔLE</th>
+                    <th class="stat-head" style="text-align: center;">INSCRIPTION</th>
+                    <th class="last-post-head" style="text-align: center;">PROFIL</th>
+                </tr>
+            </thead>
+            <tbody id="directory-members-container">
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 20px;"><em>Chargement de l'annuaire...</em></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 2. DEUXIÈME TABLEAU : SUJETS DE PRÉSENTATION -->
         <table class="forum-table">
             <thead>
                 <tr>
                     <th colspan="2" class="cat-title">_ Sujets de présentation _</th>
-                    <th class="stat-head" style="text-align: center;">Auteur</th>
-                    <th class="stat-head" style="text-align: center;">Réponses</th>
-                    <th class="last-post-head" style="text-align: center;">Dernier Message</th>
+                    <th class="stat-head" style="text-align: center;">AUTEUR</th>
+                    <th class="stat-head" style="text-align: center;">RÉPONSES</th>
+                    <th class="last-post-head" style="text-align: center;">DERNIER MESSAGE</th>
                 </tr>
             </thead>
             <tbody id="presentation-topics-container">
@@ -125,140 +96,110 @@
         </table>
 
         <!-- BOUTON CRÉER SA PRÉSENTATION -->
-        <div style="margin-top: 15px; margin-bottom: 20px;">
-            <a href="new-topic.html?cat=presentation" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">+ Me présenter</a>
+        <div style="margin-top: 15px; margin-bottom: 25px;">
+            <a href="new-topic.html?cat=presentation" class="btn-admin-edit" style="background: #61b3e8; padding: 6px 12px; font-size: 0.9em;">+ Me présenter</a>
         </div>
 
-        <div class="welcome-banner" style="text-align: center; padding: 15px;">
-            <h2>📖 Annuaire de la Communauté</h2>
-            <p style="margin-top: 5px;">Liste de tous les inscrits sur Actu Manga World</p>
-        </div>
-
-        <table class="forum-table">
-            <thead>
-                <tr>
-                    <th colspan="2" class="cat-title">_ Utilisateurs inscrits _</th>
-                    <th class="stat-head" style="text-align: center;">Rôle</th>
-                    <th class="stat-head" style="text-align: center;">Inscription</th>
-                    <th class="last-post-head" style="text-align: center;">Profil</th>
-                </tr>
-            </thead>
-            <tbody id="directory-members-container">
-                <tr><td colspan="5" style="text-align: center; padding: 15px;"><em>Chargement de l'annuaire...</em></td></tr>
-            </tbody>
-        </table>
-    </div>
     </div>
 
     <script type="module">
         import { supabase } from './supabase.js';
 
+        // Gestion de l'affichage du profil dans la nav
         const currentUsername = localStorage.getItem('forumUsername');
-        const currentUserRole = localStorage.getItem('forumUserRole');
-        const profileLink = document.getElementById('nav-profile-link');
-        const authLink = document.getElementById('nav-auth-link');
-        
         if (currentUsername) {
-            profileLink.classList.remove('hidden');
+            document.getElementById('nav-profile-link').classList.remove('hidden');
+            const authLink = document.getElementById('nav-auth-link');
             authLink.textContent = "Déconnexion";
             authLink.setAttribute('href', '#');
             authLink.onclick = async (e) => { 
                 e.preventDefault();
-                try { await supabase.auth.signOut(); } catch(err) { console.error(err); }
+                try { await supabase.auth.signOut(); } catch(err) {}
                 localStorage.clear(); 
                 window.location.reload(); 
             };
         }
 
-        // --- GESTION DES PRIVILÈGES STAFF ---
-        const adminBar = document.getElementById('admin-bar-container');
-        const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
+        // --- CHARGEMENT DE L'ANNUAIRE ---
+        async function loadDirectoryMembers() {
+            const container = document.getElementById('directory-members-container');
+            const { data: members, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-        if (isStaff && adminBar) {
-            adminBar.classList.remove('hidden');
-        }
-        
-        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
-            document.getElementById('admin-panel-form').classList.toggle('hidden');
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
-                banner: "https://images.alphacoders.com/605/605592.png" 
-            };
-            document.getElementById('input-forum-banner').value = config.banner || "https://images.alphacoders.com/605/605592.png";
-        });
-
-        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
-            document.getElementById('admin-panel-form').classList.add('hidden');
-        });
-
-        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || {};
-            config.banner = document.getElementById('input-forum-banner').value;
-            localStorage.setItem('forumHeaderConfig', JSON.stringify(config));
-            alert("Bannière mise à jour avec succès !");
-            window.location.reload();
-        });
-
-        function loadHeaderConfig() {
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
-            if (config && config.banner) {
-                document.getElementById('forum-banner-img').src = config.banner;
+            if (error || !members || members.length === 0) {
+                container.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #7f8c8d; padding: 15px;">Aucun membre dans l'annuaire pour le moment.</td></tr>`;
+                return;
             }
+
+            const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
+            const defaultIcon = iconsConfig.unread || "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png";
+
+            container.innerHTML = members.map(m => {
+                const dateFormatted = m.created_at ? new Date(m.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'}) : 'Inconnue';
+                const username = m.username || m.name || 'Membre';
+                const role = m.role || 'Membre';
+
+                return `
+                    <tr>
+                        <td class="icon-cell">
+                            <img src="${defaultIcon}" class="forum-icon-img" alt="Icône">
+                        </td>
+                        <td class="forum-desc">
+                            <span style="font-weight: bold; color: #c2185b; font-size: 1.05em;">${username}</span>
+                            <p style="font-size: 0.85em; color: #666; margin-top: 2px;">Membre de la communauté</p>
+                        </td>
+                        <td style="text-align: center; font-weight: bold; font-size: 0.9em;">${role}</td>
+                        <td style="text-align: center; font-size: 0.9em;">${dateFormatted}</td>
+                        <td style="text-align: center;">
+                            <a href="profile.html?user=${m.id}" class="btn-admin-edit" style="padding: 2px 8px; font-size: 0.8em;">Voir</a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
+        // --- CHARGEMENT DES SUJETS DE PRÉSENTATION ---
         async function loadPresentationTopics() {
             const container = document.getElementById('presentation-topics-container');
-
-            // On récupère les sujets de la catégorie 'presentation'
             const { data: topics, error } = await supabase
                 .from('topics')
                 .select('*')
                 .eq('category', 'presentation')
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                container.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Erreur de chargement des présentations.</td></tr>`;
-                return;
-            }
-
-            if (!topics || topics.length === 0) {
-                container.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucune présentation pour le moment. Sois le premier à te présenter !</td></tr>`;
+            if (error || !topics || topics.length === 0) {
+                container.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #7f8c8d; padding: 20px;">Aucune présentation pour le moment. Sois le premier à te présenter !</td></tr>`;
                 return;
             }
 
             const { data: replies } = await supabase.from('replies').select('topic_id');
-
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
             const defUnread = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png"; 
             const defRead = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783010.png";    
-
-            const activeUnreadIcon = iconsConfig.unread || defUnread;
-            const activeReadIcon = iconsConfig.read || defRead;
-
             const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
 
             container.innerHTML = topics.map(t => {
                 const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
                 const author = t.author || 'Inconnu';
-                const topicRepliesCount = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
-
-                const isRead = readTopics[t.id] === true;
-                const iconSrc = isRead ? activeReadIcon : activeUnreadIcon;
+                const count = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
+                const iconSrc = readTopics[t.id] ? (iconsConfig.read || defRead) : (iconsConfig.unread || defUnread);
 
                 return `
                     <tr>
                         <td class="icon-cell">
-                            <img src="${iconSrc}" alt="Icône" class="forum-icon-img" data-topicid="${t.id}">
+                            <img src="${iconSrc}" class="forum-icon-img" alt="Icône">
                         </td>
                         <td class="forum-desc">
-                            <a href="topic.html?id=${t.id}" class="forum-title topic-link" data-topicid="${t.id}" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
-                            <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Présentation créée le ${dateFormatted}</p>
+                            <a href="topic.html?id=${t.id}" class="topic-link" data-topicid="${t.id}" style="font-weight: bold; color: #333; text-decoration: none; font-size: 1.05em;">${t.title}</a>
+                            <p style="font-size: 0.85em; color: #666; margin-top: 2px;">Créé le ${dateFormatted}</p>
                         </td>
-                        <td class="stat-cell" style="text-align: center;">${author}</td>
-                        <td class="stat-cell" style="text-align: center;">${topicRepliesCount}</td>
-                        <td class="last-post-cell" style="text-align: center; font-size: 0.9em;">
+                        <td style="text-align: center; font-size: 0.9em;">${author}</td>
+                        <td style="text-align: center; font-size: 0.9em;">${count}</td>
+                        <td style="text-align: center; font-size: 0.85em; color: #7f8c8d;">
                             <span>Par ${author}</span><br>
-                            <small style="color: #7f8c8d;">${dateFormatted}</small>
+                            <small>${dateFormatted}</small>
                         </td>
                     </tr>
                 `;
@@ -266,15 +207,15 @@
 
             document.querySelectorAll('.topic-link').forEach(link => {
                 link.addEventListener('click', (e) => {
-                    const topicId = e.target.getAttribute('data-topicid');
+                    const id = e.target.getAttribute('data-topicid');
                     let readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
-                    readTopics[topicId] = true;
+                    readTopics[id] = true;
                     localStorage.setItem('forumReadTopics', JSON.stringify(readTopics));
                 });
             });
         }
 
-        loadHeaderConfig();
+        loadDirectoryMembers();
         loadPresentationTopics();
     </script>
 </body>
