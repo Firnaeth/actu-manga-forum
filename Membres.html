@@ -36,6 +36,16 @@
         .btn-forum-action:hover {
             background: #e2899d;
         }
+        /* Style pour masquer/afficher l'annuaire en douceur */
+        #directory-wrapper {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        #directory-wrapper.open {
+            max-height: 1000px; /* S'adapte à la quantité de membres */
+            transition: max-height 0.5s ease-in;
+        }
     </style>
 </head>
 <body>
@@ -62,22 +72,29 @@
             <p style="margin-top: 5px;">Consulte l'annuaire des inscrits et viens te présenter à la communauté !</p>
         </div>
 
-        <!-- TABLEAU 1 : ANNUAIRE DE LA COMMUNAUTÉ -->
-        <table class="forum-table" style="margin-bottom: 25px;">
-            <thead>
-                <tr>
-                    <th colspan="2" class="cat-title">📖 Annuaire de la Communauté</th>
-                    <th class="stat-head" style="text-align: center;">RANK</th>
-                    <th class="stat-head" style="text-align: center;">INSCRIPTION</th>
-                    <th class="last-post-head" style="text-align: center;">PROFIL</th>
-                </tr>
-            </thead>
-            <tbody id="directory-members-container">
-                <tr>
-                    <td colspan="5" style="text-align: center; padding: 20px;"><em>Chargement de l'annuaire...</em></td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- BOUTON POUR DÉROULER L'ANNUAIRE -->
+        <div style="margin-bottom: 15px; text-align: left;">
+            <button id="toggle-directory-btn" class="btn-forum-action" style="background: #f3a6b8;">📖 Afficher l'annuaire de la communauté ▼</button>
+        </div>
+
+        <!-- BLOC ACCORDÉON CONTENANT LE TABLEAU DE L'ANNUAIRE -->
+        <div id="directory-wrapper">
+            <table class="forum-table" style="margin-bottom: 25px;">
+                <thead>
+                    <tr>
+                        <th colspan="2" class="cat-title">📖 Annuaire de la Communauté</th>
+                        <th class="stat-head" style="text-align: center;">RANK</th>
+                        <th class="stat-head" style="text-align: center;">INSCRIPTION</th>
+                        <th class="last-post-head" style="text-align: center;">PROFIL</th>
+                    </tr>
+                </thead>
+                <tbody id="directory-members-container">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 20px;"><em>Chargement de l'annuaire...</em></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         <!-- TABLEAU 2 : SUJETS DE PRÉSENTATION -->
         <table class="forum-table">
@@ -96,7 +113,7 @@
             </tbody>
         </table>
 
-        <!-- BOUTONS EN DESSOUS DES TABLEAUX -->
+        <!-- BOUTON POUR SE PRÉSENTER -->
         <div style="margin-top: 15px; margin-bottom: 25px; display: flex; gap: 10px;">
             <a href="new-topic.html?cat=presentation" class="btn-forum-action" style="background: #61b3e8;">+ Me présenter</a>
         </div>
@@ -120,6 +137,18 @@
             };
         }
 
+        // --- GESTION DU BOUTON DÉROULANT (ACCORDÉON) ---
+        const toggleBtn = document.getElementById('toggle-directory-btn');
+        const directoryWrapper = document.getElementById('directory-wrapper');
+
+        toggleBtn.addEventListener('click', () => {
+            directoryWrapper.classList.toggle('open');
+            const isOpen = directoryWrapper.classList.contains('open');
+            toggleBtn.textContent = isOpen 
+                ? "📖 Masquer l'annuaire de la communauté ▲" 
+                : "📖 Afficher l'annuaire de la communauté ▼";
+        });
+
         // --- CHARGEMENT DE L'ANNUAIRE (AVEC LE RANK) ---
         async function loadDirectoryMembers() {
             const container = document.getElementById('directory-members-container');
@@ -139,7 +168,7 @@
             container.innerHTML = members.map(m => {
                 const dateFormatted = m.created_at ? new Date(m.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'}) : 'Inconnue';
                 const username = m.username || m.name || 'Membre';
-                const rank = m.rank || 'Membre'; // Récupère la colonne rank de Supabase
+                const rank = m.rank || 'Membre';
 
                 return `
                     <tr>
