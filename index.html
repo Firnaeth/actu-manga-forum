@@ -61,6 +61,12 @@
 
     <div id="wrapper">
 
+        <!-- BANDEAU D'INFORMATION WORK IN PROGRESS & DESCRIPTION -->
+        <div style="background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 12px 15px; border-radius: 4px; margin-bottom: 15px; font-size: 0.95em;">
+            <p style="margin: 0 0 6px 0;"><strong>⚠️ Site en Work in Progress :</strong> Le forum est actuellement en cours de développement. Si vous rencontrez le moindre bug ou dysfonctionnement, merci de m'en faire un retour directement dans la section <a href="aide.html" style="color: #856404; font-weight: bold; text-decoration: underline;">Aide & Tutoriels</a> !</p>
+            <p style="margin: 0; font-style: italic;">Retrouvez ici : Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !</p>
+        </div>
+
         <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
@@ -229,7 +235,6 @@
 
                 if (subCatsForThisCat.length > 0) {
                     subCatsForThisCat.forEach(sub => {
-                        // Gestion spécifique pour la sous-catégorie présentation ou par slug/id
                         const subTopics = topics ? topics.filter(t => t.subcategory_id === sub.id || t.category === sub.slug || (sub.slug === 'Membres' && t.category === 'presentation')) : [];
                         const count = subTopics.length;
                         
@@ -246,11 +251,9 @@
                                 <span style="font-size: 0.85em; color: #7f8c8d;">Le ${dateFormatted} par <span style="color: #c0392b;">${author}</span></span>
                             `;
 
-                            // Vérifie si au moins un sujet récent de cette sous-catégorie n'a pas été lu
                             hasUnread = subTopics.some(t => !readTopics[t.id]);
                         }
 
-                        // Choix dynamique de l'icône (Si personnalisé dans sub.icon_url ou basé sur lu/non-lu)
                         let iconUrl = "";
                         if (count > 0 && hasUnread) {
                             iconUrl = iconsConfig.unread || defUnread;
@@ -291,7 +294,6 @@
 
             forumContainer.innerHTML = htmlContent;
 
-            // Enregistrement dans le localStorage lorsqu'on clique sur un sujet pour le marquer comme lu dynamiquement
             document.querySelectorAll('.topic-link-item').forEach(link => {
                 link.addEventListener('click', (e) => {
                     const id = e.target.getAttribute('data-topicid');
@@ -331,7 +333,6 @@
             }
         }
 
-        // --- EXECUTION DES FONCTIONS AU CHARGEMENT ---
         loadHeaderConfig();
         loadForumData();
         loadOnlineUsers();
