@@ -179,7 +179,7 @@
             if (topics && topics.length > 0) {
                 newsListEl.innerHTML = topics.slice(0, 5).map(t => {
                     const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit'});
-                    return `<li><span class="date">[${dateFormatted}]</span> <a href="topic.html?id=${t.id}">${t.title}</a></li>`;
+                    return `<li><span class="date">[${dateFormatted}]</span> <a href="topic.html?id=${t.id}" class="topic-link-item" data-topicid="${t.id}">${t.title}</a></li>`;
                 }).join('');
             } else {
                 newsListEl.innerHTML = "<li><em>Aucun sujet publié pour le moment.</em></li>";
@@ -191,7 +191,7 @@
                 .select('*')
                 .order('display_order', { ascending: true });
 
-            // 3. Charger les Sous-Catégories depuis Supabase (triées par display_order ou position selon ta table subcategories)
+            // 3. Charger les Sous-Catégories depuis Supabase
             const { data: subcategories, error: subError } = await supabase
                 .from('subcategories')
                 .select('*')
@@ -203,14 +203,15 @@
                 return;
             }
 
-            // Icônes par défaut
-            const defIcon = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783011.png";
+            // Configuration des icônes Lu / Non lu
+            const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
+            const defUnread = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png"; 
+            const defRead = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783010.png";    
+            const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
 
-            // Génération dynamique du HTML des catégories et sous-catégories
             let htmlContent = '';
 
             categories.forEach(cat => {
-                // Filtrer les sous-catégories liées à cette catégorie
                 const subCatsForThisCat = subcategories ? subcategories.filter(sub => sub.category_id === cat.id) : [];
 
                 htmlContent += `
@@ -228,22 +229,36 @@
 
                 if (subCatsForThisCat.length > 0) {
                     subCatsForThisCat.forEach(sub => {
-                        // Trouver les sujets liés à cette sous-catégorie si applicable
-                        const subTopics = topics ? topics.filter(t => t.subcategory_id === sub.id || t.category === sub.slug) : [];
+                        // Gestion spécifique pour la sous-catégorie présentation ou par slug/id
+                        const subTopics = topics ? topics.filter(t => t.subcategory_id === sub.id || t.category === sub.slug || (sub.slug === 'Membres' && t.category === 'presentation')) : [];
                         const count = subTopics.length;
                         
                         let lastPostHtml = "Aucun sujet";
+                        let hasUnread = false;
+
                         if (count > 0) {
                             const latest = subTopics[0];
                             const dateFormatted = new Date(latest.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit'});
                             const author = latest.author || 'Otaku_33';
+                            
                             lastPostHtml = `
-                                <a href="topic.html?id=${latest.id}" class="cat-topic-link" data-topicid="${latest.id}">${latest.title}</a><br>
+                                <a href="topic.html?id=${latest.id}" class="cat-topic-link topic-link-item" data-topicid="${latest.id}">${latest.title}</a><br>
                                 <span style="font-size: 0.85em; color: #7f8c8d;">Le ${dateFormatted} par <span style="color: #c0392b;">${author}</span></span>
                             `;
+
+                            // Vérifie si au moins un sujet récent de cette sous-catégorie n'a pas été lu
+                            hasUnread = subTopics.some(t => !readTopics[t.id]);
                         }
 
-                        const iconUrl = (sub.icon_url && sub.icon_url.trim() !== "") ? sub.icon_url : defIcon;
+                        // Choix dynamique de l'icône (Si personnalisé dans sub.icon_url ou basé sur lu/non-lu)
+                        let iconUrl = "";
+                        if (count > 0 && hasUnread) {
+                            iconUrl = iconsConfig.unread || defUnread;
+                        } else if (count > 0 && !hasUnread) {
+                            iconUrl = iconsConfig.read || defRead;
+                        } else {
+                            iconUrl = (sub.icon_url && sub.icon_url.trim() !== "") ? sub.icon_url : defRead;
+                        }
 
                         htmlContent += `
                             <tr>
@@ -275,6 +290,18 @@
             });
 
             forumContainer.innerHTML = htmlContent;
+
+            // Enregistrement dans le localStorage lorsqu'on clique sur un sujet pour le marquer comme lu dynamiquement
+            document.querySelectorAll('.topic-link-item').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-topicid');
+                    if (id) {
+                        let readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
+                        readTopics[id] = true;
+                        localStorage.setItem('forumReadTopics', JSON.stringify(readTopics));
+                    }
+                });
+            });
         }
 
         async function loadOnlineUsers() {
