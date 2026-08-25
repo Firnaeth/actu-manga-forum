@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Membres - Actu Manga World</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- CORRECTIF POUR LA BARRE D'ADMINISTRATION --- */
+        .admin-edit-bar {
+            background: #fff0f5;
+            border: 1px dotted #ffb6c1;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-title-badge {
+            font-size: 11px;
+            color: #d9534f;
+            font-weight: bold;
+        }
+
+        .btn-admin-edit {
+            background: #f3a6b8;
+            color: white;
+            border: 1px solid #e2899d;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-admin-edit:hover {
+            background: #e2899d;
+        }
+
+        /* --- STYLE POUR AVOIR UN LISERÉ DE 1PX AUTOUR DE L'ICÔNE --- */
+        .forum-icon-img {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            display: block;
+            border: 1px solid #ffffff;
+            box-sizing: content-box;
+        }
+
+        .icon-cell {
+            width: 48px;
+            text-align: center;
+            vertical-align: middle;
+            padding: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="wrapper">
+
+        <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
+        <div id="admin-bar-container" class="admin-edit-bar hidden">
+            <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
+            <a href="admin-global.html" class="btn-admin-edit">Modifier la Bannière</a>
+        </div>
+
+        <div id="admin-panel-form" class="admin-panel-inputs hidden">
+            <form id="form-config-header">
+                <label>Lien (URL) de l'image de bannière :</label>
+                <input type="url" id="input-forum-banner" required>
+
+                <div class="admin-form-actions">
+                    <button type="submit" class="btn-admin-edit">Enregistrer</button>
+                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- BANNIÈRE EN-TÊTE -->
+        <div class="main-header">
+            <img id="forum-banner-img" src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
+        </div>
+
+        <!-- BARRE DE NAVIGATION VINTAGE -->
+        <nav class="forum-nav">
+            <a href="index.html" class="nav-link">Index</a>
+            <a href="community.html" class="nav-link">Fiches & Critiques</a>
+            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
+            <a href="#" class="nav-link">Rechercher</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
+            <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
+            <a href="#" class="nav-link">FAQ</a>
+        </nav>
+
+        <!-- FIL D'ARIANE -->
+        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
+            <a href="index.html">Accueil</a> &raquo; <span>Liste des Membres</span>
+        </div>
+
+        <!-- EN-TÊTE DE LA SECTION (TEXTE CENTRÉ) -->
+        <div class="welcome-banner" style="text-align: center; padding: 15px;">
+            <h2>👥 Annuaire des Membres</h2>
+            <p style="margin-top: 5px;">Retrouvez la liste de tous les inscrits sur Actu Manga World</p>
+        </div>
+
+        <!-- TABLEAU DES MEMBRES -->
+        <table class="forum-table">
+            <thead>
+                <tr>
+                    <th colspan="2" class="cat-title">_ Membres de la communauté _</th>
+                    <th class="stat-head" style="text-align: center;">Rôle</th>
+                    <th class="stat-head" style="text-align: center;">Date d'inscription</th>
+                    <th class="last-post-head" style="text-align: center;">Action / Profil</th>
+                </tr>
+            </thead>
+            <tbody id="members-container">
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 20px;"><em>Chargement des membres...</em></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        const currentUsername = localStorage.getItem('forumUsername');
+        const currentUserRole = localStorage.getItem('forumUserRole');
+        const profileLink = document.getElementById('nav-profile-link');
+        const authLink = document.getElementById('nav-auth-link');
+        
+        if (currentUsername) {
+            profileLink.classList.remove('hidden');
+            authLink.textContent = "Déconnexion";
+            authLink.setAttribute('href', '#');
+            authLink.onclick = async (e) => { 
+                e.preventDefault();
+                try { await supabase.auth.signOut(); } catch(err) { console.error(err); }
+                localStorage.clear(); 
+                window.location.reload(); 
+            };
+        }
+
+        // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
+        const adminBar = document.getElementById('admin-bar-container');
+        const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
+
+        if (isStaff && adminBar) {
+            adminBar.classList.remove('hidden');
+        }
+        
+        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.toggle('hidden');
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
+                banner: "https://images.alphacoders.com/605/605592.png" 
+            };
+            document.getElementById('input-forum-banner').value = config.banner || "https://images.alphacoders.com/605/605592.png";
+        });
+
+        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
+            document.getElementById('admin-panel-form').classList.add('hidden');
+        });
+
+        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || {};
+            config.banner = document.getElementById('input-forum-banner').value;
+            localStorage.setItem('forumHeaderConfig', JSON.stringify(config));
+            alert("Bannière mise à jour avec succès !");
+            window.location.reload();
+        });
+
+        function loadHeaderConfig() {
+            const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
+            if (config && config.banner) {
+                document.getElementById('forum-banner-img').src = config.banner;
+            }
+        }
+
+        async function loadMembers() {
+            const container = document.getElementById('members-container');
+
+            // Récupération des profils depuis la table 'profiles' ou 'users' de Supabase (ajuste le nom de la table selon ton setup, souvent 'profiles')
+            const { data: members, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                container.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Erreur de chargement des membres.</td></tr>`;
+                return;
+            }
+
+            if (!members || members.length === 0) {
+                container.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun membre enregistré pour le moment.</td></tr>`;
+                return;
+            }
+
+            // Gestion des icônes lues/non lues du LocalStorage (similaire à ton modèle)
+            const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
+            const defUnread = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png"; 
+            const defRead = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783010.png";    
+
+            const activeUnreadIcon = iconsConfig.unread || defUnread;
+            const activeReadIcon = iconsConfig.read || defRead;
+
+            const readMembers = JSON.parse(localStorage.getItem('forumReadMembers')) || {};
+
+            container.innerHTML = members.map(m => {
+                const dateFormatted = m.created_at ? new Date(m.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'}) : 'Inconnue';
+                const username = m.username || m.name || 'Membre';
+                const role = m.role || 'Membre';
+
+                const isRead = readMembers[m.id] === true;
+                const iconSrc = isRead ? activeReadIcon : activeUnreadIcon;
+
+                return `
+                    <tr>
+                        <td class="icon-cell">
+                            <img src="${iconSrc}" alt="Icône" class="forum-icon-img" data-memberid="${m.id}">
+                        </td>
+                        <td class="forum-desc">
+                            <span class="forum-title member-link" data-memberid="${m.id}" style="font-weight: bold; font-size: 1.1em; color: #c2185b;">${username}</span>
+                            <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Membre de la communauté Actu Manga World</p>
+                        </td>
+                        <td class="stat-cell" style="text-align: center; font-weight: bold; color: #333;">${role}</td>
+                        <td class="stat-cell" style="text-align: center; font-size: 0.9em;">${dateFormatted}</td>
+                        <td class="last-post-cell" style="text-align: center; font-size: 0.9em;">
+                            <a href="profile.html?user=${m.id}" class="btn-admin-edit" style="padding: 3px 8px; font-size: 0.8em;">Voir Profil</a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Marquer comme "lu" au clic sur un membre
+            document.querySelectorAll('.member-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const memberId = e.target.getAttribute('data-memberid');
+                    let readMembers = JSON.parse(localStorage.getItem('forumReadMembers')) || {};
+                    readMembers[memberId] = true;
+                    localStorage.setItem('forumReadMembers', JSON.stringify(readMembers));
+                });
+            });
+        }
+
+        loadHeaderConfig();
+        loadMembers();
+    </script>
+</body>
+</html>
