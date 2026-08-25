@@ -19,6 +19,7 @@
                 <option value="fc">⭐ Fan Clubs Officiels</option>
                 <option value="gaming">🕹️ Coin Arcade & Jeux Vidéo</option>
                 <option value="general">☕ Le QG des Discussions</option>
+                <option value="presentation">👋 Espace Membres & Présentations</option>
             </select>
 
             <label for="topic-title-input">Titre :</label>
@@ -34,7 +35,7 @@
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // Optionnel : Pré-sélectionner la catégorie si elle est passée dans l'URL (ex: new-topic.html?cat=graphisme)
+        // Optionnel : Pré-sélectionner la catégorie si elle est passée dans l'URL (ex: new-topic.html?cat=presentation)
         const urlParams = new URLSearchParams(window.location.search);
         const catParam = urlParams.get('cat');
         if (catParam) {
