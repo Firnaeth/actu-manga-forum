@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Membres & Présentations - Actu Manga World</title>
+    <title>Espace Membres & Présentations - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .forum-icon-img {
@@ -20,19 +20,20 @@
             vertical-align: middle;
             padding: 4px;
         }
-        .btn-admin-edit {
+        .btn-forum-action {
             background: #f3a6b8;
             color: white;
             border: 1px solid #e2899d;
-            padding: 4px 10px;
-            font-size: 11px;
+            padding: 6px 14px;
+            font-size: 12px;
             font-weight: bold;
             cursor: pointer;
-            border-radius: 3px;
+            border-radius: 4px;
             text-decoration: none;
             display: inline-block;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
-        .btn-admin-edit:hover {
+        .btn-forum-action:hover {
             background: #e2899d;
         }
     </style>
@@ -61,7 +62,7 @@
             <p style="margin-top: 5px;">Consulte l'annuaire des inscrits et viens te présenter à la communauté !</p>
         </div>
 
-        <!-- 1. PREMIER TABLEAU : ANNUAIRE DE LA COMMUNAUTÉ -->
+        <!-- TABLEAU 1 : ANNUAIRE DE LA COMMUNAUTÉ -->
         <table class="forum-table" style="margin-bottom: 25px;">
             <thead>
                 <tr>
@@ -78,7 +79,7 @@
             </tbody>
         </table>
 
-        <!-- 2. DEUXIÈME TABLEAU : SUJETS DE PRÉSENTATION -->
+        <!-- TABLEAU 2 : SUJETS DE PRÉSENTATION -->
         <table class="forum-table">
             <thead>
                 <tr>
@@ -95,9 +96,9 @@
             </tbody>
         </table>
 
-        <!-- BOUTON CRÉER SA PRÉSENTATION -->
-        <div style="margin-top: 15px; margin-bottom: 25px;">
-            <a href="new-topic.html?cat=presentation" class="btn-admin-edit" style="background: #61b3e8; padding: 6px 12px; font-size: 0.9em;">+ Me présenter</a>
+        <!-- BOUTONS EN DESSOUS DES TABLEAUX -->
+        <div style="margin-top: 15px; margin-bottom: 25px; display: flex; gap: 10px;">
+            <a href="new-topic.html?cat=presentation" class="btn-forum-action" style="background: #61b3e8;">+ Me présenter</a>
         </div>
 
     </div>
@@ -105,7 +106,6 @@
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // Gestion de l'affichage du profil dans la nav
         const currentUsername = localStorage.getItem('forumUsername');
         if (currentUsername) {
             document.getElementById('nav-profile-link').classList.remove('hidden');
@@ -129,7 +129,7 @@
                 .order('created_at', { ascending: false });
 
             if (error || !members || members.length === 0) {
-                container.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #7f8c8d; padding: 15px;">Aucun membre dans l'annuaire pour le moment.</td></tr>`;
+                container.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #7f8c8d; padding: 15px;">Aucun membre dans l'annuaire.</td></tr>`;
                 return;
             }
 
@@ -153,14 +153,14 @@
                         <td style="text-align: center; font-weight: bold; font-size: 0.9em;">${role}</td>
                         <td style="text-align: center; font-size: 0.9em;">${dateFormatted}</td>
                         <td style="text-align: center;">
-                            <a href="profile.html?user=${m.id}" class="btn-admin-edit" style="padding: 2px 8px; font-size: 0.8em;">Voir</a>
+                            <a href="profile.html?user=${m.id}" class="btn-forum-action" style="padding: 2px 8px; font-size: 0.8em;">Voir</a>
                         </td>
                     </tr>
                 `;
             }).join('');
         }
 
-        // --- CHARGEMENT DES SUJETS DE PRÉSENTATION ---
+        // --- CHARGEMENT DES PRÉSENTATIONS ---
         async function loadPresentationTopics() {
             const container = document.getElementById('presentation-topics-container');
             const { data: topics, error } = await supabase
@@ -186,23 +186,23 @@
                 const count = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
                 const iconSrc = readTopics[t.id] ? (iconsConfig.read || defRead) : (iconsConfig.unread || defUnread);
 
-                return `
-                    <tr>
-                        <td class="icon-cell">
-                            <img src="${iconSrc}" class="forum-icon-img" alt="Icône">
-                        </td>
-                        <td class="forum-desc">
-                            <a href="topic.html?id=${t.id}" class="topic-link" data-topicid="${t.id}" style="font-weight: bold; color: #333; text-decoration: none; font-size: 1.05em;">${t.title}</a>
-                            <p style="font-size: 0.85em; color: #666; margin-top: 2px;">Créé le ${dateFormatted}</p>
-                        </td>
-                        <td style="text-align: center; font-size: 0.9em;">${author}</td>
-                        <td style="text-align: center; font-size: 0.9em;">${count}</td>
-                        <td style="text-align: center; font-size: 0.85em; color: #7f8c8d;">
-                            <span>Par ${author}</span><br>
-                            <small>${dateFormatted}</small>
-                        </td>
-                    </tr>
-                `;
+            return `
+                <tr>
+                    <td class="icon-cell">
+                        <img src="${iconSrc}" class="forum-icon-img" alt="Icône">
+                    </td>
+                    <td class="forum-desc">
+                        <a href="topic.html?id=${t.id}" class="topic-link" data-topicid="${t.id}" style="font-weight: bold; color: #333; text-decoration: none; font-size: 1.05em;">${t.title}</a>
+                        <p style="font-size: 0.85em; color: #666; margin-top: 2px;">Créé le ${dateFormatted}</p>
+                    </td>
+                    <td style="text-align: center; font-size: 0.9em;">${author}</td>
+                    <td style="text-align: center; font-size: 0.9em;">${count}</td>
+                    <td style="text-align: center; font-size: 0.85em; color: #7f8c8d;">
+                        <span>Par ${author}</span><br>
+                        <small>${dateFormatted}</small>
+                    </td>
+                </tr>
+            `;
             }).join('');
 
             document.querySelectorAll('.topic-link').forEach(link => {
