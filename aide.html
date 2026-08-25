@@ -88,7 +88,7 @@
 
     </div>
 
-    <!-- SCRIPT POUR GÉRER L'ENVOI DU BUG (Optionnel : Enregistre dans Supabase en tant que sujet dans la catégorie aide) -->
+    <!-- SCRIPT POUR GÉRER L'ENVOI DU BUG (SUPABASE + DISCORD WEBHOOK) -->
     <script type="module">
         import { supabase } from './supabase.js';
 
@@ -106,21 +106,43 @@
         // Envoi du formulaire de bug
         document.getElementById('bug-report-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const title = "[BUG REPORT] " + document.getElementById('bug-title').value;
+            const rawTitle = document.getElementById('bug-title').value;
             const content = document.getElementById('bug-desc').value;
             const author = localStorage.getItem('forumUsername') || 'Membre Anonyme';
+            const title = "[BUG REPORT] " + rawTitle;
 
-            // On l'envoie dans la table topics avec une catégorie "aide" ou similaire
+            // 1. Enregistrement dans la table topics de Supabase
             const { error } = await supabase
                 .from('topics')
                 .insert([{ title, content, category: 'aide', author }]);
 
             if (error) {
-                alert("Erreur lors de l'envoi : " + error.message);
-            } else {
-                alert("Merci ! Ton rapport de bug a bien été envoyé. Je vais regarder ça.");
-                document.getElementById('bug-report-form').reset();
+                alert("Erreur lors de l'enregistrement : " + error.message);
+                return;
             }
+
+            // 2. ENVOI SUR DISCORD VIA WEBHOOK
+            // Remplace l'URL ci-dessous par l'URL de ton webhook Discord
+            const discordWebhookUrl = "";
+
+            if (discordWebhookUrl !== " {
+                const discordMessage = {
+                    content: `🚨 **Nouveau rapport de bug reçu sur le site !**\n> **Auteur :** ${author}\n> **Titre :** ${rawTitle}\n> **Description :** ${content}`
+                };
+
+                try {
+                    await fetch(discordWebhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(discordMessage)
+                    });
+                } catch (err) {
+                    console.error("Erreur d'envoi vers Discord :", err);
+                }
+            }
+
+            alert("Merci ! Ton rapport de bug a bien été envoyé sur le forum et transmis sur le Discord.");
+            document.getElementById('bug-report-form').reset();
         });
     </script>
 </body>
