@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des Membres - Actu Manga World</title>
+    <title>Présentation des membres - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
     <style>
         /* --- CORRECTIF POUR LA BARRE D'ADMINISTRATION --- */
@@ -98,31 +98,36 @@
 
         <!-- FIL D'ARIANE -->
         <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
-            <a href="index.html">Accueil</a> &raquo; <span>Liste des Membres</span>
+            <a href="index.html">Accueil</a> &raquo; <span>Présentation des membres</span>
         </div>
 
-        <!-- EN-TÊTE DE LA SECTION (TEXTE CENTRÉ) -->
+        <!-- EN-TÊTE DE LA SECTION -->
         <div class="welcome-banner" style="text-align: center; padding: 15px;">
-            <h2>👥 Annuaire des Membres</h2>
-            <p style="margin-top: 5px;">Retrouvez la liste de tous les inscrits sur Actu Manga World</p>
+            <h2>👋 Présentation des membres</h2>
+            <p style="margin-top: 5px;">Viens te présenter à la communauté : qui es-tu, quels sont tes mangas préférés ?</p>
         </div>
 
-        <!-- TABLEAU DES MEMBRES -->
+        <!-- TABLEAU DES PRÉSENTATIONS -->
         <table class="forum-table">
             <thead>
                 <tr>
-                    <th colspan="2" class="cat-title">_ Membres de la communauté _</th>
-                    <th class="stat-head" style="text-align: center;">Rôle</th>
-                    <th class="stat-head" style="text-align: center;">Date d'inscription</th>
-                    <th class="last-post-head" style="text-align: center;">Action / Profil</th>
+                    <th colspan="2" class="cat-title">_ Sujets de présentation _</th>
+                    <th class="stat-head" style="text-align: center;">Auteur</th>
+                    <th class="stat-head" style="text-align: center;">Réponses</th>
+                    <th class="last-post-head" style="text-align: center;">Dernier Message</th>
                 </tr>
             </thead>
-            <tbody id="members-container">
+            <tbody id="presentation-topics-container">
                 <tr>
-                    <td colspan="5" style="text-align: center; padding: 20px;"><em>Chargement des membres...</em></td>
+                    <td colspan="5" style="text-align: center; padding: 20px;"><em>Chargement des présentations...</em></td>
                 </tr>
             </tbody>
         </table>
+
+        <!-- BOUTON CRÉER SA PRÉSENTATION -->
+        <div style="margin-top: 15px; margin-bottom: 20px;">
+            <a href="new-topic.html?cat=presentation" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">+ Me présenter</a>
+        </div>
 
     </div>
 
@@ -146,7 +151,7 @@
             };
         }
 
-        // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
+        // --- GESTION DES PRIVILÈGES STAFF ---
         const adminBar = document.getElementById('admin-bar-container');
         const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
 
@@ -182,26 +187,28 @@
             }
         }
 
-        async function loadMembers() {
-            const container = document.getElementById('members-container');
+        async function loadPresentationTopics() {
+            const container = document.getElementById('presentation-topics-container');
 
-            // Récupération des profils depuis la table 'profiles' ou 'users' de Supabase (ajuste le nom de la table selon ton setup, souvent 'profiles')
-            const { data: members, error } = await supabase
-                .from('profiles')
+            // On récupère les sujets de la catégorie 'presentation'
+            const { data: topics, error } = await supabase
+                .from('topics')
                 .select('*')
+                .eq('category', 'presentation')
                 .order('created_at', { ascending: false });
 
             if (error) {
-                container.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Erreur de chargement des membres.</td></tr>`;
+                container.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Erreur de chargement des présentations.</td></tr>`;
                 return;
             }
 
-            if (!members || members.length === 0) {
-                container.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucun membre enregistré pour le moment.</td></tr>`;
+            if (!topics || topics.length === 0) {
+                container.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Aucune présentation pour le moment. Sois le premier à te présenter !</td></tr>`;
                 return;
             }
 
-            // Gestion des icônes lues/non lues du LocalStorage (similaire à ton modèle)
+            const { data: replies } = await supabase.from('replies').select('topic_id');
+
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
             const defUnread = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png"; 
             const defRead = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783010.png";    
@@ -209,47 +216,47 @@
             const activeUnreadIcon = iconsConfig.unread || defUnread;
             const activeReadIcon = iconsConfig.read || defRead;
 
-            const readMembers = JSON.parse(localStorage.getItem('forumReadMembers')) || {};
+            const readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
 
-            container.innerHTML = members.map(m => {
-                const dateFormatted = m.created_at ? new Date(m.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'}) : 'Inconnue';
-                const username = m.username || m.name || 'Membre';
-                const role = m.role || 'Membre';
+            container.innerHTML = topics.map(t => {
+                const dateFormatted = new Date(t.created_at).toLocaleDateString([], {day: '2-digit', month: '2-digit', year: 'numeric'});
+                const author = t.author || 'Inconnu';
+                const topicRepliesCount = replies ? replies.filter(r => r.topic_id === t.id).length : 0;
 
-                const isRead = readMembers[m.id] === true;
+                const isRead = readTopics[t.id] === true;
                 const iconSrc = isRead ? activeReadIcon : activeUnreadIcon;
 
                 return `
                     <tr>
                         <td class="icon-cell">
-                            <img src="${iconSrc}" alt="Icône" class="forum-icon-img" data-memberid="${m.id}">
+                            <img src="${iconSrc}" alt="Icône" class="forum-icon-img" data-topicid="${t.id}">
                         </td>
                         <td class="forum-desc">
-                            <span class="forum-title member-link" data-memberid="${m.id}" style="font-weight: bold; font-size: 1.1em; color: #c2185b;">${username}</span>
-                            <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Membre de la communauté Actu Manga World</p>
+                            <a href="topic.html?id=${t.id}" class="forum-title topic-link" data-topicid="${t.id}" style="font-weight: bold; font-size: 1.1em;">${t.title}</a>
+                            <p style="font-size: 0.85em; color: #666; margin-top: 3px;">Présentation créée le ${dateFormatted}</p>
                         </td>
-                        <td class="stat-cell" style="text-align: center; font-weight: bold; color: #333;">${role}</td>
-                        <td class="stat-cell" style="text-align: center; font-size: 0.9em;">${dateFormatted}</td>
+                        <td class="stat-cell" style="text-align: center;">${author}</td>
+                        <td class="stat-cell" style="text-align: center;">${topicRepliesCount}</td>
                         <td class="last-post-cell" style="text-align: center; font-size: 0.9em;">
-                            <a href="profile.html?user=${m.id}" class="btn-admin-edit" style="padding: 3px 8px; font-size: 0.8em;">Voir Profil</a>
+                            <span>Par ${author}</span><br>
+                            <small style="color: #7f8c8d;">${dateFormatted}</small>
                         </td>
                     </tr>
                 `;
             }).join('');
 
-            // Marquer comme "lu" au clic sur un membre
-            document.querySelectorAll('.member-link').forEach(link => {
+            document.querySelectorAll('.topic-link').forEach(link => {
                 link.addEventListener('click', (e) => {
-                    const memberId = e.target.getAttribute('data-memberid');
-                    let readMembers = JSON.parse(localStorage.getItem('forumReadMembers')) || {};
-                    readMembers[memberId] = true;
-                    localStorage.setItem('forumReadMembers', JSON.stringify(readMembers));
+                    const topicId = e.target.getAttribute('data-topicid');
+                    let readTopics = JSON.parse(localStorage.getItem('forumReadTopics')) || {};
+                    readTopics[topicId] = true;
+                    localStorage.setItem('forumReadTopics', JSON.stringify(readTopics));
                 });
             });
         }
 
         loadHeaderConfig();
-        loadMembers();
+        loadPresentationTopics();
     </script>
 </body>
 </html>
