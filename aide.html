@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aide & Tutoriels - Actu Manga World</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .help-section {
+            background: #fff;
+            border: 1px solid #ffb6c1;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .help-section h3 {
+            color: #c0392b;
+            margin-top: 0;
+            border-bottom: 1px solid #fce4ec;
+            padding-bottom: 8px;
+        }
+        .help-box-alert {
+            background: #fff3cd; 
+            border: 1px solid #ffeeba; 
+            color: #856404; 
+            padding: 15px; 
+            border-radius: 4px; 
+            margin-bottom: 20px; 
+        }
+    </style>
+</head>
+<body>
+
+    <div id="wrapper">
+
+        <!-- EN-TÊTE / BANNIÈRE -->
+        <div class="main-header">
+            <img src="https://images.alphacoders.com/605/605592.png" alt="Bannière Forum Manga" class="header-banner">
+        </div>
+
+        <!-- NAVIGATION -->
+        <nav class="forum-nav">
+            <a href="index.html" class="nav-link">Index</a>
+            <a href="community.html" class="nav-link">Fiches & Critiques</a>
+            <a href="contest-view.html" class="nav-link">Concours Dessin</a>
+            <a href="#" class="nav-link">Rechercher</a>
+            <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
+            <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
+            <a href="aide.html" class="nav-link" style="font-weight: bold; color: #c0392b;">Aide</a>
+        </nav>
+
+        <!-- CONTENU DE LA PAGE D'AIDE -->
+        <div class="news-container" style="padding: 20px;">
+            <h2 style="color: #333; margin-top: 0;">🛠️ Section Aide, Tutoriels & Signalement de Bugs</h2>
+            
+            <!-- Encadré spécifique Bug Report -->
+            <div class="help-box-alert">
+                <h4 style="margin: 0 0 8px 0;">⚠️ Un bug rencontré sur le site ?</h4>
+                <p style="margin: 0;">Le forum étant actuellement en <strong>Work in Progress</strong>, il est possible que tu croises quelques dysfonctionnements. N'hésite pas à m'en faire un retour détaillé ci-dessous ou en créant un sujet dans cette section pour que je puisse corriger ça rapidement !</p>
+            </div>
+
+            <!-- Tutoriels & Fonctionnement -->
+            <div class="help-section">
+                <h3>📖 Comment utiliser le forum ?</h3>
+                <ul>
+                    <li><strong>Créer un sujet :</strong> Rendez-vous dans la catégorie de votre choix et cliquez sur le bouton de création de sujet pour partager vos avis, vos fiches ou vos dessins (Rappel : <em>Concours de dessin Non-IA uniquement !</em>).</li>
+                    <li><strong>Gérer son profil :</strong> Vous pouvez modifier votre avatar et consulter votre mangathèque personnalisée depuis l'onglet "Mon Profil".</li>
+                    <li><strong>Les Sorties VF :</strong> Retrouvez toutes les actualités et le calendrier mis à jour régulièrement par l'équipe.</li>
+                </ul>
+            </div>
+
+            <!-- Espace Signalement / Contact Rapide -->
+            <div class="help-section">
+                <h3>💬 Signaler un bug ou poser une question</h3>
+                <p>Tu peux poster ton rapport de bug directement en indiquant la page concernée et ce qui ne fonctionne pas :</p>
+                
+                <form id="bug-report-form">
+                    <label for="bug-title" style="display: block; margin-bottom: 5px; font-weight: bold;">Titre / Résumé du dysfonctionnement :</label>
+                    <input type="text" id="bug-title" placeholder="Ex: Erreur d'affichage sur la page profil..." style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 3px;" required>
+
+                    <label for="bug-desc" style="display: block; margin-bottom: 5px; font-weight: bold;">Description détaillée du bug :</label>
+                    <textarea id="bug-desc" rows="5" placeholder="explique ce qui s'est passé, sur quelle page, etc." style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 3px;" required></textarea>
+
+                    <button type="submit" style="background: #f3a6b8; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 3px; cursor: pointer;">Envoyer le rapport de bug</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT POUR GÉRER L'ENVOI DU BUG (Optionnel : Enregistre dans Supabase en tant que sujet dans la catégorie aide) -->
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        // Gestion de la navbar (connexion / déconnexion)
+        const currentUsername = localStorage.getItem('forumUsername');
+        const profileLink = document.getElementById('nav-profile-link');
+        const authLink = document.getElementById('nav-auth-link');
+        if (currentUsername) {
+            profileLink.classList.remove('hidden');
+            authLink.textContent = "Déconnexion";
+            authLink.setAttribute('href', '#');
+            authLink.onclick = () => { localStorage.clear(); window.location.href = 'index.html'; };
+        }
+
+        // Envoi du formulaire de bug
+        document.getElementById('bug-report-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = "[BUG REPORT] " + document.getElementById('bug-title').value;
+            const content = document.getElementById('bug-desc').value;
+            const author = localStorage.getItem('forumUsername') || 'Membre Anonyme';
+
+            // On l'envoie dans la table topics avec une catégorie "aide" ou similaire
+            const { error } = await supabase
+                .from('topics')
+                .insert([{ title, content, category: 'aide', author }]);
+
+            if (error) {
+                alert("Erreur lors de l'envoi : " + error.message);
+            } else {
+                alert("Merci ! Ton rapport de bug a bien été envoyé. Je vais regarder ça.");
+                document.getElementById('bug-report-form').reset();
+            }
+        });
+    </script>
+</body>
+</html>
