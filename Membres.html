@@ -20,22 +20,27 @@
             vertical-align: middle;
             padding: 4px;
         }
-        .btn-forum-action {
-            background: #f3a6b8;
-            color: white;
-            border: 1px solid #e2899d;
-            padding: 6px 14px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 4px;
-            text-decoration: none;
-            display: inline-block;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-        .btn-forum-action:hover {
-            background: #e2899d;
-        }
+/* Bouton étiré sur toute la largeur avec le même style rose */
+    .btn-forum-action {
+        background: #f3a6b8;
+        color: white;
+        border: 1px solid #e2899d;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 4px;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        margin-bottom: 10px;
+    }
+    .btn-forum-action:hover {
+        background: #e2899d;
+    }
         /* Style pour masquer/afficher l'annuaire en douceur */
         #directory-wrapper {
             max-height: 0;
