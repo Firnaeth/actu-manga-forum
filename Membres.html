@@ -86,6 +86,29 @@
             max-height: 1000px; /* S'adapte à la quantité de membres */
             transition: max-height 0.5s ease-in;
         }
+        /* Style du bouton bleu pleine largeur (identique à ton autre page) */
+    .btn-new-topic {
+        background-color: #3498db;
+        color: white;
+        border: 1px solid #2980b9;
+        padding: 8px 15px;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 4px;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .btn-new-topic:hover {
+        background-color: #2980b9;
+    }       
     </style>
 </head>
 <body>
@@ -166,7 +189,7 @@
 
         <!-- BOUTON POUR SE PRÉSENTER -->
         <div style="margin-top: 15px; margin-bottom: 25px; display: flex; gap: 10px;">
-            <a href="new-topic.html?cat=presentation" class="btn-forum-action" style="background: #61b3e8;">+ Me présenter</a>
+            <a href="new-topic.html?category=presentation" class="btn-new-topic" style="background: #61b3e8;">+ Me présenter</a>
         </div>
 
     </div>
