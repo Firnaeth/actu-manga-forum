@@ -318,6 +318,15 @@
             });
         }
 
+        // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
+        const currentUserRole = localStorage.getItem('forumUserRole');
+        const adminBar = document.getElementById('admin-bar-container');
+        const isStaff = (currentUserRole === 'admin' || currentUserRole === 'modo' || currentUsername === "Otaku_33" || currentUsername === "Admin_Otaku");
+
+        if (isStaff && adminBar) {
+            adminBar.classList.remove('hidden');
+        }
+
         loadDirectoryMembers();
         loadPresentationTopics();
     </script>
