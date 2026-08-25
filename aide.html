@@ -107,17 +107,17 @@
         document.getElementById('bug-report-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const title = document.getElementById('bug-title').value;
-            const content = document.getElementById('bug-desc-bug') ? document.getElementById('bug-desc-bug').value : document.getElementById('bug-desc').value;
+            const content = document.getElementById('bug-desc').value;
             const author = localStorage.getItem('forumUsername') || 'Membre Anonyme';
 
-            // Enregistrement dans la table bug_reports de Supabase (qui déclenchera ton Webhook Discord)
+            // Enregistrement direct dans bug_reports (ce qui déclenchera ton webhook Discord)
             const { error } = await supabase
                 .from('bug_reports')
                 .insert([{ title, content, author }]);
 
             if (error) {
                 alert("Erreur lors de l'enregistrement : " + error.message);
-                console.error(error);
+                console.error("Détail erreur Supabase :", error);
             } else {
                 alert("Merci ! Ton rapport de bug a bien été envoyé.");
                 document.getElementById('bug-report-form').reset();
