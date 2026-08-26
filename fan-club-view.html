@@ -139,16 +139,32 @@
         // --- GESTION DE LA BANNIÈRE DÉDIÉE DEPUIS SUPABASE (CORRIGÉE) ---
         async function loadHeaderConfig() {
             try {
-                if (fcId) {
-                    // Utilisation de .limit(1) pour éviter l'erreur 400
-                    const { data, error } = await supabase
+                if (!fcId) return;
+
+                // 1. On récupère d'abord le topic principal pour connaitre son titre exact
+                const { data: topicData } = await supabase
+                    .from('topics')
+                    .select('title')
+                    .eq('id', fcId)
+                    .single();
+
+                if (topicData && topicData.title) {
+                    // On extrait le mot-clé (ex: "[FAN CLUB] VANDREAD : ..." -> "vandread")
+                    let cleanTitle = topicData.title.toLowerCase()
+                        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                        .replace(/\[fan club\]|fan club officiel|fan club|[:\-]/g, "")
+                        .trim();
+                    let keyword = cleanTitle.split(/\s+/)[0];
+
+                    // 2. On interroge la table fan_clubs avec ce mot-clé textuel
+                    const { data: fcData, error } = await supabase
                         .from('fan_clubs')
                         .select('banner_url')
-                        .eq('id', fcId)
+                        .eq('id', keyword)
                         .limit(1);
 
-                    if (!error && data && data.length > 0 && data[0].banner_url) {
-                        const bannerUrl = data[0].banner_url.trim();
+                    if (!error && fcData && fcData.length > 0 && fcData[0].banner_url) {
+                        const bannerUrl = fcData[0].banner_url.trim();
                         if (bannerUrl.startsWith('http')) {
                             const bannerImg = document.getElementById('forum-banner-img');
                             if (bannerImg) {
