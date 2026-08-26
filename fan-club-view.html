@@ -85,8 +85,9 @@
             </tbody>
         </table>
 
-        <div style="margin-top: 15px; margin-bottom: 20px;">
-            <a href="#" id="btn-new-topic" class="btn-admin-edit" style="text-decoration: none; padding: 8px 14px; background: #61b3e8; border: none;">+ Créer un Sujet dans cette section</a>
+        <!-- ZONE DU BOUTON DE CRÉATION DE SUJET (Gérée dynamiquement) -->
+        <div id="fc-action-container" style="margin-top: 15px; margin-bottom: 20px;">
+            <a href="#" id="btn-new-topic" class="btn-admin-edit" style="text-decoration: none; padding: 8px 14px; background: #61b3e8; border: none; display: inline-block;">+ Créer un Sujet dans cette section</a>
         </div>
     </div>
 
@@ -107,6 +108,16 @@
                 localStorage.clear(); 
                 window.location.reload(); 
             };
+        } else {
+            // Si non connecté, on remplace le bouton par un message d'avertissement
+            const actionContainer = document.getElementById('fc-action-container');
+            if (actionContainer) {
+                actionContainer.innerHTML = `
+                    <div style="background: #fff3cd; color: #856404; padding: 12px; border-radius: 4px; border: 1px solid #ffeeba; font-size: 0.9em; text-align: center;">
+                        🔒 Vous devez être <strong>connecté</strong> pour créer un sujet dans ce Fan Club. <a href="register.html" style="color: #c2185b; font-weight: bold;">Se connecter</a>
+                    </div>
+                `;
+            }
         }
 
         const adminBar = document.getElementById('admin-bar-container');
@@ -118,6 +129,12 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const fcId = urlParams.get('id');
+
+        // Met à jour le lien du bouton de création si l'élément existe toujours
+        const btnNewTopic = document.getElementById('btn-new-topic');
+        if (btnNewTopic) {
+            btnNewTopic.setAttribute('href', `new-topic.html?cat=fc&fc_id=${fcId || ''}`);
+        }
 
         // Gestion de la bannière spécifique du Fan Club ou globale
         function loadHeaderConfig() {
@@ -145,8 +162,6 @@
                 console.error("Erreur chargement bannière", e);
             }
         }
-
-        document.getElementById('btn-new-topic').setAttribute('href', `new-topic.html?cat=fc&fc_id=${fcId || ''}`);
 
         async function loadFanClubData() {
             if (!fcId) {
