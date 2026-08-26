@@ -116,7 +116,8 @@
             </tbody>
         </table>
 
-        <div style="margin-top: 15px; margin-bottom: 20px;">
+        <!-- ZONE DU BOUTON DE CRÉATION DE SUJET (Gérée dynamiquement) -->
+        <div id="graphisme-action-container" style="margin-top: 15px; margin-bottom: 20px;">
             <a href="new-topic.html?cat=graphisme" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em;">+ Créer un Sujet Graphique</a>
         </div>
     </div>
@@ -139,6 +140,16 @@
                 localStorage.clear(); 
                 window.location.reload(); 
             };
+        } else {
+            // Si non connecté, on remplace le bouton par un message d'avertissement
+            const actionContainer = document.getElementById('graphisme-action-container');
+            if (actionContainer) {
+                actionContainer.innerHTML = `
+                    <div style="background: #fff3cd; color: #856404; padding: 12px; border-radius: 4px; border: 1px solid #ffeeba; font-size: 0.9em; text-align: center;">
+                        🔒 Vous devez être <strong>connecté</strong> pour créer un sujet graphique. <a href="register.html" style="color: #c2185b; font-weight: bold;">Se connecter</a>
+                    </div>
+                `;
+            }
         }
 
         // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
