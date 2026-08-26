@@ -56,30 +56,29 @@
             padding: 4px;
         }
 
-        /* --- BLOC "QUI EST EN LIGNE" AVEC LE DÉGRADÉ BLEU DE TON MODÈLE --- */
-        .online-blue-table {
+        /* --- STYLE EXACT DU BLOC "QUI EST EN LIGNE" DE TON IMAGE --- */
+        .online-exact-table {
             width: 100%;
             border-collapse: collapse;
             background: #ffffff;
-            border: 1px solid #7ac1eb;
+            border: 1px solid #5bc0de;
             margin-top: 20px;
             margin-bottom: 20px;
             border-radius: 4px;
             overflow: hidden;
         }
 
-        .online-blue-header {
-            background: linear-gradient(to right, #40c9ff, #e81cff); /* Dégradé style ton image */
-            background: linear-gradient(to right, #5bc0de, #87ceeb, #b0e0e6); /* Dégradé bleu pastel doux */
+        .online-exact-header {
+            background: #5bc0de; /* Fond bleu uni (sans dégradé) */
             color: #ffffff;
-            padding: 10px 15px;
+            padding: 8px 12px;
             font-weight: bold;
             font-size: 0.95em;
-            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
-            border-bottom: 1px solid #7ac1eb;
+            text-align: left; /* Aligné à gauche */
+            border-bottom: 1px solid #5bc0de;
         }
 
-        .online-blue-cell-image {
+        .online-exact-cell-image {
             width: 220px;
             padding: 12px;
             text-align: center;
@@ -88,7 +87,7 @@
             border-right: 1px solid #bce8f1;
         }
 
-        .online-blue-cell-content {
+        .online-exact-cell-content {
             padding: 15px;
             vertical-align: top;
             font-size: 0.9em;
@@ -100,7 +99,7 @@
             width: 200px;
             height: 200px;
             object-fit: cover;
-            border: 1px solid #87ceeb;
+            border: 1px solid #5bc0de;
             border-radius: 4px;
         }
     </style>
@@ -167,32 +166,26 @@
             </table>
         </div>
 
-        <!-- WIDGET QUI EST EN LIGNE (STYLE BLEU SANS AVATARS) -->
-        <table class="online-blue-table">
+        <!-- WIDGET QUI EST EN LIGNE (STYLE IDENTIQUE À TON IMAGE AVEC POINTILLÉS) -->
+        <table class="online-exact-table">
             <thead>
                 <tr>
-                    <th colspan="2" class="online-blue-header">Qui est en ligne ?</th>
+                    <th colspan="2" class="online-exact-header">_ Qui est en ligne ? _</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <!-- Image illustrative sur le côté gauche -->
-                    <td class="online-blue-cell-image">
+                    <td class="online-exact-cell-image">
                         <img src="https://images.alphacoders.com/605/605592.png" alt="Illustration Qui est en ligne" class="online-img-preview">
                     </td>
-                    <!-- Informations et liste des membres sans avatars à droite -->
-                    <td class="online-blue-cell-content">
+                    <!-- Informations et liste des membres à droite avec les pointillés exacts -->
+                    <td class="online-exact-cell-content">
                         <div id="online-count-msg" style="margin-bottom: 8px;">Chargement des statistiques...</div>
-                        <hr style="border: none; border-top: 1px dotted #87ceeb; margin: 10px 0;">
-                        <div style="margin-bottom: 10px;">
-                            <strong>Membres inscrits :</strong> <span id="online-users-list" style="color: #333;">Chargement...</span>
-                        </div>
-                        <hr style="border: none; border-top: 1px dotted #87ceeb; margin: 10px 0;">
-                        <div style="font-size: 0.85em; color: #666;">
-                            <strong>Légende :</strong> 
-                            <span style="color: #d9534f; font-weight: bold;">[ Administrateur ]</span> 
-                            <span style="color: #f0ad4e; font-weight: bold;">[ Modérateur ]</span> 
-                            <span style="color: #337ab7; font-weight: bold;">[ Membre ]</span>
+                        <!-- Ligne en pointillés bleus exacte -->
+                        <hr style="border: none; border-top: 1px dotted #5bc0de; margin: 10px 0;">
+                        <div style="margin-bottom: 5px;">
+                            Membres inscrits : <span id="online-users-list" style="color: #333;">Chargement...</span>
                         </div>
                     </td>
                 </tr>
@@ -402,25 +395,12 @@
 
             if (!profiles || profiles.length === 0) return;
 
-            // Tri par rang (Admin d'abord, puis Modo, puis Membre)
-            profiles.sort((a, b) => {
-                const getPriority = (user) => {
-                    const r = (user.role || '').toLowerCase();
-                    const rankText = (user.rank || '').toLowerCase();
-                    if (r === 'admin' || rankText.includes('admin')) return 1;
-                    if (r === 'moderator' || r === 'modérateur' || rankText.includes('mod')) return 2;
-                    return 3;
-                };
-                return getPriority(a) - getPriority(b);
-            });
-
             if (countMsg) countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
             
-            // Affichage dans le bloc "Qui est en ligne ?" sans les avatars (sous forme de texte cliquable simple)
+            // Affichage simple des pseudos sous forme de texte sans avatars pour le bloc du bas
             if (usersListContainer) {
                 usersListContainer.innerHTML = profiles.map(u => {
-                    const rankName = u.rank || (u.role === 'admin' ? 'Administrateur' : 'Membre');
-                    return `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none; font-weight: bold; color: #337ab7;">${u.username}</a> <span style="font-size: 0.8em; color: #777;">(${rankName})</span>`;
+                    return `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none; font-weight: bold; color: #337ab7;">${u.username}</a>`;
                 }).join(', ');
             }
 
