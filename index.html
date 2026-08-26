@@ -172,7 +172,7 @@
         <table class="online-sidebar-table">
             <thead>
                 <tr>
-                    <th colspan="2" style="background-color: #d9edf7; color: #31708f; text-align: left; padding: 8px 10px; font-weight: bold;">_ Qui est en ligne ? _ </th>
+                    <th colspan="2" style="background: linear-gradient(to up, #d9edf7, #ffffff); color: #31708f; text-align: left; padding: 8px 10px; font-weight: bold;">_ Qui est en ligne ? _ </th>
                 </tr>
             </thead>
             <tbody>
@@ -396,21 +396,33 @@
             const { data: profiles } = await supabase.from('profiles').select('username, role, rank, avatar_url');
             const staffContainer = document.getElementById('staff-avatars-container');
             const countMsg = document.getElementById('online-count-msg');
-            const usersListContainer = document.getElementById('online-users-list');
+            const simpleListContainer = document.getElementById('online-users-simple');
+            const ranksListContainer = document.getElementById('online-users-ranks');
             const defaultAvatar = "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg";
 
             if (!profiles || profiles.length === 0) return;
 
-            if (countMsg) countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
+            // 1ère ligne : Compteur total
+            if (countMsg) {
+                countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
+            }
             
-            // Affichage simple des pseudos sous forme de texte sans avatars pour le bloc du bas
-            if (usersListContainer) {
-                usersListContainer.innerHTML = profiles.map(u => {
-                    return `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none; font-weight: bold; color: #337ab7;">${u.username}</a>`;
+            // 2ème ligne : Liste simple des pseudos
+            if (simpleListContainer) {
+                simpleListContainer.innerHTML = profiles.map(u => 
+                    `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none; font-weight: bold; color: #337ab7;">${u.username}</a>`
+                ).join(', ');
+            }
+
+            // 3ème ligne : Pseudos avec les Ranks
+            if (ranksListContainer) {
+                ranksListContainer.innerHTML = profiles.map(u => {
+                    const rankName = u.rank || 'Membre';
+                    return `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none; font-weight: bold; color: #337ab7;">${u.username}</a> <span style="font-size: 0.85em; color: #666; font-weight: bold;">[${rankName}]</span>`;
                 }).join(', ');
             }
 
-            // Affichage dans le bloc "Staff & Membres" en haut (conserve les avatars pour le haut)
+            // Affichage dans le bloc "Staff & Membres" en haut
             if (staffContainer) {
                 staffContainer.innerHTML = profiles.map(user => {
                     const avatar = (user.avatar_url && user.avatar_url.trim() !== "") ? user.avatar_url : defaultAvatar;
