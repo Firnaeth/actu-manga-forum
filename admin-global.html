@@ -197,28 +197,46 @@
             document.getElementById('btn-tab-' + tabName).style.background = '#e0a899';
         };
 
-        // --- 1. GESTION DE L'EN-TÊTE ET DE L'ACCUEIL ---
-        const defaultConfig = { 
-            title: "Bienvenue sur Actu Manga World : The Ultimate Otaku Network", 
-            subtitle: "Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !", 
-            banner: "https://images.alphacoders.com/605/605592.png" 
-        };
-        const currentConfig = JSON.parse(localStorage.getItem('forumHeaderConfig')) || defaultConfig;
-        
-        document.getElementById('input-forum-title').value = currentConfig.title;
-        document.getElementById('input-forum-subtitle').value = currentConfig.subtitle;
-        document.getElementById('input-forum-banner').value = currentConfig.banner;
+        // --- 1. GESTION DE L'EN-TÊTE ET DE L'ACCUEIL (SUPABASE) ---
+        async function loadHeaderConfig() {
+            const { data, error } = await supabase
+                .from('site_settings')
+                .select('*')
+                .eq('id', 'global')
+                .single();
 
-        document.getElementById('form-config-header').addEventListener('submit', (e) => {
+            if (error) {
+                console.error("Erreur chargement configuration accueil :", error);
+                return;
+            }
+
+            if (data) {
+                document.getElementById('input-forum-title').value = data.forum_title || '';
+                document.getElementById('input-forum-subtitle').value = data.welcome_text || '';
+                document.getElementById('input-forum-banner').value = data.banner_url || '';
+            }
+        }
+
+        document.getElementById('form-config-header').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const newConfig = {
-                title: document.getElementById('input-forum-title').value,
-                subtitle: document.getElementById('input-forum-subtitle').value,
-                banner: document.getElementById('input-forum-banner').value
-            };
-            localStorage.setItem('forumHeaderConfig', JSON.stringify(newConfig));
-            alert("En-tête et accueil mis à jour avec succès !");
+            const forum_title = document.getElementById('input-forum-title').value;
+            const welcome_text = document.getElementById('input-forum-subtitle').value;
+            const banner_url = document.getElementById('input-forum-banner').value;
+
+            const { error } = await supabase
+                .from('site_settings')
+                .update({ forum_title, welcome_text, banner_url })
+                .eq('id', 'global');
+
+            if (error) {
+                alert("Erreur lors de la mise à jour : " + error.message);
+            } else {
+                alert("En-tête et accueil mis à jour dans Supabase avec succès ! Tout le monde verra les changements.");
+            }
         });
+
+        // Charger la config au démarrage
+        loadHeaderConfig();
 
         // --- 2. GESTION DES FAN CLUBS ---
         let fanClubsBanners = JSON.parse(localStorage.getItem('fanClubsBanners')) || [];
@@ -380,7 +398,7 @@
             const { data: categories, error } = await supabase
                 .from('categories')
                 .select('*')
-                .order('display_order', { ascending: true }); // Tri par ordre
+                .order('display_order', { ascending: true });
 
             if (error) {
                 console.error("Erreur chargement catégories :", error);
@@ -454,7 +472,7 @@
             const { data: subcategories, error } = await supabase
                 .from('subcategories')
                 .select('*')
-                .order('display_order', { ascending: true }); // Tri par ordre
+                .order('display_order', { ascending: true });
 
             if (error) {
                 console.error("Erreur chargement sous-catégories :", error);
