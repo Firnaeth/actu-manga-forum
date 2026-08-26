@@ -136,32 +136,35 @@
             btnNewTopic.setAttribute('href', `new-topic.html?cat=fc&fc_id=${fcId || ''}`);
         }
 
-        // --- GESTION DE LA BANNIÈRE DÉDIÉE DEPUIS SUPABASE ---
+        // --- GESTION DE LA BANNIÈRE DÉDIÉE DEPUIS SUPABASE (CORRIGÉE) ---
         async function loadHeaderConfig() {
             try {
                 if (fcId) {
-                    // 1. Chercher la bannière spécifique dans la table Supabase 'fan_clubs'
+                    // Utilisation de .limit(1) pour éviter l'erreur 400
                     const { data, error } = await supabase
                         .from('fan_clubs')
                         .select('banner_url')
                         .eq('id', fcId)
-                        .single();
+                        .limit(1);
 
-                    if (data && data.banner_url && data.banner_url.startsWith('http')) {
-                        const bannerImg = document.getElementById('forum-banner-img');
-                        if (bannerImg) {
-                            bannerImg.src = data.banner_url;
-                            return;
+                    if (!error && data && data.length > 0 && data[0].banner_url) {
+                        const bannerUrl = data[0].banner_url.trim();
+                        if (bannerUrl.startsWith('http')) {
+                            const bannerImg = document.getElementById('forum-banner-img');
+                            if (bannerImg) {
+                                bannerImg.src = bannerUrl;
+                                return;
+                            }
                         }
                     }
                 }
 
-                // 2. Fallback : Charger la configuration globale du site si aucune bannière spécifique n'est trouvée
+                // Fallback global de sécurité si aucune bannière spécifique n'est trouvée
                 const { data: globalData } = await supabase
                     .from('site_settings')
                     .select('banner_url')
                     .eq('id', 'global')
-                    .single();
+                    .maybeSingle();
 
                 if (globalData && globalData.banner_url) {
                     const bannerImg = document.getElementById('forum-banner-img');
