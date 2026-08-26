@@ -158,17 +158,29 @@
             adminBar.classList.remove('hidden');
         }
 
-        // Chargement dynamique de l'en-tête depuis le localStorage
-        function loadHeaderConfig() {
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
-                title: "Bienvenue sur Actu Manga World", 
-                subtitle: "Toutes les sorties VF / VOSTFR...", 
-                banner: "https://images.alphacoders.com/605/605592.png" 
-            };
-            document.getElementById('forum-title-display').textContent = config.title;
-            const subtitleEl = document.getElementById('forum-subtitle-display');
-            if (subtitleEl) subtitleEl.textContent = config.subtitle;
-            document.getElementById('forum-banner-img').src = config.banner;
+        // --- CHARGEMENT DE L'EN-TÊTE DEPUIS SUPABASE ---
+        async function loadHeaderConfig() {
+            const { data, error } = await supabase
+                .from('site_settings')
+                .select('*')
+                .eq('id', 'global')
+                .single();
+
+            if (error) {
+                console.error("Erreur chargement configuration accueil depuis Supabase :", error);
+                return;
+            }
+
+            if (data) {
+                document.getElementById('forum-title-display').textContent = data.forum_title || "Bienvenue sur Actu Manga World";
+                const subtitleEl = document.getElementById('forum-subtitle-display');
+                if (subtitleEl) subtitleEl.textContent = data.welcome_text || "";
+                
+                const bannerImg = document.getElementById('forum-banner-img');
+                if (bannerImg && data.banner_url) {
+                    bannerImg.src = data.banner_url;
+                }
+            }
         }
 
         async function loadForumData() {
