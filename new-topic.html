@@ -4,10 +4,43 @@
     <meta charset="UTF-8">
     <title>Créer un Nouveau Sujet</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .topic-header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .btn-help-link {
+            background: #f78fb3;
+            color: white;
+            padding: 6px 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-help-link:hover {
+            background: #e2899d;
+        }
+    </style>
 </head>
 <body>
     <div id="wrapper">
-        <h1 class="topic-main-title">📝 Création d'un Nouveau Sujet</h1>
+        <div class="topic-header-container">
+            <h1 class="topic-main-title" style="margin: 0;">📝 Création d'un Nouveau Sujet</h1>
+            <!-- Bouton menant vers la page d'aide / tuto image -->
+            <a href="help.html" target="_blank" class="btn-help-link">
+                💡 Tuto : Comment insérer une image ?
+            </a>
+        </div>
+
         <form class="reply-form" id="new-topic-form">
             <label for="topic-type">Catégorie :</label>
             <select id="topic-type" style="width: 100%; padding: 8px; margin-bottom: 12px;">
