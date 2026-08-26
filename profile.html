@@ -167,6 +167,7 @@
         }
 
         let currentUserId = null;
+        let userMangaList = [];
 
         async function loadUserProfile() {
             document.getElementById('bread-username').textContent = profileUser;
@@ -182,7 +183,6 @@
             if (profile) {
                 currentUserId = profile.id;
                 
-                // Gestion dynamique du rang et de sa couleur de badge
                 const rankSpan = document.getElementById('user-rank');
                 const userRole = profile.role ? profile.role.toLowerCase() : 'member';
                 const userRankText = profile.rank || (userRole === 'admin' ? 'Administrateur' : (userRole === 'moderator' || userRole === 'modérateur' || userRole === 'mod') ? 'Modérateur' : 'Membre');
@@ -206,7 +206,7 @@
                 document.getElementById('user-status').innerHTML = profile.status ? `<em>"${profile.status}"</em>` : '<em>Pas de statut particulier...</em>';
                 document.getElementById('user-anime').textContent = profile.current_anime || 'Non spécifié';
                 
-                // --- COMPTAGE AUTOMATIQUE DES MESSAGES (SUJETS + RÉPONSES) ---
+                // COMPTAGE AUTOMATIQUE DES MESSAGES
                 const { count: topicsCount } = await supabase
                     .from('topics')
                     .select('*', { count: 'exact', head: true })
@@ -219,7 +219,6 @@
 
                 const totalPosts = (topicsCount || 0) + (repliesCount || 0);
                 document.getElementById('user-posts').textContent = `${totalPosts} message${totalPosts > 1 ? 's' : ''}`;
-                // -------------------------------------------------------------
 
                 const malCell = document.getElementById('user-mal');
                 if (profile.mal_url) {
@@ -246,7 +245,6 @@
                     document.getElementById('user-avatar').src = profile.avatar_url;
                 }
 
-                // Si c'est notre propre profil, afficher et remplir le formulaire d'édition
                 if (profileUser === currentUsername) {
                     document.getElementById('edit-profile-section').style.display = 'block';
                     document.getElementById('edit-avatar-url').value = profile.avatar_url || '';
@@ -261,6 +259,13 @@
                     document.getElementById('edit-signature').value = profile.signature || '';
                 }
             }
+
+            if (profileUser !== currentUsername) {
+                document.getElementById('add-manga-box').style.display = 'none';
+            }
+
+            // Charger les mangas depuis Supabase pour cet utilisateur
+            await loadMangatheque();
         }
 
         // Sauvegarder les modifications de profil dans Supabase
@@ -301,21 +306,21 @@
             }
         });
 
-        if (profileUser !== currentUsername) {
-            document.getElementById('add-manga-box').style.display = 'none';
+        // --- GESTION DE LA MANGATHÈQUE VIA SUPABASE ---
+        async function loadMangatheque() {
+            if (!currentUserId) return;
+
+            const { data, error } = await supabase
+                .from('mangatheques')
+                .select('*')
+                .eq('user_id', currentUserId)
+                .order('created_at', { ascending: true });
+
+            if (!error) {
+                userMangaList = data || [];
+                renderMangatheque();
+            }
         }
-
-        // Gestion de la Mangathèque
-        const defaultMangas = {
-            "Otaku_33": [{ id: 1, title: "Bleach", count: 636 }]
-        };
-
-        if (!localStorage.getItem('forumMangatheques')) {
-            localStorage.setItem('forumMangatheques', JSON.stringify(defaultMangas));
-        }
-
-        const allMangatheques = JSON.parse(localStorage.getItem('forumMangatheques'));
-        let userMangaList = allMangatheques[profileUser] || [];
 
         function renderMangatheque() {
             const container = document.getElementById('manga-list-container');
@@ -329,14 +334,14 @@
 
             let total = 0;
             container.innerHTML = userMangaList.map(item => {
-                total += parseInt(item.count);
+                total += parseInt(item.volume_count);
                 const isOwner = profileUser === currentUsername;
                 return `
                     <div class="manga-item">
                         <div class="manga-info">
-                            <strong>${item.title}</strong>
+                            <strong>${item.manga_title}</strong>
                             <div class="volume-counter">
-                                📖 <span>${item.count} tomes</span>
+                                📖 <span>${item.volume_count} tomes</span>
                                 ${isOwner ? `
                                     <button class="btn-qty" data-id="${item.id}" data-action="minus">-</button>
                                     <button class="btn-qty" data-id="${item.id}" data-action="plus">+</button>
@@ -359,52 +364,67 @@
                 btn.onclick = function() {
                     const id = parseInt(this.getAttribute('data-id'));
                     const action = this.getAttribute('data-action');
-                    updateCount(id, action === 'plus' ? 1 : -1);
+                    const manga = userMangaList.find(m => m.id === id);
+                    if (manga) {
+                        const newCount = action === 'plus' ? manga.volume_count + 1 : manga.volume_count - 1;
+                        updateCountInSupabase(id, Math.max(1, newCount));
+                    }
                 };
             });
 
             document.querySelectorAll('.btn-del').forEach(btn => {
                 btn.onclick = function() {
                     const id = parseInt(this.getAttribute('data-id'));
-                    removeManga(id);
+                    removeMangaFromSupabase(id);
                 };
             });
         }
 
-        document.getElementById('form-add-manga').addEventListener('submit', function(e) {
+        document.getElementById('form-add-manga').addEventListener('submit', async function(e) {
             e.preventDefault();
             const title = document.getElementById('manga-title-input').value;
             const count = parseInt(document.getElementById('manga-count-input').value);
 
-            userMangaList.push({ id: Date.now(), title: title, count: count });
-            saveAndRender();
+            const { data, error } = await supabase
+                .from('mangatheques')
+                .insert([
+                    { user_id: currentUserId, manga_title: title, volume_count: count }
+                ])
+                .select();
 
-            document.getElementById('manga-title-input').value = '';
-            document.getElementById('manga-count-input').value = '';
+            if (error) {
+                alert("Erreur lors de l'ajout : " + error.message);
+            } else {
+                document.getElementById('manga-title-input').value = '';
+                document.getElementById('manga-count-input').value = '';
+                await loadMangatheque();
+            }
         });
 
-        function updateCount(id, change) {
-            const manga = userMangaList.find(m => m.id === id);
-            if (manga) {
-                manga.count += change;
-                if (manga.count < 1) manga.count = 1;
-                saveAndRender();
+        async function updateCountInSupabase(id, newCount) {
+            const { error } = await supabase
+                .from('mangatheques')
+                .update({ volume_count: newCount })
+                .eq('id', id);
+
+            if (!error) {
+                await loadMangatheque();
             }
         }
 
-        function removeManga(id) {
-            userMangaList = userMangaList.filter(item => item.id !== id);
-            saveAndRender();
+        async function removeMangaFromSupabase(id) {
+            const { error } = await supabase
+                .from('mangatheques')
+                .delete()
+                .eq('id', id);
+
+            if (!error) {
+                await loadMangatheque();
+            }
         }
 
-        function saveAndRender() {
-            allMangatheques[profileUser] = userMangaList;
-            localStorage.setItem('forumMangatheques', JSON.stringify(allMangatheques));
-            renderMangatheque();
-        }
-
+        // Lancement initial
         loadUserProfile();
-        renderMangatheque();
     </script>
 </body>
 </html>
