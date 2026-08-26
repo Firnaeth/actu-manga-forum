@@ -119,7 +119,7 @@
             </table>
         </div>
 
-        <!-- WIDGET QUI EST EN LIGNE AVEC IMAGE SUR LA GAUCHE (HARMONISÉ EN .forum-table) -->
+        <!-- WIDGET QUI EST EN LIGNE INTÉGRÉ EN VRAI .forum-table AVEC EN-TÊTE BLEU -->
         <table class="forum-table" style="margin-top: 20px; margin-bottom: 20px;">
             <thead>
                 <tr>
@@ -348,7 +348,6 @@
             if (countMsg) countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
             
             if (usersListContainer) {
-                // Intégration des ranks avec des couleurs adaptées
                 usersListContainer.innerHTML = profiles.map(u => {
                     let roleBadge = '';
                     let roleColor = '#555';
