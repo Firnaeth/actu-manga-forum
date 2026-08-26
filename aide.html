@@ -15,6 +15,29 @@
             border-radius: 4px; 
             margin-bottom: 20px; 
         }
+
+        .help-section {
+            margin-bottom: 25px;
+        }
+
+        .help-section h3 {
+            color: #2980b9;
+            border-bottom: 2px solid #f3a6b8;
+            padding-bottom: 5px;
+            margin-bottom: 12px;
+        }
+
+        .code-example {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 8px 12px;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #c7254e;
+            border-radius: 3px;
+            display: inline-block;
+            margin: 4px 0;
+        }
     </style>
 </head>
 <body>
@@ -45,6 +68,20 @@
                 </ul>
             </div>
 
+            <!-- NOUVELLE SECTION : INSÉRER DES IMAGES -->
+            <div class="help-section">
+                <h3>🎨 Comment insérer des images (Atelier Graphique, Signatures & Sujets)</h3>
+                <p>Tu souhaites partager tes créations graphiques, mettre une image dans un sujet ou illustrer tes messages ? Suis ces étapes simples :</p>
+                <ol style="line-height: 1.6; margin-left: 20px;">
+                    <li>Héberge ton image sur un site de partage (comme <strong>Casimages</strong>, Imgur, etc.).</li>
+                    <li>Récupère impérativement le <strong>lien direct de l'image</strong> (l'URL qui se termine par <code style="color: #d9534f;">.jpg</code>, <code style="color: #d9534f;">.png</code> ou <code style="color: #d9534f;">.gif</code>, et non le lien de la page web de l'hébergeur).</li>
+                    <li>Dans ton message ou ton sujet, utilise la balise HTML standard pour afficher l'image :<br>
+                        <span class="code-example">&lt;img src="URL_DIRECTE_DE_TON_IMAGE" alt="Ma création" style="max-width: 100%; border-radius: 4px;"&gt;</span>
+                    </li>
+                </ol>
+                <p style="font-size: 0.9em; color: #666; margin-top: 8px;"><em>Astuce : Le style <code style="color: #333;">max-width: 100%;</code> permet d'éviter que ton image ne dépasse des dimensions du forum sur les petits écrans !</em></p>
+            </div>
+
             <!-- Espace Signalement / Contact Rapide -->
             <div class="help-section">
                 <h3>💬 Signaler un bug ou poser une question</h3>
@@ -55,7 +92,7 @@
                     <input type="text" id="bug-title" placeholder="Ex: Erreur d'affichage sur la page profil..." style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 3px;" required>
 
                     <label for="bug-desc" style="display: block; margin-bottom: 5px; font-weight: bold;">Description détaillée du bug :</label>
-                    <textarea id="bug-desc" rows="5" placeholder="explique ce qui s'est passé, sur quelle page, etc." style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 3px;" required></textarea>
+                    <textarea id="bug-desc" rows="5" placeholder="Explique ce qui s'est passé, sur quelle page, etc." style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 3px;" required></textarea>
 
                     <button type="submit" style="background: #f3a6b8; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 3px; cursor: pointer;">Envoyer le rapport de bug</button>
                 </form>
