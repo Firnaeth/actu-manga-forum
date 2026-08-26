@@ -55,6 +55,55 @@
             vertical-align: middle;
             padding: 4px;
         }
+
+        /* --- BLOC "QUI EST EN LIGNE" AVEC IMAGE SUR LE CÔTÉ ET DÉGRADÉ --- */
+        .online-sidebar-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border: 1px solid #7ac1eb;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .online-sidebar-header {
+            /* Dégradé bleu horizontal identique à la photo 1 */
+            background: linear-gradient(to right, #6bc5f8, #45aee8, #82d4ff);
+            color: #ffffff;
+            padding: 8px 12px;
+            font-weight: bold;
+            font-size: 0.95em;
+            text-align: left;
+            border-bottom: 1px solid #7ac1eb;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        .online-sidebar-cell-image {
+            width: 220px;
+            padding: 12px;
+            text-align: center;
+            vertical-align: middle;
+            background: #fff;
+            border-right: 1px solid #bce8f1;
+        }
+
+        .online-sidebar-cell-content {
+            padding: 15px;
+            vertical-align: top;
+            font-size: 0.9em;
+            line-height: 1.6;
+            background: #fff;
+        }
+
+        .online-img-preview {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border: 1px solid #7ac1eb;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -119,24 +168,26 @@
             </table>
         </div>
 
-        <!-- WIDGET QUI EST EN LIGNE : TABLEAU STRUCTURÉ AVEC BORDURE ET SÉPARATEURS BLEUS -->
-        <table class="forum-table" style="margin-top: 20px; margin-bottom: 20px; border: 1px solid #2980b9;">
+        <!-- WIDGET QUI EST EN LIGNE (AVEC IMAGE SUR LE CÔTÉ ET STYLE PHOTO 1) -->
+        <table class="online-sidebar-table">
             <thead>
                 <tr>
-                    <th colspan="2" style="background-color: #2980b9; color: #ffffff; text-align: left; padding: 8px 10px; font-weight: bold;">Qui est en ligne ?</th>
+                    <th colspan="2" class="online-sidebar-header">Qui est en ligne ?</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <!-- Case de gauche avec l'image -->
-                    <td style="width: 220px; padding: 12px; text-align: center; vertical-align: middle; background: #fff; border-right: 1px solid #2980b9;">
-                        <img src="https://images.alphacoders.com/605/605592.png" alt="Illustration Qui est en ligne" style="width: 190px; height: 190px; object-fit: cover; border: 1px solid #2980b9; border-radius: 4px;">
+                    <!-- Image sur le côté gauche -->
+                    <td class="online-sidebar-cell-image">
+                        <img src="https://images.alphacoders.com/605/605592.png" alt="Illustration Qui est en ligne" class="online-img-preview">
                     </td>
-                    <!-- Case de droite avec les textes et le séparateur -->
-                    <td style="padding: 15px; vertical-align: middle; background: #fff;">
-                        <p id="online-count-msg" style="margin-bottom: 8px;">Chargement des membres inscrits...</p>
-                        <hr style="border: none; border-top: 1px solid #2980b9; margin: 10px 0;">
-                        <p><small>Membres inscrits et Ranks : <span id="online-users-list">...</span></small></p>
+                    <!-- Contenu textuel avec pointillés -->
+                    <td class="online-sidebar-cell-content">
+                        <div id="online-count-msg" style="margin-bottom: 8px;">Il y a actuellement <strong>2</strong> membre(s) inscrit(s) sur le forum.</div>
+                        <hr style="border: none; border-top: 1px dotted #7ac1eb; margin: 10px 0;">
+                        <div style="margin-bottom: 5px;">
+                            Membres inscrits : <span id="online-users-list" style="color: #333;">Chargement...</span>
+                        </div>
                     </td>
                 </tr>
             </tbody>
@@ -337,7 +388,7 @@
         }
 
         async function loadOnlineUsers() {
-            const { data: profiles } = await supabase.from('profiles').select('username, role, avatar_url');
+            const { data: profiles } = await supabase.from('profiles').select('username, role, rank, avatar_url');
             const staffContainer = document.getElementById('staff-avatars-container');
             const countMsg = document.getElementById('online-count-msg');
             const usersListContainer = document.getElementById('online-users-list');
@@ -347,32 +398,24 @@
 
             if (countMsg) countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
             
+            // Affichage simple des pseudos sous forme de texte sans avatars pour le bloc du bas
             if (usersListContainer) {
                 usersListContainer.innerHTML = profiles.map(u => {
-                    let roleBadge = '';
-                    let roleColor = '#555';
-                    if (u.role === 'admin') {
-                        roleBadge = '[Admin]';
-                        roleColor = '#d9534f';
-                    } else if (u.role === 'modo') {
-                        roleBadge = '[Modo]';
-                        roleColor = '#f0ad4e';
-                    } else {
-                        roleBadge = '[Membre]';
-                        roleColor = '#337ab7';
-                    }
-                    return `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none; font-weight: bold;">${u.username}</a> <span style="font-size: 0.8em; color: ${roleColor};">${roleBadge}</span>`;
+                    return `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none; font-weight: bold; color: #337ab7;">${u.username}</a>`;
                 }).join(', ');
             }
 
+            // Affichage dans le bloc "Staff & Membres" en haut (conserve les avatars pour le haut)
             if (staffContainer) {
                 staffContainer.innerHTML = profiles.map(user => {
                     const avatar = (user.avatar_url && user.avatar_url.trim() !== "") ? user.avatar_url : defaultAvatar;
+                    const rankName = user.rank || 'Membre';
                     return `
                         <div style="display: inline-block; text-align: center; margin: 5px;">
-                            <a href="profile.html?user=${encodeURIComponent(user.username)}">
+                            <a href="profile.html?user=${encodeURIComponent(user.username)}" style="text-decoration: none;">
                                 <img src="${avatar}" alt="${user.username}" title="${user.username}" style="width: 40px; height: 40px; border-radius: 5px; object-fit: cover;"><br>
-                                <span style="font-size: 10px;">${user.username}</span>
+                                <span style="font-size: 10px; font-weight: bold;">${user.username}</span><br>
+                                <span style="font-size: 8px; color: #888;">${rankName}</span>
                             </a>
                         </div>`;
                 }).join('');
