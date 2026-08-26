@@ -76,24 +76,15 @@
         const currentUsername = localStorage.getItem('forumUsername');
         const currentRole = (localStorage.getItem('forumUserRole') || 'member').toLowerCase();
         
-        // Reconnaissance élargie du staff (inclut 'mod')
         const isStaff = (currentRole === 'admin' || currentRole === 'mod' || currentRole === 'modo' || currentRole === 'moderator' || currentRole === 'modérateur');
 
-        // Gestion de l'affichage sécurisé selon la connexion
         const replyFormContainer = document.getElementById('reply-form-container');
         const btnGotoReply = document.getElementById('btn-goto-reply');
         const btnCreateTopic = document.getElementById('btn-create-topic');
 
         if (!currentUsername) {
-            // Masquer le bouton de création de sujet si non connecté
-            if (btnCreateTopic) {
-                btnCreateTopic.style.display = 'none';
-            }
-            // Masquer le bouton d'accès rapide au formulaire de réponse
-            if (btnGotoReply) {
-                btnGotoReply.style.display = 'none';
-            }
-            // Remplacer le formulaire de réponse par une invitation à se connecter
+            if (btnCreateTopic) btnCreateTopic.style.display = 'none';
+            if (btnGotoReply) btnGotoReply.style.display = 'none';
             if (replyFormContainer) {
                 replyFormContainer.innerHTML = `
                     <div class="box-title">Poster une réponse</div>
@@ -114,13 +105,19 @@
             'general': { name: 'Général', url: 'general.html' }
         };
 
-        // --- 3. FONCTION DE TRANSFORMATION DES LIENS EN IMAGES ---
+        // --- 3. FONCTION DE TRANSFORMATION (CORRIGÉE) ---
         function formatContent(text) {
             if (!text) return '';
+            
+            // Si le texte contient déjà du code HTML valide (ex: <img ...>), on le laisse passer
+            // Sinon, si c'est un lien direct d'image simple, on le transforme en balise img
             const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif))/gi;
             let formatted = text.replace(urlRegex, (url) => {
+                // Évite de doubler si le lien est déjà dans une balise img
+                if (text.includes(`src="${url}"`)) return url;
                 return `<br><img src="${url}" alt="Image" style="max-width: 100%; border-radius: 4px; margin: 10px 0;"><br>`;
             });
+
             return formatted.replace(/\n/g, '<br>');
         }
 
@@ -138,7 +135,6 @@
                 `;
             }
 
-            // Récupérer les données du profil depuis Supabase
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('*')
@@ -149,7 +145,6 @@
             const userRole = profile && profile.role ? profile.role.toLowerCase() : 'member';
             const userRankText = profile && profile.rank ? profile.rank : (userRole === 'admin' ? 'Administrateur' : (userRole === 'mod' || userRole === 'moderator' || userRole === 'modérateur' || userRole === 'modo') ? 'Modérateur' : 'Membre');
             
-            // Classe CSS du rang
             let rankClass = 'rank-member';
             if (userRole === 'admin') rankClass = 'rank-admin';
             else if (userRole === 'mod' || userRole === 'moderator' || userRole === 'modérateur' || userRole === 'modo') rankClass = 'rank-mod';
@@ -158,7 +153,6 @@
             const sexRaceText = (profile && profile.sex_race) ? profile.sex_race : '-';
             let statutText = (profile && profile.status && profile.status !== 'EMPTY') ? profile.status : '-';
 
-            // --- COMPTAGE AUTOMATIQUE DES MESSAGES (SUJETS + RÉPONSES) ---
             const { count: topicsCount } = await supabase
                 .from('topics')
                 .select('*', { count: 'exact', head: true })
@@ -198,7 +192,6 @@
                 return;
             }
 
-            // A. Charger le sujet principal
             const { data: topic, error: topicError } = await supabase
                 .from('topics')
                 .select('*')
@@ -216,7 +209,6 @@
             const catInfo = categoryMap[topic.category] || { name: topic.category, url: 'index.html' };
             document.getElementById('bread-category-slot').innerHTML = `<a href="${catInfo.url}">${catInfo.name}</a>`;
 
-            // Récupérer la signature de l'auteur du sujet
             let authorSignatureHtml = '';
             if (topic.author) {
                 const { data: profile } = await supabase
@@ -235,8 +227,6 @@
             }
 
             const authorBoxHtml = await buildUserProfileBox(topic.author);
-
-            // Un utilisateur peut modifier/supprimer si c'est son propre message OU s'il est staff
             const canManageTopic = (currentUsername === topic.author || isStaff);
 
             let htmlContent = `
@@ -255,7 +245,6 @@
                 </div>
             `;
 
-            // B. Charger les réponses (replies) associées à ce sujet
             const { data: replies, error: repliesError } = await supabase
                 .from('replies')
                 .select('*')
