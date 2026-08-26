@@ -105,9 +105,9 @@
             </tbody>
         </table>
 
-        <!-- BOUTON CRÉER UN SUJET -->
-        <div style="margin-top: 15px; margin-bottom: 20px;">
-            <a href="new-topic.html?cat=gaming" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">+ Créer un Sujet</a>
+        <!-- BOUTON CRÉER UN SUJET (Sécurisé dynamiquement) -->
+        <div id="create-topic-container" style="margin-top: 15px; margin-bottom: 20px;">
+            <a href="new-topic.html?cat=gaming" id="btn-create-topic" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">+ Créer un Sujet</a>
         </div>
     </div>
 
@@ -128,6 +128,12 @@
                 localStorage.clear(); 
                 window.location.reload(); 
             };
+        } else {
+            // --- SÉCURISATION : Masquer le bouton de création de sujet si non connecté ---
+            const createTopicContainer = document.getElementById('create-topic-container');
+            if (createTopicContainer) {
+                createTopicContainer.style.display = 'none';
+            }
         }
 
         // --- GESTION DES PRIVILÈGES STAFF (ADMIN & MODO) ---
