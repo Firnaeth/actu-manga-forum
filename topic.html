@@ -79,21 +79,28 @@
         // Reconnaissance élargie du staff (inclut 'mod')
         const isStaff = (currentRole === 'admin' || currentRole === 'mod' || currentRole === 'modo' || currentRole === 'moderator' || currentRole === 'modérateur');
 
-        // Gestion de l'affichage du formulaire de réponse selon la connexion
+        // Gestion de l'affichage sécurisé selon la connexion
         const replyFormContainer = document.getElementById('reply-form-container');
         const btnGotoReply = document.getElementById('btn-goto-reply');
+        const btnCreateTopic = document.getElementById('btn-create-topic');
 
         if (!currentUsername) {
+            // Masquer le bouton de création de sujet si non connecté
+            if (btnCreateTopic) {
+                btnCreateTopic.style.display = 'none';
+            }
+            // Masquer le bouton d'accès rapide au formulaire de réponse
+            if (btnGotoReply) {
+                btnGotoReply.style.display = 'none';
+            }
+            // Remplacer le formulaire de réponse par une invitation à se connecter
             if (replyFormContainer) {
                 replyFormContainer.innerHTML = `
                     <div class="box-title">Poster une réponse</div>
                     <div style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 4px; border: 1px solid #ffeeba; font-size: 0.95em; text-align: center; margin-top: 10px;">
-                        🔒 Vous devez être <strong>connecté</strong> pour poster une réponse sur ce sujet. <a href="register.html" style="color: #c2185b; font-weight: bold;">Se connecter / S'enregistrer</a>
+                        🔒 Vous devez être <strong>connecté</strong> pour créer un sujet ou poster une réponse. <a href="register.html" style="color: #c2185b; font-weight: bold;">Se connecter / S'enregistrer</a>
                     </div>
                 `;
-            }
-            if (btnGotoReply) {
-                btnGotoReply.style.display = 'none';
             }
         }
 
