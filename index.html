@@ -55,6 +55,49 @@
             vertical-align: middle;
             padding: 4px;
         }
+
+        /* --- STYLE DU BLOC "QUI EST EN LIGNE" VERSION MODÈLE (DEUX COLONNES) --- */
+        .online-retro-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border: 1px solid #000000;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .online-retro-header {
+            background: linear-gradient(to right, #ffb6c1, #ffc0cb, #e0b0ff);
+            color: #000;
+            padding: 8px 12px;
+            font-weight: bold;
+            font-size: 0.95em;
+            border-bottom: 1px solid #000000;
+        }
+
+        .online-retro-cell-image {
+            width: 220px;
+            padding: 10px;
+            text-align: center;
+            vertical-align: middle;
+            border-right: 1px solid #000000;
+            background: #fffafa;
+        }
+
+        .online-retro-cell-content {
+            padding: 12px;
+            vertical-align: top;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .online-custom-img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border: 1px solid #ffb6c1;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -119,15 +162,38 @@
             </table>
         </div>
 
-        <!-- WIDGET QUI EST EN LIGNE -->
-        <div class="online-box">
-            <div class="box-title">Qui est en ligne ?</div>
-            <div class="box-content">
-                <p id="online-count-msg">Chargement des membres inscrits...</p>
-                <hr class="box-hr">
-                <p><small>Membres inscrits : <span id="online-users-list">...</span></small></p>
-            </div>
-        </div>
+        <!-- WIDGET QUI EST EN LIGNE (STYLE MODÈLE AVEC IMAGE À GAUCHE ET RANGS) -->
+        <table class="online-retro-table">
+            <thead>
+                <tr>
+                    <th colspan="2" class="online-retro-header">Qui est en ligne ?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <!-- Image sur le côté gauche (change l'URL de l'image ici si tu le souhaites) -->
+                    <td class="online-retro-cell-image">
+                        <img src="https://images.alphacoders.com/605/605592.png" alt="Illustration Qui est en ligne" class="online-custom-img">
+                    </td>
+                    <!-- Informations et liste triée par rang à droite -->
+                    <td class="online-retro-cell-content">
+                        <div id="online-count-msg" style="margin-bottom: 8px;">Chargement des statistiques...</div>
+                        <hr style="border: none; border-top: 1px solid #ddd; margin: 8px 0;">
+                        <div style="margin-bottom: 8px;">
+                            <strong>Membres connectés (triés par rang) :</strong><br>
+                            <span id="online-users-list">Chargement des membres...</span>
+                        </div>
+                        <hr style="border: none; border-top: 1px solid #ddd; margin: 8px 0;">
+                        <div style="font-size: 0.85em; color: #555;">
+                            <strong>Légende des rangs :</strong> 
+                            <span style="color: #d9534f; font-weight: bold;">[ Administrateur ]</span> 
+                            <span style="color: #f0ad4e; font-weight: bold;">[ Modérateur ]</span> 
+                            <span style="color: #337ab7; font-weight: bold;">[ Membre ]</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
     </div>
 
@@ -181,7 +247,6 @@
                 const subtitleEl = document.getElementById('forum-subtitle-display');
                 if (subtitleEl) subtitleEl.textContent = data.welcome_text || "";
 
-                // Chargement dynamique du slogan rétro si la colonne existe dans Supabase
                 const retroEl = document.getElementById('forum-retro-display');
                 if (retroEl && data.slogan_retro) {
                     retroEl.innerHTML = `<small>${data.slogan_retro}</small>`;
@@ -195,7 +260,6 @@
         }
 
         async function loadForumData() {
-            // 1. Charger les sujets récents pour le fil d'actualité
             const { data: topics, error } = await supabase
                 .from('topics')
                 .select('*')
@@ -213,13 +277,11 @@
                 newsListEl.innerHTML = "<li><em>Aucun sujet publié pour le moment.</em></li>";
             }
 
-            // 2. Charger les Catégories depuis Supabase (triées par display_order)
             const { data: categories, error: catError } = await supabase
                 .from('categories')
                 .select('*')
                 .order('display_order', { ascending: true });
 
-            // 3. Charger les Sous-Catégories depuis Supabase
             const { data: subcategories, error: subError } = await supabase
                 .from('subcategories')
                 .select('*')
@@ -231,7 +293,6 @@
                 return;
             }
 
-            // Configuration des icônes Lu / Non lu
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
             const defUnread = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png"; 
             const defRead = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783010.png";    
@@ -329,7 +390,7 @@
         }
 
         async function loadOnlineUsers() {
-            const { data: profiles } = await supabase.from('profiles').select('username, role, avatar_url');
+            const { data: profiles } = await supabase.from('profiles').select('username, role, rank, avatar_url');
             const staffContainer = document.getElementById('staff-avatars-container');
             const countMsg = document.getElementById('online-count-msg');
             const usersListContainer = document.getElementById('online-users-list');
@@ -337,18 +398,46 @@
 
             if (!profiles || profiles.length === 0) return;
 
+            // Tri par rang (Admin d'abord, puis Modo, puis Membre)
+            profiles.sort((a, b) => {
+                const getPriority = (user) => {
+                    const r = (user.role || '').toLowerCase();
+                    const rankText = (user.rank || '').toLowerCase();
+                    if (r === 'admin' || rankText.includes('admin')) return 1;
+                    if (r === 'moderator' || r === 'modérateur' || rankText.includes('mod')) return 2;
+                    return 3;
+                };
+                return getPriority(a) - getPriority(b);
+            });
+
             if (countMsg) countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
+            
+            // Affichage dans le bloc "Qui est en ligne ?" avec avatar miniature, pseudo et rang classé
             if (usersListContainer) {
-                usersListContainer.innerHTML = profiles.map(u => `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none;">${u.username}</a>`).join(', ');
+                usersListContainer.innerHTML = profiles.map(u => {
+                    const avatar = (u.avatar_url && u.avatar_url.trim() !== "") ? u.avatar_url : defaultAvatar;
+                    const rankName = u.rank || (u.role === 'admin' ? 'Administrateur' : 'Membre');
+                    return `
+                        <span style="display: inline-flex; align-items: center; gap: 5px; margin-right: 15px; margin-bottom: 6px;">
+                            <img src="${avatar}" alt="" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;">
+                            <a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none; font-weight: bold;">${u.username}</a>
+                            <span style="font-size: 0.8em; color: #666;">(${rankName})</span>
+                        </span>
+                    `;
+                }).join('');
             }
+
+            // Affichage dans le bloc "Staff & Membres" en haut
             if (staffContainer) {
                 staffContainer.innerHTML = profiles.map(user => {
                     const avatar = (user.avatar_url && user.avatar_url.trim() !== "") ? user.avatar_url : defaultAvatar;
+                    const rankName = user.rank || 'Membre';
                     return `
                         <div style="display: inline-block; text-align: center; margin: 5px;">
-                            <a href="profile.html?user=${encodeURIComponent(user.username)}">
+                            <a href="profile.html?user=${encodeURIComponent(user.username)}" style="text-decoration: none;">
                                 <img src="${avatar}" alt="${user.username}" title="${user.username}" style="width: 40px; height: 40px; border-radius: 5px; object-fit: cover;"><br>
-                                <span style="font-size: 10px;">${user.username}</span>
+                                <span style="font-size: 10px; font-weight: bold;">${user.username}</span><br>
+                                <span style="font-size: 8px; color: #888;">${rankName}</span>
                             </a>
                         </div>`;
                 }).join('');
