@@ -89,31 +89,56 @@
             adminBar.classList.remove('hidden');
         }
         
-        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
+        document.getElementById('btn-toggle-admin')?.addEventListener('click', async () => {
             document.getElementById('admin-panel-form').classList.toggle('hidden');
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
-                banner: "https://images.alphacoders.com/605/605592.png" 
-            };
-            document.getElementById('input-forum-banner').value = config.banner || "https://images.alphacoders.com/605/605592.png";
+            
+            // Récupère l'URL actuelle depuis Supabase pour pré-remplir l'input
+            const { data } = await supabase
+                .from('site_settings')
+                .select('banner_url')
+                .eq('id', 'global')
+                .single();
+
+            const currentBanner = data?.banner_url || "https://images.alphacoders.com/605/605592.png";
+            document.getElementById('input-forum-banner').value = currentBanner;
         });
 
         document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
             document.getElementById('admin-panel-form').classList.add('hidden');
         });
 
-        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
+        document.getElementById('form-config-header')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || {};
-            config.banner = document.getElementById('input-forum-banner').value;
-            localStorage.setItem('forumHeaderConfig', JSON.stringify(config));
+            const newBannerUrl = document.getElementById('input-forum-banner').value;
+
+            // Met à jour directement dans Supabase sur la ligne 'global'
+            const { error } = await supabase
+                .from('site_settings')
+                .update({ banner_url: newBannerUrl })
+                .eq('id', 'global');
+
+            if (error) {
+                alert("Erreur lors de la mise à jour de la bannière : " + error.message);
+                return;
+            }
+
             alert("Bannière mise à jour avec succès !");
             window.location.reload();
         });
 
-        function loadHeaderConfig() {
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
-            if (config && config.banner) {
-                document.getElementById('forum-banner-img').src = config.banner;
+        async function loadHeaderConfig() {
+            // Va chercher la bannière globale depuis Supabase
+            const { data, error } = await supabase
+                .from('site_settings')
+                .select('banner_url')
+                .eq('id', 'global')
+                .single();
+
+            if (data && data.banner_url) {
+                const bannerImg = document.getElementById('forum-banner-img');
+                if (bannerImg) {
+                    bannerImg.src = data.banner_url;
+                }
             }
         }
 
