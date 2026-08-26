@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -6,6 +6,19 @@
     <title>Aide & Tutoriels - Actu Manga World</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        .help-section {
+            background: #fff;
+            border: 1px solid #ffb6c1;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .help-section h3 {
+            color: #c0392b;
+            margin-top: 0;
+            border-bottom: 1px solid #fce4ec;
+            padding-bottom: 8px;
+        }
         .help-box-alert {
             background: #fff3cd; 
             border: 1px solid #ffeeba; 
@@ -33,21 +46,12 @@
             <a href="#" class="nav-link">Rechercher</a>
             <a href="profile.html" id="nav-profile-link" class="nav-link hidden">Mon Profil & Mangathèque</a>
             <a href="register.html" id="nav-auth-link" class="nav-link highlight">S'enregistrer</a>
-            <a href="aide.html" class="nav-link" style="font-weight: bold; color: #c2185b;">Aide</a>
+            <a href="aide.html" class="nav-link" style="font-weight: bold; color: #c0392b;">Aide</a>
         </nav>
 
-        <!-- FIL D'ARIANE -->
-        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
-            <a href="index.html">Index du Forum</a> &raquo; <span>Aide & Tutoriels</span>
-        </div>
-
-        <!-- TITRE DE LA PAGE -->
-        <div style="font-size: 16px; font-weight: bold; color: #c2185b; margin-bottom: 15px; border-bottom: 2px solid #f8bbd0; padding-bottom: 5px;">
-            🛠️ Section Aide, Tutoriels & Signalement de Bugs
-        </div>
-
         <!-- CONTENU DE LA PAGE D'AIDE -->
-        <div class="news-container" style="padding: 0;">
+        <div class="news-container" style="padding: 20px;">
+            <h2 style="color: #333; margin-top: 0;">🛠️ Section Aide, Tutoriels & Signalement de Bugs</h2>
             
             <!-- Encadré spécifique Bug Report -->
             <div class="help-box-alert">
@@ -55,46 +59,27 @@
                 <p style="margin: 0;">Le forum étant actuellement en <strong>Work in Progress</strong>, il est possible que tu croises quelques dysfonctionnements. N'hésite pas à m'en faire un retour détaillé ci-dessous ou en créant un sujet dans cette section pour que je puisse corriger ça rapidement !</p>
             </div>
 
-            <!-- Section 1 : Tutoriels & Fonctionnement -->
-            <div style="margin-top: 25px; margin-bottom: 10px; font-weight: bold; font-size: 15px; color: #c2185b; border-bottom: 2px solid #c2185b; padding-bottom: 5px;">
-                📖 1. Comment utiliser le forum ?
+            <!-- Tutoriels & Fonctionnement -->
+            <div class="help-section">
+                <h3>📖 Comment utiliser le forum ?</h3>
+                <ul>
+                    <li><strong>Créer un sujet :</strong> Rendez-vous dans la catégorie de votre choix et cliquez sur le bouton de création de sujet pour partager vos avis, vos fiches ou vos dessins (Rappel : <em>Concours de dessin Non-IA uniquement !</em>).</li>
+                    <li><strong>Gérer son profil :</strong> Vous pouvez modifier votre avatar et consulter votre mangathèque personnalisée depuis l'onglet "Mon Profil".</li>
+                    <li><strong>Les Sorties VF :</strong> Retrouvez toutes les actualités et le calendrier mis à jour régulièrement par l'équipe.</li>
+                </ul>
             </div>
-            <table class="forum-table" style="margin-bottom: 20px;">
-                <thead>
-                    <tr>
-                        <th style="width: 25%;">Fonctionnalité</th>
-                        <th style="width: 75%;">Explications / Consignes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="font-weight: bold;">Créer un sujet</td>
-                        <td style="font-size: 12px; color: #555;">Rendez-vous dans la catégorie de votre choix et cliquez sur le bouton de création de sujet pour partager vos avis, vos fiches ou vos dessins (Rappel : <em>Concours de dessin Non-IA uniquement !</em>).</td>
-                    </tr>
-                    <tr>
-                        <td style="font-weight: bold;">Gérer son profil</td>
-                        <td style="font-size: 12px; color: #555;">Vous pouvez modifier votre avatar et consulter votre mangathèque personnalisée depuis l'onglet "Mon Profil".</td>
-                    </tr>
-                    <tr>
-                        <td style="font-weight: bold;">Les Sorties VF</td>
-                        <td style="font-size: 12px; color: #555;">Retrouvez toutes les actualités et le calendrier mis à jour régulièrement par l'équipe.</td>
-                    </tr>
-                </tbody>
-            </table>
 
-            <!-- Section 2 : Espace Signalement / Contact Rapide -->
-            <div style="margin-top: 25px; margin-bottom: 10px; font-weight: bold; font-size: 15px; color: #c2185b; border-bottom: 2px solid #c2185b; padding-bottom: 5px;">
-                💬 2. Signaler un bug ou poser une question
-            </div>
-            <div style="background: #fff; border: 1px solid #f8bbd0; padding: 20px; margin-bottom: 20px; border-radius: 4px;">
-                <p style="margin-top: 0; font-size: 13px; color: #555;">Tu peux poster ton rapport de bug directement en indiquant la page concernée et ce qui ne fonctionne pas :</p>
+            <!-- Espace Signalement / Contact Rapide -->
+            <div class="help-section">
+                <h3>💬 Signaler un bug ou poser une question</h3>
+                <p>Tu peux poster ton rapport de bug directement en indiquant la page concernée et ce qui ne fonctionne pas :</p>
                 
                 <form id="bug-report-form">
-                    <label for="bug-title" style="display: block; margin-bottom: 5px; font-weight: bold; color: #c2185b; font-size: 13px;">Titre / Résumé du dysfonctionnement :</label>
-                    <input type="text" id="bug-title" placeholder="Ex: Erreur d'affichage sur la page profil..." style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box;" required>
+                    <label for="bug-title" style="display: block; margin-bottom: 5px; font-weight: bold;">Titre / Résumé du dysfonctionnement :</label>
+                    <input type="text" id="bug-title" placeholder="Ex: Erreur d'affichage sur la page profil..." style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 3px;" required>
 
-                    <label for="bug-desc" style="display: block; margin-bottom: 5px; font-weight: bold; color: #c2185b; font-size: 13px;">Description détaillée du bug :</label>
-                    <textarea id="bug-desc" rows="5" placeholder="Explique ce qui s'est passé, sur quelle page, etc." style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box;" required></textarea>
+                    <label for="bug-desc" style="display: block; margin-bottom: 5px; font-weight: bold;">Description détaillée du bug :</label>
+                    <textarea id="bug-desc" rows="5" placeholder="explique ce qui s'est passé, sur quelle page, etc." style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 3px;" required></textarea>
 
                     <button type="submit" style="background: #f3a6b8; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 3px; cursor: pointer;">Envoyer le rapport de bug</button>
                 </form>
