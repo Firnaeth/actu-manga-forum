@@ -4,6 +4,12 @@
 
 ---
 
+## 🚧 Statut du Projet : Work In Progress (WIP)
+
+> ⚠️ **Attention :** Le forum est actuellement en cours de développement actif (*Work In Progress*). Des modifications, des ajouts de fonctionnalités et des ajustements de code ont lieu régulièrement. N'hésite pas à suivre les mises à jour !
+
+---
+
 ## ✨ Fonctionnalités principales
 
 * **👥 Système de Membres & Authentification** : Inscription, connexion sécurisée et gestion des profils via **Supabase**.
