@@ -56,12 +56,12 @@
             padding: 4px;
         }
 
-        /* --- BLOC "QUI EST EN LIGNE" AVEC CADRE BLEU COMPLET ET DÉGRADÉ --- */
+        /* --- BLOC "QUI EST EN LIGNE" AVEC CADRE DE 1PX ET DÉGRADÉ --- */
         .online-sidebar-table {
             width: 100%;
             border-collapse: collapse;
             background: #ffffff;
-            border: 2px solid #2980b9;
+            border: 1px solid #2980b9; /* Cadre de 1px tout autour */
             margin-top: 20px;
             margin-bottom: 20px;
             border-radius: 4px;
@@ -69,14 +69,14 @@
         }
 
         .online-sidebar-header {
-            /* Dégradé vertical corrigé : Blanc en haut vers le bleu en bas */
+            /* Dégradé vertical : Blanc en haut vers le bleu en bas */
             background: linear-gradient(to bottom, #ffffff, #bce8f1, #82d4ff);
             color: #31708f;
             padding: 8px 12px;
             font-weight: bold;
             font-size: 0.95em;
             text-align: left;
-            border-bottom: 2px solid #2980b9;
+            border-bottom: 1px solid #2980b9; /* Liseré de 1px en bas de l'en-tête */
             text-shadow: 0 1px 1px rgba(0,0,0,0.1);
         }
 
@@ -86,7 +86,7 @@
             text-align: center;
             vertical-align: middle;
             background: #fff;
-            border-right: 2px solid #2980b9;
+            border-right: 1px solid #2980b9;
         }
 
         .online-sidebar-cell-content {
@@ -168,7 +168,7 @@
             </table>
         </div>
 
-        <!-- WIDGET QUI EST EN LIGNE (AVEC CADRE BLEU ET DÉGRADÉ BLANC -> BLEU) -->
+        <!-- WIDGET QUI EST EN LIGNE (AVEC CADRE DE 1PX ET DÉGRADÉ BLANC -> BLEU) -->
         <table class="online-sidebar-table">
             <thead>
                 <tr>
@@ -178,7 +178,7 @@
             <tbody>
                 <tr>
                     <!-- Image à gauche -->
-                    <td style="width: 220px; padding: 12px; text-align: center; vertical-align: middle; background: #fff; border-right: 2px solid #2980b9;">
+                    <td style="width: 220px; padding: 12px; text-align: center; vertical-align: middle; background: #fff; border-right: 1px solid #2980b9;">
                         <img src="https://images.alphacoders.com/605/605592.png" alt="Illustration Qui est en ligne" style="width: 190px; height: 190px; object-fit: cover; border: 1px solid #2980b9; border-radius: 4px;">
                     </td>
                     <!-- Partie texte divisée en 3 lignes distinctes -->
