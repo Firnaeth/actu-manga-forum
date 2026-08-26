@@ -55,53 +55,6 @@
             vertical-align: middle;
             padding: 4px;
         }
-
-        /* --- STYLE DU WIDGET "QUI EST EN LIGNE" AVEC IMAGE LATÉRALE --- */
-        .online-sidebar-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #ffffff;
-            border: 1px solid #bce8f1;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .online-sidebar-header {
-            background: #d9edf7;
-            color: #31708f;
-            padding: 8px 12px;
-            font-weight: bold;
-            font-size: 0.95em;
-            text-align: left;
-            border-bottom: 1px solid #bce8f1;
-        }
-
-        .online-sidebar-cell-image {
-            width: 220px;
-            padding: 12px;
-            text-align: center;
-            vertical-align: middle;
-            background: #fff;
-            border-right: 1px solid #bce8f1;
-        }
-
-        .online-sidebar-cell-content {
-            padding: 15px;
-            vertical-align: top;
-            font-size: 0.9em;
-            line-height: 1.6;
-            background: #fff;
-        }
-
-        .online-img-preview {
-            width: 200px;
-            height: 200px;
-            object-fit: cover;
-            border: 1px solid #bce8f1;
-            border-radius: 4px;
-        }
     </style>
 </head>
 <body>
@@ -166,24 +119,24 @@
             </table>
         </div>
 
-        <!-- WIDGET QUI EST EN LIGNE AVEC IMAGE SUR LA GAUCHE -->
-        <table class="online-sidebar-table">
+        <!-- WIDGET QUI EST EN LIGNE AVEC IMAGE SUR LA GAUCHE (HARMONISÉ EN .forum-table) -->
+        <table class="forum-table" style="margin-top: 20px; margin-bottom: 20px;">
             <thead>
                 <tr>
-                    <th colspan="2" class="online-sidebar-header">Qui est en ligne ?</th>
+                    <th colspan="2" class="cat-title" style="text-align: left; padding-left: 10px;">Qui est en ligne ?</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <!-- Image sur le côté gauche -->
-                    <td class="online-sidebar-cell-image">
-                        <img src="https://images.alphacoders.com/605/605592.png" alt="Illustration Qui est en ligne" class="online-img-preview">
+                    <td style="width: 220px; padding: 12px; text-align: center; vertical-align: middle; background: #fff; border-right: 1px dotted #ffb6c1;">
+                        <img src="https://images.alphacoders.com/605/605592.png" alt="Illustration Qui est en ligne" style="width: 190px; height: 190px; object-fit: cover; border: 1px solid #ffb6c1; border-radius: 4px;">
                     </td>
-                    <!-- Contenu textuel d'origine -->
-                    <td class="online-sidebar-cell-content">
+                    <!-- Contenu textuel avec Ranks -->
+                    <td style="padding: 15px; vertical-align: middle; background: #fff;">
                         <p id="online-count-msg" style="margin-bottom: 8px;">Chargement des membres inscrits...</p>
-                        <hr class="box-hr" style="border: none; border-top: 1px solid #bce8f1; margin: 10px 0;">
-                        <p><small>Membres inscrits : <span id="online-users-list">...</span></small></p>
+                        <hr style="border: none; border-top: 1px dotted #ffb6c1; margin: 10px 0;">
+                        <p><small>Membres inscrits et Ranks : <span id="online-users-list">...</span></small></p>
                     </td>
                 </tr>
             </tbody>
@@ -241,7 +194,6 @@
                 const subtitleEl = document.getElementById('forum-subtitle-display');
                 if (subtitleEl) subtitleEl.textContent = data.welcome_text || "";
 
-                // Chargement dynamique du slogan rétro si la colonne existe dans Supabase
                 const retroEl = document.getElementById('forum-retro-display');
                 if (retroEl && data.slogan_retro) {
                     retroEl.innerHTML = `<small>${data.slogan_retro}</small>`;
@@ -255,7 +207,6 @@
         }
 
         async function loadForumData() {
-            // 1. Charger les sujets récents pour le fil d'actualité
             const { data: topics, error } = await supabase
                 .from('topics')
                 .select('*')
@@ -273,13 +224,11 @@
                 newsListEl.innerHTML = "<li><em>Aucun sujet publié pour le moment.</em></li>";
             }
 
-            // 2. Charger les Catégories depuis Supabase (triées par display_order)
             const { data: categories, error: catError } = await supabase
                 .from('categories')
                 .select('*')
                 .order('display_order', { ascending: true });
 
-            // 3. Charger les Sous-Catégories depuis Supabase
             const { data: subcategories, error: subError } = await supabase
                 .from('subcategories')
                 .select('*')
@@ -291,7 +240,6 @@
                 return;
             }
 
-            // Configuration des icônes Lu / Non lu
             const iconsConfig = JSON.parse(localStorage.getItem('forumIcons')) || {};
             const defUnread = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783009.png"; 
             const defRead = "https://nsm09.casimages.com/img/2026/08/19//26081902203911099118783010.png";    
@@ -398,9 +346,26 @@
             if (!profiles || profiles.length === 0) return;
 
             if (countMsg) countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
+            
             if (usersListContainer) {
-                usersListContainer.innerHTML = profiles.map(u => `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none;">${u.username}</a>`).join(', ');
+                // Intégration des ranks avec des couleurs adaptées
+                usersListContainer.innerHTML = profiles.map(u => {
+                    let roleBadge = '';
+                    let roleColor = '#555';
+                    if (u.role === 'admin') {
+                        roleBadge = '[Admin]';
+                        roleColor = '#d9534f';
+                    } else if (u.role === 'modo') {
+                        roleBadge = '[Modo]';
+                        roleColor = '#f0ad4e';
+                    } else {
+                        roleBadge = '[Membre]';
+                        roleColor = '#337ab7';
+                    }
+                    return `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none; font-weight: bold;">${u.username}</a> <span style="font-size: 0.8em; color: ${roleColor};">${roleBadge}</span>`;
+                }).join(', ');
             }
+
             if (staffContainer) {
                 staffContainer.innerHTML = profiles.map(user => {
                     const avatar = (user.avatar_url && user.avatar_url.trim() !== "") ? user.avatar_url : defaultAvatar;
