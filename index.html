@@ -56,46 +56,51 @@
             padding: 4px;
         }
 
-        /* --- STYLE DU BLOC "QUI EST EN LIGNE" VERSION MODÈLE (DEUX COLONNES) --- */
-        .online-retro-table {
+        /* --- BLOC "QUI EST EN LIGNE" AVEC LE DÉGRADÉ BLEU DE TON MODÈLE --- */
+        .online-blue-table {
             width: 100%;
             border-collapse: collapse;
             background: #ffffff;
-            border: 1px solid #000000;
+            border: 1px solid #7ac1eb;
             margin-top: 20px;
             margin-bottom: 20px;
+            border-radius: 4px;
+            overflow: hidden;
         }
 
-        .online-retro-header {
-            background: linear-gradient(to right, #ffb6c1, #ffc0cb, #e0b0ff);
-            color: #000;
-            padding: 8px 12px;
+        .online-blue-header {
+            background: linear-gradient(to right, #40c9ff, #e81cff); /* Dégradé style ton image */
+            background: linear-gradient(to right, #5bc0de, #87ceeb, #b0e0e6); /* Dégradé bleu pastel doux */
+            color: #ffffff;
+            padding: 10px 15px;
             font-weight: bold;
             font-size: 0.95em;
-            border-bottom: 1px solid #000000;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            border-bottom: 1px solid #7ac1eb;
         }
 
-        .online-retro-cell-image {
+        .online-blue-cell-image {
             width: 220px;
-            padding: 10px;
+            padding: 12px;
             text-align: center;
             vertical-align: middle;
-            border-right: 1px solid #000000;
-            background: #fffafa;
+            background: #fff;
+            border-right: 1px solid #bce8f1;
         }
 
-        .online-retro-cell-content {
-            padding: 12px;
+        .online-blue-cell-content {
+            padding: 15px;
             vertical-align: top;
             font-size: 0.9em;
-            line-height: 1.5;
+            line-height: 1.6;
+            background: #fff;
         }
 
-        .online-custom-img {
+        .online-img-preview {
             width: 200px;
             height: 200px;
             object-fit: cover;
-            border: 1px solid #ffb6c1;
+            border: 1px solid #87ceeb;
             border-radius: 4px;
         }
     </style>
@@ -162,30 +167,29 @@
             </table>
         </div>
 
-        <!-- WIDGET QUI EST EN LIGNE (STYLE MODÈLE AVEC IMAGE À GAUCHE ET RANGS) -->
-        <table class="online-retro-table">
+        <!-- WIDGET QUI EST EN LIGNE (STYLE BLEU SANS AVATARS) -->
+        <table class="online-blue-table">
             <thead>
                 <tr>
-                    <th colspan="2" class="online-retro-header">Qui est en ligne ?</th>
+                    <th colspan="2" class="online-blue-header">Qui est en ligne ?</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <!-- Image sur le côté gauche (change l'URL de l'image ici si tu le souhaites) -->
-                    <td class="online-retro-cell-image">
-                        <img src="https://images.alphacoders.com/605/605592.png" alt="Illustration Qui est en ligne" class="online-custom-img">
+                    <!-- Image illustrative sur le côté gauche -->
+                    <td class="online-blue-cell-image">
+                        <img src="https://images.alphacoders.com/605/605592.png" alt="Illustration Qui est en ligne" class="online-img-preview">
                     </td>
-                    <!-- Informations et liste triée par rang à droite -->
-                    <td class="online-retro-cell-content">
+                    <!-- Informations et liste des membres sans avatars à droite -->
+                    <td class="online-blue-cell-content">
                         <div id="online-count-msg" style="margin-bottom: 8px;">Chargement des statistiques...</div>
-                        <hr style="border: none; border-top: 1px solid #ddd; margin: 8px 0;">
-                        <div style="margin-bottom: 8px;">
-                            <strong>Membres connectés (triés par rang) :</strong><br>
-                            <span id="online-users-list">Chargement des membres...</span>
+                        <hr style="border: none; border-top: 1px dotted #87ceeb; margin: 10px 0;">
+                        <div style="margin-bottom: 10px;">
+                            <strong>Membres inscrits :</strong> <span id="online-users-list" style="color: #333;">Chargement...</span>
                         </div>
-                        <hr style="border: none; border-top: 1px solid #ddd; margin: 8px 0;">
-                        <div style="font-size: 0.85em; color: #555;">
-                            <strong>Légende des rangs :</strong> 
+                        <hr style="border: none; border-top: 1px dotted #87ceeb; margin: 10px 0;">
+                        <div style="font-size: 0.85em; color: #666;">
+                            <strong>Légende :</strong> 
                             <span style="color: #d9534f; font-weight: bold;">[ Administrateur ]</span> 
                             <span style="color: #f0ad4e; font-weight: bold;">[ Modérateur ]</span> 
                             <span style="color: #337ab7; font-weight: bold;">[ Membre ]</span>
@@ -412,22 +416,15 @@
 
             if (countMsg) countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
             
-            // Affichage dans le bloc "Qui est en ligne ?" avec avatar miniature, pseudo et rang classé
+            // Affichage dans le bloc "Qui est en ligne ?" sans les avatars (sous forme de texte cliquable simple)
             if (usersListContainer) {
                 usersListContainer.innerHTML = profiles.map(u => {
-                    const avatar = (u.avatar_url && u.avatar_url.trim() !== "") ? u.avatar_url : defaultAvatar;
                     const rankName = u.rank || (u.role === 'admin' ? 'Administrateur' : 'Membre');
-                    return `
-                        <span style="display: inline-flex; align-items: center; gap: 5px; margin-right: 15px; margin-bottom: 6px;">
-                            <img src="${avatar}" alt="" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;">
-                            <a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none; font-weight: bold;">${u.username}</a>
-                            <span style="font-size: 0.8em; color: #666;">(${rankName})</span>
-                        </span>
-                    `;
-                }).join('');
+                    return `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none; font-weight: bold; color: #337ab7;">${u.username}</a> <span style="font-size: 0.8em; color: #777;">(${rankName})</span>`;
+                }).join(', ');
             }
 
-            // Affichage dans le bloc "Staff & Membres" en haut
+            // Affichage dans le bloc "Staff & Membres" en haut (conserve les avatars pour le haut)
             if (staffContainer) {
                 staffContainer.innerHTML = profiles.map(user => {
                     const avatar = (user.avatar_url && user.avatar_url.trim() !== "") ? user.avatar_url : defaultAvatar;
