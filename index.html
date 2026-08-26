@@ -90,6 +90,10 @@
             <div class="welcome-banner">
                 <h2 id="forum-title-display">Bienvenue sur Actu Manga World : The Ultimate Otaku Network</h2>
                 <p id="forum-subtitle-display">Toutes les sorties VF, fiches animes, concours de dessin Non-IA et espace Gaming !</p>
+                <!-- Ajout du paragraphe Rétro 2010 id1 -->
+                <p id="forum-retro-display" style="font-style: italic; color: #555; margin-top: 10px;">
+                    <small>Ici, nous sommes comme en 2010. Retrouvez l'esprit des forums d'antan !</small>
+                </p>
             </div>
 
             <div class="news-flex">
@@ -173,8 +177,15 @@
 
             if (data) {
                 document.getElementById('forum-title-display').textContent = data.forum_title || "Bienvenue sur Actu Manga World";
+                
                 const subtitleEl = document.getElementById('forum-subtitle-display');
                 if (subtitleEl) subtitleEl.textContent = data.welcome_text || "";
+
+                // Chargement dynamique du slogan rétro si la colonne existe dans Supabase
+                const retroEl = document.getElementById('forum-retro-display');
+                if (retroEl && data.slogan_retro) {
+                    retroEl.innerHTML = `<small>${data.slogan_retro}</small>`;
+                }
                 
                 const bannerImg = document.getElementById('forum-banner-img');
                 if (bannerImg && data.banner_url) {
