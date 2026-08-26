@@ -33,6 +33,7 @@
             cursor: pointer;
             border-radius: 3px;
             text-decoration: none;
+            display: inline-block;
         }
 
         .btn-admin-edit:hover {
@@ -63,19 +64,7 @@
         <!-- PANNEAU D'ÉDITION EN-TÊTE (ADMINISTRATEUR & MODÉRATEUR) -->
         <div id="admin-bar-container" class="admin-edit-bar hidden">
             <span class="admin-title-badge">⚙️ Administration de l'en-tête</span>
-            <a href="admin-global.html" class="btn-admin-edit">Modifier la Bannière</a>
-        </div>
-
-        <div id="admin-panel-form" class="admin-panel-inputs hidden">
-            <form id="form-config-header">
-                <label>Lien (URL) de l'image de bannière :</label>
-                <input type="url" id="input-forum-banner" required>
-
-                <div class="admin-form-actions">
-                    <button type="submit" class="btn-admin-edit">Enregistrer</button>
-                    <button type="button" class="btn-admin-edit btn-cancel" id="btn-cancel-admin">Annuler</button>
-                </div>
-            </form>
+            <a href="admin-global.html" class="btn-admin-edit">Modifier Titre & Bannière</a>
         </div>
 
         <div class="main-header">
@@ -149,31 +138,22 @@
             adminBar.classList.remove('hidden');
         }
 
-        document.getElementById('btn-toggle-admin')?.addEventListener('click', () => {
-            document.getElementById('admin-panel-form').classList.toggle('hidden');
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || { 
-                banner: "https://images.alphacoders.com/605/605592.png" 
-            };
-            document.getElementById('input-forum-banner').value = config.banner || "https://images.alphacoders.com/605/605592.png";
-        });
+        async function loadHeaderConfig() {
+            try {
+                const { data, error } = await supabase
+                    .from('site_settings')
+                    .select('banner_url')
+                    .eq('id', 'global')
+                    .single();
 
-        document.getElementById('btn-cancel-admin')?.addEventListener('click', () => {
-            document.getElementById('admin-panel-form').classList.add('hidden');
-        });
-
-        document.getElementById('form-config-header')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig')) || {};
-            config.banner = document.getElementById('input-forum-banner').value;
-            localStorage.setItem('forumHeaderConfig', JSON.stringify(config));
-            alert("Bannière mise à jour avec succès !");
-            window.location.reload();
-        });
-
-        function loadHeaderConfig() {
-            const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
-            if (config && config.banner) {
-                document.getElementById('forum-banner-img').src = config.banner;
+                if (data && data.banner_url) {
+                    const bannerImg = document.getElementById('forum-banner-img');
+                    if (bannerImg) {
+                        bannerImg.src = data.banner_url;
+                    }
+                }
+            } catch (e) {
+                console.error("Erreur lors du chargement de la bannière Supabase", e);
             }
         }
 
