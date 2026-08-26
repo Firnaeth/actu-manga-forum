@@ -136,30 +136,41 @@
             btnNewTopic.setAttribute('href', `new-topic.html?cat=fc&fc_id=${fcId || ''}`);
         }
 
-        // Gestion de la bannière spécifique du Fan Club ou globale
-        function loadHeaderConfig() {
+        // --- GESTION DE LA BANNIÈRE DÉDIÉE DEPUIS SUPABASE ---
+        async function loadHeaderConfig() {
             try {
-                // 1. Vérifier si une bannière spécifique à ce Fan Club a été enregistrée dans l'admin
-                const fanClubsBanners = JSON.parse(localStorage.getItem('fanClubsBanners')) || [];
-                const currentFcBanner = fanClubsBanners.find(item => item.id == fcId);
-                
-                if (currentFcBanner && currentFcBanner.banner) {
-                    document.getElementById('forum-banner-img').src = currentFcBanner.banner;
-                    return;
+                if (fcId) {
+                    // 1. Chercher la bannière spécifique dans la table Supabase 'fan_clubs'
+                    const { data, error } = await supabase
+                        .from('fan_clubs')
+                        .select('banner_url')
+                        .eq('id', fcId)
+                        .single();
+
+                    if (data && data.banner_url && data.banner_url.startsWith('http')) {
+                        const bannerImg = document.getElementById('forum-banner-img');
+                        if (bannerImg) {
+                            bannerImg.src = data.banner_url;
+                            return;
+                        }
+                    }
                 }
 
-                // 2. Sinon, charger la configuration globale de l'en-tête
-                const config = JSON.parse(localStorage.getItem('forumHeaderConfig'));
-                if (config && config.banner) {
-                    document.getElementById('forum-banner-img').src = config.banner;
-                    return;
-                }
-                const customBanner = localStorage.getItem('customBanner');
-                if (customBanner) {
-                    document.getElementById('forum-banner-img').src = customBanner;
+                // 2. Fallback : Charger la configuration globale du site si aucune bannière spécifique n'est trouvée
+                const { data: globalData } = await supabase
+                    .from('site_settings')
+                    .select('banner_url')
+                    .eq('id', 'global')
+                    .single();
+
+                if (globalData && globalData.banner_url) {
+                    const bannerImg = document.getElementById('forum-banner-img');
+                    if (bannerImg) {
+                        bannerImg.src = globalData.banner_url;
+                    }
                 }
             } catch(e) {
-                console.error("Erreur chargement bannière", e);
+                console.error("Erreur lors du chargement de la bannière Supabase", e);
             }
         }
 
