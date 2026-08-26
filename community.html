@@ -53,7 +53,9 @@
 
         <!-- BARRE D'ACTIONS ET FILTRES -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <button id="btn-toggle-form" style="background: #f8bbd0; color: #c2185b; border: 1px solid #c2185b; padding: 6px 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 12px;">+ Créer une Fiche</button>
+            <div id="sheet-action-container">
+                <button id="btn-toggle-form" style="background: #f8bbd0; color: #c2185b; border: 1px solid #c2185b; padding: 6px 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 12px;">+ Créer une Fiche</button>
+            </div>
             
             <div style="display: flex; gap: 5px; align-items: center;">
                 <button onclick="filterSheets('all')" style="background: #f48fb1; color: white; border: none; padding: 4px 12px; font-size: 11px; border-radius: 12px; cursor: pointer; font-weight: bold;">Tous</button>
@@ -176,18 +178,26 @@
         const currentUsername = localStorage.getItem('forumUsername');
         let allSheets = [];
 
-        // Gestion de l'affichage du formulaire
-        const toggleBtn = document.getElementById('btn-toggle-form');
+        // Gestion de l'affichage du formulaire ou du message de connexion
+        const actionContainer = document.getElementById('sheet-action-container');
         const formContainer = document.getElementById('form-container');
-        
-        toggleBtn.addEventListener('click', () => {
-            if (!currentUsername) {
-                alert("Vous devez être connecté pour créer une fiche !");
-                window.location.href = "register.html";
-                return;
+
+        if (!currentUsername) {
+            if (actionContainer) {
+                actionContainer.innerHTML = `
+                    <div style="background: #fff3cd; color: #856404; padding: 6px 12px; border-radius: 4px; border: 1px solid #ffeeba; font-size: 0.9em;">
+                        🔒 <a href="register.html" style="color: #c2185b; font-weight: bold;">Connectez-vous</a> pour créer une fiche.
+                    </div>
+                `;
             }
-            formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
-        });
+        } else {
+            const toggleBtn = document.getElementById('btn-toggle-form');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+                });
+            }
+        }
 
         async function loadSheets() {
             const { data, error } = await supabase
@@ -261,40 +271,43 @@
         }
 
         // Soumission du formulaire de création
-        document.getElementById('form-create-sheet').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        const createSheetForm = document.getElementById('form-create-sheet');
+        if (createSheetForm) {
+            createSheetForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
 
-            if (!currentUsername) {
-                alert("Session expirée, veuillez vous reconnecter.");
-                window.location.href = "register.html";
-                return;
-            }
+                if (!currentUsername) {
+                    alert("Session expirée, veuillez vous reconnecter.");
+                    window.location.href = "register.html";
+                    return;
+                }
 
-            const newSheet = {
-                title: document.getElementById('sheet-title').value,
-                sheet_type: document.getElementById('sheet-type').value,
-                cover_url: document.getElementById('sheet-cover').value,
-                details: document.getElementById('sheet-author-detail').value,
-                genre: document.getElementById('sheet-genre').value,
-                age_rating: document.getElementById('sheet-age').value,
-                rating: parseInt(document.getElementById('sheet-rating').value),
-                content: document.getElementById('sheet-synopsis').value,
-                review: document.getElementById('sheet-review').value,
-                author: currentUsername,
-                category: 'community'
-            };
+                const newSheet = {
+                    title: document.getElementById('sheet-title').value,
+                    sheet_type: document.getElementById('sheet-type').value,
+                    cover_url: document.getElementById('sheet-cover').value,
+                    details: document.getElementById('sheet-author-detail').value,
+                    genre: document.getElementById('sheet-genre').value,
+                    age_rating: document.getElementById('sheet-age').value,
+                    rating: parseInt(document.getElementById('sheet-rating').value),
+                    content: document.getElementById('sheet-synopsis').value,
+                    review: document.getElementById('sheet-review').value,
+                    author: currentUsername,
+                    category: 'community'
+                };
 
-            const { data, error } = await supabase.from('topics').insert([newSheet]).select();
+                const { data, error } = await supabase.from('topics').insert([newSheet]).select();
 
-            if (error) {
-                alert("Erreur lors de la création de la fiche : " + error.message);
-            } else {
-                alert("Fiche créée avec succès !");
-                document.getElementById('form-create-sheet').reset();
-                formContainer.style.display = 'none';
-                loadSheets();
-            }
-        });
+                if (error) {
+                    alert("Erreur lors de la création de la fiche : " + error.message);
+                } else {
+                    alert("Fiche créée avec succès !");
+                    createSheetForm.reset();
+                    formContainer.style.display = 'none';
+                    loadSheets();
+                }
+            });
+        }
 
         loadSheets();
     </script>
