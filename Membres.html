@@ -55,7 +55,7 @@
             vertical-align: middle;
             padding: 4px;
         }
-/* Bouton étiré sur toute la largeur avec le même style rose */
+        /* Bouton étiré sur toute la largeur avec le même style rose */
     .btn-forum-action {
         background: #f3a6b8;
         color: white;
@@ -108,7 +108,7 @@
 
     .btn-new-topic:hover {
         background-color: #2980b9;
-    }        
+    }       
     </style>
 </head>
 <body>
@@ -187,9 +187,10 @@
             </tbody>
         </table>
 
-        <!-- BOUTON POUR SE PRÉSENTER -->
-         <div style="margin-top: 15px; margin-bottom: 20px;">
-            <a href="new-topic.html?cat=general" class="btn-admin-edit" style="text-decoration: none; padding: 6px 12px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">+ Me présenter</a>
+        <!-- ZONE DU BOUTON "ME PRÉSENTER" (Gérée dynamiquement selon la connexion) -->
+        <div id="presentation-action-container" style="margin-top: 15px; margin-bottom: 20px; text-align: center;">
+            <!-- Remplacé automatiquement par du JS si non connecté -->
+            <a href="new-topic.html?cat=general" class="btn-admin-edit" style="text-decoration: none; padding: 8px 15px; background: #61b3e8; color: white; border-radius: 4px; font-weight: bold; font-size: 0.9em; box-shadow: 0 1px 3px rgba(0,0,0,0.2); display: inline-block;">+ Me présenter</a>
         </div>
 
     </div>
@@ -220,6 +221,8 @@
         loadGlobalBanner();
 
         const currentUsername = localStorage.getItem('forumUsername');
+        
+        // --- GESTION DU BOUTON DE CONNEXION / PROFIL ---
         if (currentUsername) {
             document.getElementById('nav-profile-link').classList.remove('hidden');
             const authLink = document.getElementById('nav-auth-link');
@@ -231,6 +234,16 @@
                 localStorage.clear(); 
                 window.location.reload(); 
             };
+        } else {
+            // Si non connecté, on remplace le bouton "+ Me présenter" par un message d'invite
+            const actionContainer = document.getElementById('presentation-action-container');
+            if (actionContainer) {
+                actionContainer.innerHTML = `
+                    <div style="background: #fff3cd; color: #856404; padding: 12px; border-radius: 4px; border: 1px solid #ffeeba; font-size: 0.9em;">
+                        🔒 Vous devez être <strong>connecté</strong> pour créer un sujet de présentation. <a href="register.html" style="color: #c2185b; font-weight: bold;">Se connecter</a>
+                    </div>
+                `;
+            }
         }
 
         // --- GESTION DU BOUTON DÉROULANT (ACCORDÉON) ---
