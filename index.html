@@ -411,12 +411,14 @@
 
             if (!profiles || profiles.length === 0) return;
 
-            // Fonction pour attribuer une couleur spécifique selon le rang (modifiable selon tes préférences)
+            // Fonction pour attribuer une couleur spécifique selon le rang
             function getRankColor(rankName) {
                 const r = rankName.toLowerCase();
                 if (r.includes('admin')) return '#d9534f'; // Rouge Admin
-                if (r.includes('modo') || r.includes('moderateur')) return '#337ab7'; // Bleu Modérateur
+                if (r.includes('modo') || r.includes('modérateur') || r.includes('moderator')) return '#337ab7'; // Bleu Modérateur
+                if (r.includes('contributeur')) return '#5cb85c'; // Vert Contributeur
                 if (r.includes('vip')) return '#f0ad4e'; // Orange VIP
+                if (r.includes('graphiste')) return '#9b59b6'; // Violet Graphiste
                 return '#555555'; // Gris par défaut pour les membres
             }
 
