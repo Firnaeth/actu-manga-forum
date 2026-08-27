@@ -404,6 +404,7 @@
             const { data: profiles } = await supabase.from('profiles').select('username, role, rank, avatar_url');
             const staffContainer = document.getElementById('staff-avatars-container');
             const countMsg = document.getElementById('online-count-msg');
+            const connectedContainer = document.getElementById('online-users-connected'); // <-- Déclaration ajoutée ici pour corriger le bug
             const simpleListContainer = document.getElementById('online-users-simple');
             const ranksListContainer = document.getElementById('online-users-ranks');
             const defaultAvatar = "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg";
@@ -414,7 +415,8 @@
             if (countMsg) {
                 countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
             }
-            // Ligne : Membres connectés actuellement (si l'utilisateur connecté est présent, on l'affiche ou on liste l'ensemble des profils récupérés)
+            
+            // Ligne : Membres connectés actuellement
             if (connectedContainer) {
                 if (currentUsername) {
                     connectedContainer.innerHTML = `<a href="profile.html?user=${encodeURIComponent(currentUsername)}" style="text-decoration: none; font-weight: bold; color: #337ab7;">${currentUsername}</a>`;
