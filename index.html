@@ -184,7 +184,7 @@
                     <td style="width: 220px; padding: 12px; text-align: center; vertical-align: middle; background: #fff; border-right: 1px solid #2980b9;">
                         <img src="https://images.alphacoders.com/605/605592.png" alt="Illustration Qui est en ligne" style="width: 190px; height: 190px; object-fit: cover; border: 1px solid #2980b9; border-radius: 4px;">
                     </td>
-                    <!-- Partie texte divisée en 3 lignes distinctes -->
+                    <!-- Partie texte divisée en lignes distinctes -->
                     <td class="online-sidebar-cell-content">
                         <!-- 1ère ligne : Le compteur -->
                         <p id="online-count-msg" style="margin-bottom: 6px;">Chargement des membres inscrits...</p>
@@ -199,8 +199,8 @@
                         <!-- Ligne de séparation bleue insérée ici -->
                         <hr style="border: none; border-top: 1px solid #2980b9; margin: 8px 0;">
 
-                        <!-- 3ème ligne : Les ranks avec les pseudos -->
-                        <p><small>Membres et Ranks : <span id="online-users-ranks">...</span></small></p>
+                        <!-- 3ème ligne : Les ranks affichés en colonnes (ex: Modérateur : Nanguille40) -->
+                        <div id="online-users-ranks"><small>...</small></div>
                     </td>
                 </tr>
             </tbody>
@@ -404,7 +404,7 @@
             const { data: profiles } = await supabase.from('profiles').select('username, role, rank, avatar_url');
             const staffContainer = document.getElementById('staff-avatars-container');
             const countMsg = document.getElementById('online-count-msg');
-            const connectedContainer = document.getElementById('online-users-connected'); // <-- Déclaration ajoutée ici pour corriger le bug
+            const connectedContainer = document.getElementById('online-users-connected');
             const simpleListContainer = document.getElementById('online-users-simple');
             const ranksListContainer = document.getElementById('online-users-ranks');
             const defaultAvatar = "https://i.pinimg.com/236x/d9/1b/2e/d91b2e2b34a6210f22ef2f8bb7df5f06.jpg";
@@ -432,12 +432,24 @@
                 ).join(', ');
             }
 
-            // 3ème ligne : Pseudos avec les Ranks
+            // 3ème ligne : Ranks groupés en colonnes (ex: Modérateur : Nanguille40)
             if (ranksListContainer) {
-                ranksListContainer.innerHTML = profiles.map(u => {
+                // Regroupement par rank
+                const rankGroups = {};
+                profiles.forEach(u => {
                     const rankName = u.rank || 'Membre';
-                    return `<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none; font-weight: bold; color: #337ab7;">${u.username}</a> <span style="font-size: 0.85em; color: #666; font-weight: bold;">[${rankName}]</span>`;
-                }).join(', ');
+                    if (!rankGroups[rankName]) {
+                        rankGroups[rankName] = [];
+                    }
+                    rankGroups[rankName].push(`<a href="profile.html?user=${encodeURIComponent(u.username)}" style="text-decoration: none; font-weight: bold; color: #337ab7;">${u.username}</a>`);
+                });
+
+                // Génération des lignes en colonnes
+                let ranksHtml = '';
+                for (const [rank, usersArray] of Object.entries(rankGroups)) {
+                    ranksHtml += `<div style="margin-bottom: 4px;"><small><strong>${rank}</strong> : ${usersArray.join(', ')}</small></div>`;
+                }
+                ranksListContainer.innerHTML = ranksHtml;
             }
 
             // Affichage dans le bloc "Staff & Membres" en haut
