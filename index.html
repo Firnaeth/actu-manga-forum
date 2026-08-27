@@ -188,6 +188,8 @@
                     <td class="online-sidebar-cell-content">
                         <!-- 1ère ligne : Le compteur -->
                         <p id="online-count-msg" style="margin-bottom: 6px;">Chargement des membres inscrits...</p>
+                        <!-- Ligne : Membres connectés actuellement -->
+                        <p style="margin-bottom: 6px;"><small>Membres connectés actuellement : <span id="online-users-connected">...</span></small></p>
                         
                         <hr style="border: none; border-top: 1px solid #2980b9; margin: 8px 0;">
                         
@@ -411,6 +413,14 @@
             // 1ère ligne : Compteur total
             if (countMsg) {
                 countMsg.innerHTML = `Il y a actuellement <strong>${profiles.length}</strong> membre(s) inscrit(s) sur le forum.`;
+            }
+            // Ligne : Membres connectés actuellement (si l'utilisateur connecté est présent, on l'affiche ou on liste l'ensemble des profils récupérés)
+            if (connectedContainer) {
+                if (currentUsername) {
+                    connectedContainer.innerHTML = `<a href="profile.html?user=${encodeURIComponent(currentUsername)}" style="text-decoration: none; font-weight: bold; color: #337ab7;">${currentUsername}</a>`;
+                } else {
+                    connectedContainer.innerHTML = "<em>Aucun membre connecté (Invité)</em>";
+                }
             }
             
             // 2ème ligne : Liste simple des pseudos
