@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vos Idées & Suggestions - Actu Manga World</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- STYLE POUR L'ENCADRÉ VIOLET D'IDÉES --- */
+        .help-box-alert {
+            background: #f4ecf7; 
+            border: 1px solid #d7bde2; 
+            color: #512e5f; 
+            padding: 15px; 
+            border-radius: 4px; 
+            margin-bottom: 20px; 
+        }
+
+        .help-section {
+            margin-bottom: 25px;
+        }
+
+        .help-section h3 {
+            color: #8e44ad;
+            border-bottom: 2px solid #d7bde2;
+            padding-bottom: 5px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="wrapper">
+        <!-- Fil d'Ariane -->
+        <div class="breadcrumb" style="margin: 10px 0; font-size: 0.9em;">
+            <a href="index.html">Index du Forum</a> &raquo; <span>Vos Idées & Suggestions</span>
+        </div>
+
+        <!-- CONTENU DE LA PAGE D'IDÉES -->
+        <div class="news-container" style="padding: 20px;">
+            <h2 style="color: #333; margin-top: 0;">💡 Boîte à idées & Suggestions pour le Forum</h2>
+            
+            <!-- Encadré spécifique Boîte à idées -->
+            <div class="help-box-alert">
+                <h4 style="margin: 0 0 8px 0;">✨ Envie de faire évoluer le forum ?</h4>
+                <p style="margin: 0;">Une suggestion de nouveau fan-club, une idée de fonctionnalité ou une amélioration pour le design ? Partage ton idée ci-dessous pour qu'on puisse l'étudier ensemble !</p>
+            </div>
+
+            <!-- Espace Soumission d'une idée -->
+            <div class="help-section">
+                <h3>💬 Proposer une nouvelle idée</h3>
+                <p>Remplis le formulaire ci-dessous pour soumettre ta suggestion à la communauté et à l'équipe :</p>
+                
+                <form id="idea-report-form">
+                    <label for="idea-title" style="display: block; margin-bottom: 5px; font-weight: bold;">Titre de l'idée :</label>
+                    <input type="text" id="idea-title" placeholder="Ex: Ajouter un fan-club Fullmetal Alchemist..." style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 3px;" required>
+
+                    <label for="idea-desc" style="display: block; margin-bottom: 5px; font-weight: bold;">Description détaillée :</label>
+                    <textarea id="idea-desc" rows="5" placeholder="Explique ton idée en détail..." style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 3px;" required></textarea>
+
+                    <button type="submit" style="background: #8e44ad; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 3px; cursor: pointer;">Envoyer ma suggestion</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT POUR GÉRER L'ENVOI DE L'IDÉE (SUPABASE & WEBHOOK DISCORD) -->
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        // Envoi du formulaire d'idées
+        document.getElementById('idea-report-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('idea-title').value;
+            const description = document.getElementById('idea-desc').value;
+            
+            // Récupération de l'ID utilisateur connecté dans Supabase Auth (nécessaire pour la table 'ideas')
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                alert("Tu dois être connecté pour poster une idée !");
+                return;
+            }
+
+            // Enregistrement direct dans la table 'ideas' (ce qui déclenchera ton webhook Discord automatiquement)
+            const { error } = await supabase
+                .from('ideas')
+                .insert([{ title, description, user_id: user.id }]);
+
+            if (error) {
+                alert("Erreur lors de l'enregistrement : " + error.message);
+                console.error("Détail erreur Supabase :", error);
+            } else {
+                alert("Merci ! Ton idée a bien été envoyée et transmise sur Discord.");
+                document.getElementById('idea-report-form').reset();
+            }
+        });
+    </script>
+</body>
+</html>
