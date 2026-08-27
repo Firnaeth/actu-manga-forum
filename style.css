@@ -1020,3 +1020,19 @@ a.group-admin:hover, a.group-member:hover {
 .btn-save-profile:hover {
     background: #ff4081;
 }
+
+/* Rend toutes les listes du forum bien compactes */
+.news-container ul, .post-content ul, body ul {
+    margin: 5px 0 10px 0 !important;
+    padding-left: 20px !important;
+}
+
+.news-container li, .post-content li, body li {
+    margin-bottom: 4px !important;
+}
+
+/* Réduit l'espace vertical des titres dans les posts */
+.news-container h3, .post-content h3 {
+    margin-top: 15px !important;
+    margin-bottom: 5px !important;
+}
