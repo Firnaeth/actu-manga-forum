@@ -35,12 +35,44 @@
         .post-user-details p {
             margin: 3px 0;
         }
+
+        /* Style de la barre d'outils unifiée */
+        .editor-toolbar {
+            background: #f1f1f1;
+            padding: 6px;
+            border: 1px solid #ccc;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            flex-wrap: wrap;
+            border-radius: 4px 4px 0 0;
+            margin-top: 10px;
+        }
+        .editor-toolbar button, .editor-toolbar select {
+            padding: 4px 8px;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        .editor-toolbar button:hover, .editor-toolbar select:hover {
+            background: #e2e2e2;
+        }
+        .editor-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
 
     <div id="wrapper">
-        <!-- BREADCRUMB DYNAMIQUE -->
         <div class="breadcrumb" id="topic-breadcrumb">
             <a href="index.html">Index du Forum</a> &raquo; 
             <span id="bread-category-slot"><a href="index.html">Chargement...</a></span> &raquo; 
@@ -54,16 +86,17 @@
             <a href="#reply-form" class="btn-reply" id="btn-goto-reply">Répondre à ce sujet</a>
         </div>
 
-        <!-- CONTENEUR GLOBAL DES POSTS (SUJET + RÉPONSES) -->
         <div id="posts-container">
             <p style="text-align: center; padding: 20px;">Chargement du sujet et des réponses...</p>
         </div>
 
-        <!-- ZONE DU FORMULAIRE DE RÉPONSE (Sécurisée dynamiquement) -->
         <div class="reply-box" id="reply-form-container">
             <div class="box-title">Poster une réponse</div>
+            
+            <div id="toolbar-reply"></div>
+
             <form class="reply-form" id="form-add-reply">
-                <textarea id="message" rows="6" placeholder="Écrivez votre réponse ici... (Collez un lien direct http... pour afficher une image)" required></textarea>
+                <textarea id="message" rows="12" class="editor-textarea" placeholder="Écrivez votre réponse ici..." required></textarea>
                 <button type="submit" class="btn-submit" style="margin-top: 10px;">Envoyer</button>
             </form>
         </div>
@@ -72,10 +105,119 @@
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // --- 1. VÉRIFICATION DE LA VRAIE SESSION ---
+        // --- FONCTION QUI GÉNÈRE LA BARRE D'OUTILS POUR N'IMPORTE QUEL TEXTAREA ---
+        window.createEditorToolbar = function(textareaId) {
+            const containerId = 'toolbar-' + textareaId;
+            return `
+                <div class="editor-toolbar">
+                    <button type="button" onclick="insertTag('${textareaId}', '**', '**')" style="font-weight: bold;" title="Gras">B</button>
+                    <button type="button" onclick="insertTag('${textareaId}', '*', '*')" style="font-style: italic;" title="Italique">I</button>
+                    <button type="button" onclick="insertTag('${textareaId}', '<u>', '</u>')" style="text-decoration: underline;" title="Souligné">U</button>
+                    <button type="button" onclick="insertTag('${textareaId}', '<p>', '</p>')" title="Paragraphe">Paragraphe</button>
+                    
+                    <span style="border-left: 1px solid #ccc; height: 20px; margin: 0 4px;"></span>
+                    
+                    <button type="button" onclick="insertImage('${textareaId}')" title="Insérer une image">🖼️ Image</button>
+                    <button type="button" onclick="insertVideo('${textareaId}')" title="Insérer une vidéo">🎬 Vidéo</button>
+                    <button type="button" onclick="insertLink('${textareaId}')" title="Insérer un lien">🔗 Lien</button>
+                    
+                    <span style="border-left: 1px solid #ccc; height: 20px; margin: 0 4px;"></span>
+                    
+                    <select onchange="changeFont('${textareaId}', this.value)">
+                        <option value="">Police</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                    
+                    <button type="button" onclick="insertSpoiler('${textareaId}')" style="background: #8e44ad; color: white; border: none; font-weight: bold;" title="Ajouter un spoiler">⚠️ Spoiler</button>
+                </div>
+            `;
+        }
+
+        // Injecte la barre d'outils dans le formulaire de réponse principal
+        document.getElementById('toolbar-reply').innerHTML = createEditorToolbar('message');
+
+        // --- FONCTIONS DE MANIPULATION DU TEXTE ---
+        window.insertTag = function(id, startTag, endTag) {
+            const ta = document.getElementById(id);
+            const startPos = ta.selectionStart;
+            const endPos = ta.selectionEnd;
+            const selectedText = ta.value.substring(startPos, endPos);
+            
+            ta.value = ta.value.substring(0, startPos) + startTag + selectedText + endTag + ta.value.substring(endPos);
+            ta.focus();
+            ta.setSelectionRange(startPos + startTag.length, endPos + startTag.length);
+        }
+
+        window.insertLink = function(id) {
+            const url = prompt("Entrez l'URL du lien :");
+            if (url) {
+                const ta = document.getElementById(id);
+                const startPos = ta.selectionStart;
+                const endPos = ta.selectionEnd;
+                const selectedText = ta.value.substring(startPos, endPos) || "Texte du lien";
+                const linkHtml = `<a href="${url}" target="_blank">${selectedText}</a>`;
+                
+                ta.value = ta.value.substring(0, startPos) + linkHtml + ta.value.substring(endPos);
+                ta.focus();
+            }
+        }
+
+        window.insertImage = function(id) {
+            const url = prompt("Entrez l'URL de l'image :");
+            if (url) {
+                const ta = document.getElementById(id);
+                const startPos = ta.selectionStart;
+                const endPos = ta.selectionEnd;
+                const imgHtml = `<img src="${url}" alt="Image" style="max-width: 100%; border-radius: 4px;">`;
+                
+                ta.value = ta.value.substring(0, startPos) + imgHtml + ta.value.substring(endPos);
+                ta.focus();
+            }
+        }
+
+        window.insertVideo = function(id) {
+            const url = prompt("Entrez l'URL de la vidéo (ou lien embed) :");
+            if (url) {
+                const ta = document.getElementById(id);
+                const startPos = ta.selectionStart;
+                const endPos = ta.selectionEnd;
+                const videoHtml = `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;"><iframe src="${url}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe></div>`;
+                
+                ta.value = ta.value.substring(0, startPos) + videoHtml + ta.value.substring(endPos);
+                ta.focus();
+            }
+        }
+
+        window.changeFont = function(id, fontName) {
+            if (!fontName) return;
+            const ta = document.getElementById(id);
+            const startPos = ta.selectionStart;
+            const endPos = ta.selectionEnd;
+            const selectedText = ta.value.substring(startPos, endPos);
+            const fontHtml = `<span style="font-family: '${fontName}', sans-serif;">${selectedText}</span>`;
+            
+            ta.value = ta.value.substring(0, startPos) + fontHtml + ta.value.substring(endPos);
+            ta.focus();
+        }
+
+        window.insertSpoiler = function(id) {
+            const ta = document.getElementById(id);
+            const startPos = ta.selectionStart;
+            const endPos = ta.selectionEnd;
+            const selectedText = ta.value.substring(startPos, endPos);
+            
+            const spoilerMarkup = `<details style="background: #f9f4fb; border: 1px dashed #8e44ad; padding: 8px; border-radius: 4px; margin: 8px 0; cursor: pointer;"><summary style="font-weight: bold; color: #8e44ad; outline: none;">⚠️ Spoiler</summary><p style="margin: 6px 0 0 0; color: #333; font-size: 0.95em;">${selectedText || 'Votre texte de spoiler ici'}</p></details>`;
+            
+            ta.value = ta.value.substring(0, startPos) + spoilerMarkup + ta.value.substring(endPos);
+            ta.focus();
+        }
+
+        // --- 1. VÉRIFICATION DE LA SESSION ---
         const currentUsername = localStorage.getItem('forumUsername');
         const currentRole = (localStorage.getItem('forumUserRole') || 'member').toLowerCase();
-        
         const isStaff = (currentRole === 'admin' || currentRole === 'mod' || currentRole === 'modo' || currentRole === 'moderator' || currentRole === 'modérateur');
 
         const replyFormContainer = document.getElementById('reply-form-container');
@@ -95,7 +237,6 @@
             }
         }
 
-        // --- 2. CONFIGURATION DES CATÉGORIES ---
         const categoryMap = {
             'planning': { name: 'Planning des Sorties VF', url: 'news.html' },
             'manga': { name: 'Discussion Manga', url: 'community.html' },
@@ -105,25 +246,18 @@
             'general': { name: 'Général', url: 'general.html' }
         };
 
-        // --- 3. FONCTION DE TRANSFORMATION (CORRIGÉE) ---
         function formatContent(text) {
             if (!text) return '';
-            
-            // Si le texte contient déjà du code HTML valide (ex: <img ...>), on le laisse passer
-            // Sinon, si c'est un lien direct d'image simple, on le transforme en balise img
             const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif))/gi;
             let formatted = text.replace(urlRegex, (url) => {
-                // Évite de doubler si le lien est déjà dans une balise img
                 if (text.includes(`src="${url}"`)) return url;
                 return `<br><img src="${url}" alt="Image" style="max-width: 100%; border-radius: 4px; margin: 10px 0;"><br>`;
             });
-
             return formatted.replace(/\n/g, '<br>');
         }
 
         const topicId = new URLSearchParams(window.location.search).get('id');
 
-        // --- FONCTION UTILITAIRE POUR GÉNÉRER LE BLOC DE GAUCHE (MINI-PROFIL) ---
         async function buildUserProfileBox(username) {
             if (!username) {
                 return `
@@ -153,28 +287,15 @@
             const sexRaceText = (profile && profile.sex_race) ? profile.sex_race : '-';
             let statutText = (profile && profile.status && profile.status !== 'EMPTY') ? profile.status : '-';
 
-            const { count: topicsCount } = await supabase
-                .from('topics')
-                .select('*', { count: 'exact', head: true })
-                .eq('author', username);
-
-            const { count: repliesCount } = await supabase
-                .from('replies')
-                .select('*', { count: 'exact', head: true })
-                .eq('author', username);
-
+            const { count: topicsCount } = await supabase.from('topics').select('*', { count: 'exact', head: true }).eq('author', username);
+            const { count: repliesCount } = await supabase.from('replies').select('*', { count: 'exact', head: true }).eq('author', username);
             const totalPosts = (topicsCount || 0) + (repliesCount || 0);
 
             return `
                 <div class="post-user">
-                    <div class="post-user-avatar">
-                        <img src="${avatarUrl}" alt="Avatar de ${username}">
-                    </div>
-                    <div>
-                        <a href="profile.html?user=${username}" class="username ${userRole === 'admin' ? 'admin' : 'member'}" style="font-weight: bold;">${username}</a>
-                    </div>
+                    <div class="post-user-avatar"><img src="${avatarUrl}" alt="Avatar"></div>
+                    <div><a href="profile.html?user=${username}" class="username ${userRole === 'admin' ? 'admin' : 'member'}" style="font-weight: bold;">${username}</a></div>
                     <div><span class="rank ${rankClass}">${userRankText}</span></div>
-                    
                     <div class="post-user-details">
                         <p><strong>Âge :</strong> ${ageText}</p>
                         <p><strong>Sexe/Race :</strong> ${sexRaceText}</p>
@@ -185,19 +306,13 @@
             `;
         }
 
-        // --- 4. CHARGEMENT DU SUJET ET DES RÉPONSES ---
         async function loadTopicAndReplies() {
             if (!topicId) {
                 document.getElementById('posts-container').innerHTML = "<p>Aucun sujet spécifié.</p>";
                 return;
             }
 
-            const { data: topic, error: topicError } = await supabase
-                .from('topics')
-                .select('*')
-                .eq('id', topicId)
-                .single();
-
+            const { data: topic, error: topicError } = await supabase.from('topics').select('*').eq('id', topicId).single();
             if (topicError || !topic) {
                 document.getElementById('posts-container').innerHTML = "<p>Sujet introuvable.</p>";
                 return;
@@ -205,18 +320,12 @@
 
             document.getElementById('topic-title').textContent = topic.title;
             document.getElementById('bread-topic-title').textContent = topic.title;
-            
             const catInfo = categoryMap[topic.category] || { name: topic.category, url: 'index.html' };
             document.getElementById('bread-category-slot').innerHTML = `<a href="${catInfo.url}">${catInfo.name}</a>`;
 
             let authorSignatureHtml = '';
             if (topic.author) {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('signature')
-                    .eq('username', topic.author)
-                    .single();
-
+                const { data: profile } = await supabase.from('profiles').select('signature').eq('username', topic.author).single();
                 if (profile && profile.signature) {
                     if (profile.signature.startsWith('http://') || profile.signature.startsWith('https://')) {
                         authorSignatureHtml = `<div class="post-signature"><img src="${profile.signature}" alt="Signature"></div>`;
@@ -234,32 +343,19 @@
                     ${authorBoxHtml}
                     <div class="post-content">
                         <div class="post-date">Posté le ${new Date(topic.created_at).toLocaleDateString()}
-                            ${canManageTopic ? `<button class="btn-edit" onclick="editTopic(${topic.id})">Éditer</button>
-                                                <button class="btn-mod" onclick="deleteTopic(${topic.id})">Supprimer</button>` : ''}
+                            ${canManageTopic ? `<button class="btn-edit" onclick="editTopic(${topic.id})">Éditer</button><button class="btn-mod" onclick="deleteTopic(${topic.id})">Supprimer</button>` : ''}
                         </div>
-                        <div class="post-text" style="margin-top: 10px;">
-                            ${formatContent(topic.content)}
-                        </div>
+                        <div class="post-text" style="margin-top: 10px;">${formatContent(topic.content)}</div>
                         ${authorSignatureHtml}
                     </div>
                 </div>
             `;
 
-            const { data: replies, error: repliesError } = await supabase
-                .from('replies')
-                .select('*')
-                .eq('topic_id', topicId)
-                .order('created_at', { ascending: true });
-
-            if (!repliesError && replies && replies.length > 0) {
+            const { data: replies } = await supabase.from('replies').select('*').eq('topic_id', topicId).order('created_at', { ascending: true });
+            if (replies && replies.length > 0) {
                 for (const reply of replies) {
                     let replySigHtml = '';
-                    const { data: replyProfile } = await supabase
-                        .from('profiles')
-                        .select('signature')
-                        .eq('username', reply.author)
-                        .single();
-
+                    const { data: replyProfile } = await supabase.from('profiles').select('signature').eq('username', reply.author).single();
                     if (replyProfile && replyProfile.signature) {
                         if (replyProfile.signature.startsWith('http://') || replyProfile.signature.startsWith('https://')) {
                             replySigHtml = `<div class="post-signature"><img src="${replyProfile.signature}" alt="Signature"></div>`;
@@ -276,12 +372,9 @@
                             ${replyAuthorBoxHtml}
                             <div class="post-content">
                                 <div class="post-date">Répondu le ${new Date(reply.created_at).toLocaleDateString()}
-                                    ${canManageReply ? `<button class="btn-edit" onclick="editReply(${reply.id})">Éditer</button>
-                                                         <button class="btn-mod" onclick="deleteReply(${reply.id})">Supprimer</button>` : ''}
+                                    ${canManageReply ? `<button class="btn-edit" onclick="editReply(${reply.id})">Éditer</button><button class="btn-mod" onclick="deleteReply(${reply.id})">Supprimer</button>` : ''}
                                 </div>
-                                <div class="post-text" style="margin-top: 10px;">
-                                    ${formatContent(reply.content)}
-                                </div>
+                                <div class="post-text" style="margin-top: 10px;">${formatContent(reply.content)}</div>
                                 ${replySigHtml}
                             </div>
                         </div>
@@ -292,27 +385,16 @@
             document.getElementById('posts-container').innerHTML = htmlContent;
         }
 
-        // --- 5. ENVOI D'UNE NOUVELLE RÉPONSE ---
         const formAddReply = document.getElementById('form-add-reply');
         if (formAddReply) {
             formAddReply.addEventListener('submit', async (e) => {
                 e.preventDefault();
-
                 if (!currentUsername) {
                     alert("Vous devez être connecté pour répondre.");
                     return;
                 }
-
                 const content = document.getElementById('message').value;
-
-                const { error } = await supabase
-                    .from('replies')
-                    .insert([{
-                        topic_id: topicId,
-                        author: currentUsername,
-                        content: content
-                    }]);
-
+                const { error } = await supabase.from('replies').insert([{ topic_id: topicId, author: currentUsername, content: content }]);
                 if (error) {
                     alert("Erreur lors de l'envoi de la réponse : " + error.message);
                 } else {
@@ -322,27 +404,33 @@
             });
         }
 
-        // --- 6. ACTIONS DE MODÉRATION & EDITION ---
-        window.deleteTopic = async (id) => {
-            if(confirm("Supprimer ce sujet ?")) {
-                await supabase.from('topics').delete().eq('id', id);
-                window.location.href = "index.html";
-            }
-        };
-
+        // --- MODIFICATION AMÉLIORÉE (AVEC PROMPT INTELLIGENT / ZONE DE MODIF) ---
         window.editTopic = async (id) => {
-            const newContent = prompt("Nouveau contenu :");
-            if (newContent) {
+            const { data: topic } = await supabase.from('topics').select('content').eq('id', id).single();
+            if(!topic) return;
+
+            const newContent = prompt("Modifier le contenu du sujet :", topic.content);
+            if (newContent !== null) {
                 await supabase.from('topics').update({ content: newContent }).eq('id', id);
                 location.reload();
             }
         };
 
         window.editReply = async (id) => {
-            const newContent = prompt("Nouveau contenu de la réponse :");
-            if (newContent) {
+            const { data: reply } = await supabase.from('replies').select('content').eq('id', id).single();
+            if(!reply) return;
+
+            const newContent = prompt("Modifier la réponse :", reply.content);
+            if (newContent !== null) {
                 await supabase.from('replies').update({ content: newContent }).eq('id', id);
                 loadTopicAndReplies();
+            }
+        };
+
+        window.deleteTopic = async (id) => {
+            if(confirm("Supprimer ce sujet ?")) {
+                await supabase.from('topics').delete().eq('id', id);
+                window.location.href = "index.html";
             }
         };
 
