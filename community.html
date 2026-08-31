@@ -37,6 +37,40 @@
             border-radius: 3px;
             font-size: 12px;
         }
+
+        /* Style de la barre d'outils unifiée */
+        .editor-toolbar {
+            background: #f1f1f1;
+            padding: 6px;
+            border: 1px solid #ccc;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            flex-wrap: wrap;
+            border-radius: 4px 4px 0 0;
+            margin-top: 10px;
+        }
+        .editor-toolbar button, .editor-toolbar select {
+            padding: 4px 8px;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        .editor-toolbar button:hover, .editor-toolbar select:hover {
+            background: #e2e2e2;
+        }
+        .editor-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -141,12 +175,14 @@
 
                 <div class="form-group" style="margin-bottom: 10px;">
                     <label>Synopsis / Résumé :</label>
-                    <textarea id="sheet-synopsis" rows="3" placeholder="Résumé de l'œuvre..." required></textarea>
+                    <div id="toolbar-sheet-synopsis"></div>
+                    <textarea id="sheet-synopsis" rows="3" class="editor-textarea" placeholder="Résumé de l'œuvre..." required></textarea>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 15px;">
                     <label>Avis personnel :</label>
-                    <textarea id="sheet-review" rows="2" placeholder="Ton avis personnel sur l'œuvre..." required></textarea>
+                    <div id="toolbar-sheet-review"></div>
+                    <textarea id="sheet-review" rows="2" class="editor-textarea" placeholder="Ton avis personnel sur l'œuvre..." required></textarea>
                 </div>
 
                 <button type="submit" style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">Publier la fiche</button>
@@ -171,14 +207,123 @@
         </table>
     </div>
 
-    <!-- SCRIPT SUPABASE -->
+    <!-- SCRIPT SUPABASE & OUTILS -->
     <script type="module">
         import { supabase } from './supabase.js';
+
+        // --- FONCTION QUI GÉNÈRE LA BARRE D'OUTILS ---
+        window.createEditorToolbar = function(textareaId) {
+            return `
+                <div class="editor-toolbar">
+                    <button type="button" onclick="insertTag('${textareaId}', '**', '**')" style="font-weight: bold;" title="Gras">B</button>
+                    <button type="button" onclick="insertTag('${textareaId}', '*', '*')" style="font-style: italic;" title="Italique">I</button>
+                    <button type="button" onclick="insertTag('${textareaId}', '<u>', '</u>')" style="text-decoration: underline;" title="Souligné">U</button>
+                    <button type="button" onclick="insertTag('${textareaId}', '<p>', '</p>')" title="Paragraphe">Paragraphe</button>
+                    
+                    <span style="border-left: 1px solid #ccc; height: 20px; margin: 0 4px;"></span>
+                    
+                    <button type="button" onclick="insertImage('${textareaId}')" title="Insérer une image">🖼️ Image</button>
+                    <button type="button" onclick="insertVideo('${textareaId}')" title="Insérer une vidéo">🎬 Vidéo</button>
+                    <button type="button" onclick="insertLink('${textareaId}')" title="Insérer un lien">🔗 Lien</button>
+                    
+                    <span style="border-left: 1px solid #ccc; height: 20px; margin: 0 4px;"></span>
+                    
+                    <select onchange="changeFont('${textareaId}', this.value)">
+                        <option value="">Police</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                    
+                    <button type="button" onclick="insertSpoiler('${textareaId}')" style="background: #8e44ad; color: white; border: none; font-weight: bold;" title="Ajouter un spoiler">⚠️ Spoiler</button>
+                </div>
+            `;
+        }
+
+        // Injection des barres d'outils sur les deux textareas du formulaire de fiches
+        document.getElementById('toolbar-sheet-synopsis').innerHTML = createEditorToolbar('sheet-synopsis');
+        document.getElementById('toolbar-sheet-review').innerHTML = createEditorToolbar('sheet-review');
+
+        // --- FONCTIONS DE MANIPULATION DU TEXTE ---
+        window.insertTag = function(id, startTag, endTag) {
+            const ta = document.getElementById(id);
+            const startPos = ta.selectionStart;
+            const endPos = ta.selectionEnd;
+            const selectedText = ta.value.substring(startPos, endPos);
+            
+            ta.value = ta.value.substring(0, startPos) + startTag + selectedText + endTag + ta.value.substring(endPos);
+            ta.focus();
+            ta.setSelectionRange(startPos + startTag.length, endPos + startTag.length);
+        }
+
+        window.insertLink = function(id) {
+            const url = prompt("Entrez l'URL du lien :");
+            if (url) {
+                const ta = document.getElementById(id);
+                const startPos = ta.selectionStart;
+                const endPos = ta.selectionEnd;
+                const selectedText = ta.value.substring(startPos, endPos) || "Texte du lien";
+                const linkHtml = `<a href="${url}" target="_blank">${selectedText}</a>`;
+                
+                ta.value = ta.value.substring(0, startPos) + linkHtml + ta.value.substring(endPos);
+                ta.focus();
+            }
+        }
+
+        window.insertImage = function(id) {
+            const url = prompt("Entrez l'URL de l'image :");
+            if (url) {
+                const ta = document.getElementById(id);
+                const startPos = ta.selectionStart;
+                const endPos = ta.selectionEnd;
+                const imgHtml = `<img src="${url}" alt="Image" style="max-width: 100%; border-radius: 4px;">`;
+                
+                ta.value = ta.value.substring(0, startPos) + imgHtml + ta.value.substring(endPos);
+                ta.focus();
+            }
+        }
+
+        window.insertVideo = function(id) {
+            const url = prompt("Entrez l'URL de la vidéo (ou lien embed) :");
+            if (url) {
+                const ta = document.getElementById(id);
+                const startPos = ta.selectionStart;
+                const endPos = ta.selectionEnd;
+                const videoHtml = `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;"><iframe src="${url}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe></div>`;
+                
+                ta.value = ta.value.substring(0, startPos) + videoHtml + ta.value.substring(endPos);
+                ta.focus();
+            }
+        }
+
+        window.changeFont = function(id, fontName) {
+            if (!fontName) return;
+            const ta = document.getElementById(id);
+            const startPos = ta.selectionStart;
+            const endPos = ta.selectionEnd;
+            const selectedText = ta.value.substring(startPos, endPos);
+            const fontHtml = `<span style="font-family: '${fontName}', sans-serif;">${selectedText}</span>`;
+            
+            ta.value = ta.value.substring(0, startPos) + fontHtml + ta.value.substring(endPos);
+            ta.focus();
+        }
+
+        window.insertSpoiler = function(id) {
+            const ta = document.getElementById(id);
+            const startPos = ta.selectionStart;
+            const endPos = ta.selectionEnd;
+            const selectedText = ta.value.substring(startPos, endPos);
+            
+            const spoilerMarkup = `<details style="background: #f9f4fb; border: 1px dashed #8e44ad; padding: 8px; border-radius: 4px; margin: 8px 0; cursor: pointer;"><summary style="font-weight: bold; color: #8e44ad; outline: none;">⚠️ Spoiler</summary><p style="margin: 6px 0 0 0; color: #333; font-size: 0.95em;">${selectedText || 'Votre texte de spoiler ici'}</p></details>`;
+            
+            ta.value = ta.value.substring(0, startPos) + spoilerMarkup + ta.value.substring(endPos);
+            ta.focus();
+        }
 
         const currentUsername = localStorage.getItem('forumUsername');
         let allSheets = [];
 
-        // Gestion de l'affichage du formulaire ou du message de connexion
         const actionContainer = document.getElementById('sheet-action-container');
         const formContainer = document.getElementById('form-container');
 
@@ -270,7 +415,6 @@
             }
         }
 
-        // Soumission du formulaire de création
         const createSheetForm = document.getElementById('form-create-sheet');
         if (createSheetForm) {
             createSheetForm.addEventListener('submit', async (e) => {
