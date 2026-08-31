@@ -273,42 +273,51 @@
         }
 
         // Sauvegarder les modifications de profil dans Supabase
-        document.getElementById('form-edit-profile').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const avatarUrl = document.getElementById('edit-avatar-url').value;
-            const ageVal = document.getElementById('edit-age').value;
-            const sexRace = document.getElementById('edit-sex-race').value;
-            const status = document.getElementById('edit-status').value;
-            const favManga = document.getElementById('edit-fav-manga').value;
-            const anime = document.getElementById('edit-anime').value;
-            const malUrl = document.getElementById('edit-mal').value;
-            const discord = document.getElementById('edit-discord').value;
-            const quote = document.getElementById('edit-quote').value;
-            const signature = document.getElementById('edit-signature').value;
+document.getElementById('form-edit-profile').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    if (!currentUserId) {
+        alert("Erreur : Impossible d'identifier l'utilisateur connecté.");
+        return;
+    }
 
-            const { error } = await supabase
-                .from('profiles')
-                .update({
-                    avatar_url: avatarUrl,
-                    age: ageVal ? parseInt(ageVal) : null,
-                    sex_race: sexRace,
-                    status: status,
-                    favorite_manga: favManga,
-                    current_anime: anime,
-                    mal_url: malUrl,
-                    discord_tag: discord,
-                    favorite_quote: quote,
-                    signature: signature
-                })
-                .eq('username', currentUsername);
+    const avatarUrl = document.getElementById('edit-avatar-url').value;
+    const ageVal = document.getElementById('edit-age').value;
+    const sexRace = document.getElementById('edit-sex-race').value;
+    const status = document.getElementById('edit-status').value;
+    const favManga = document.getElementById('edit-fav-manga').value;
+    const anime = document.getElementById('edit-anime').value;
+    const malUrl = document.getElementById('edit-mal').value;
+    const discord = document.getElementById('edit-discord').value;
+    const quote = document.getElementById('edit-quote').value;
+    const signature = document.getElementById('edit-signature').value;
 
-            if (error) {
-                alert("Erreur lors de la mise à jour : " + error.message);
-            } else {
-                alert("Profil mis à jour avec succès !");
-                location.reload();
-            }
-        });
+    // On met à jour en ciblant l'ID unique de l'utilisateur (plus sécurisé que le username)
+    const { data, error } = await supabase
+        .from('profiles')
+        .update({
+            avatar_url: avatarUrl,
+            age: ageVal ? parseInt(ageVal) : null,
+            sex_race: sexRace,
+            status: status,
+            favorite_manga: favManga,
+            current_anime: anime,
+            mal_url: malUrl,
+            discord_tag: discord,
+            favorite_quote: quote,
+            signature: signature
+        })
+        .eq('id', currentUserId)
+        .select();
+
+    if (error) {
+        console.error("Erreur Supabase détaillée :", error);
+        alert("Erreur lors de la mise à jour : " + error.message);
+    } else {
+        alert("Profil mis à jour avec succès !");
+        location.reload();
+    }
+});
 
         // --- GESTION DE LA MANGATHÈQUE VIA SUPABASE ---
         async function loadMangatheque() {
