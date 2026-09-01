@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Erreur Système - Actu Manga World</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0b0f19;
+            font-family: Tahoma, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .win-fullscreen {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+
+        .win-window-43 {
+            width: 100%;
+            max-width: 840px;
+            aspect-ratio: 4 / 3;
+            background: #1e1e1e;
+            border: 2px solid;
+            border-color: #444444 #000000 #000000 #444444;
+            box-shadow: 4px 4px 20px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        .win-titlebar {
+            background: linear-gradient(90deg, #122238, #1b3a57);
+            padding: 8px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #d1d5db;
+            font-weight: bold;
+            font-size: 1em;
+            border-bottom: 1px solid #333;
+        }
+
+        .win-title-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .win-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .win-btn-control {
+            width: 20px;
+            height: 20px;
+            background: #2d2d2d;
+            border: 1px solid;
+            border-color: #555 #111 #111 #555;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .win-body {
+            padding: 20px 25px;
+            background: #1e1e1e;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-grow: 1;
+            justify-content: center;
+        }
+
+        .win-screen-box {
+            background: #121212;
+            border: 2px inset #333333;
+            padding: 15px;
+            text-align: left;
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .log-line {
+            font-size: 0.98em; /* Police agrandie pour une meilleure lisibilité */
+            padding: 6px 10px;
+            border-radius: 2px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.4;
+        }
+
+        .log-warn {
+            background: rgba(245, 159, 0, 0.1);
+            border-left: 3px solid #f59f00;
+            color: #fcc419;
+        }
+
+        .log-error {
+            background: rgba(240, 62, 62, 0.1);
+            border-left: 3px solid #f03e3e;
+            color: #ff6b6b;
+        }
+
+        .log-info {
+            background: rgba(55, 148, 255, 0.1);
+            border-left: 3px solid #3794ff;
+            color: #74c0fc;
+        }
+
+        .log-path {
+            color: #74c0fc;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .win-footer {
+            background: #1e1e1e;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #333333;
+        }
+
+        .win-status {
+            font-size: 0.9em;
+            color: #9ca3af;
+            font-weight: bold;
+        }
+
+        .win-button {
+            background: #2d2d2d;
+            border: 2px solid;
+            border-color: #555 #111 #111 #555;
+            padding: 6px 16px;
+            color: #f3a6b8;
+            font-family: Tahoma, Arial, sans-serif;
+            font-size: 0.95em;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .win-button:active {
+            border-color: #111 #555 #555 #111;
+            padding: 7px 15px 5px 17px;
+        }
+
+        .win-button:hover {
+            background: #383838;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="win-fullscreen">
+        <div class="win-window-43">
+            <div class="win-titlebar">
+                <div class="win-title-left">
+                    <span>💻</span>
+                    <span>Actu Manga World — Erreur_Fatale_404.exe</span>
+                </div>
+                <div class="win-controls">
+                    <div class="win-btn-control">_</div>
+                    <div class="win-btn-control">🗖</div>
+                    <div class="win-btn-control">✕</div>
+                </div>
+            </div>
+
+            <div class="win-body">
+                <div style="font-weight: bold; font-size: 1.15em; color: #f3f4f6; text-align: left; margin-bottom: 2px;">
+                    ⚠️ Alerte critique du district central :
+                </div>
+
+                <div class="win-screen-box">
+                    <!-- Étape 1 : On essaie d'accéder à la page introuvable -->
+                    <div class="log-line log-warn">
+                        <span>⚠️</span>
+                        <span>[System] Tentative de transmutation humaine détectée sur le lien <span class="log-path">/inconnu</span>.</span>
+                    </div>
+
+                    <!-- Étape 2 : Le système cherche l'âme et échoue -->
+                    <div class="log-line log-error">
+                        <span>❌</span>
+                        <span>GET <span class="log-path">https://actu-manga-world.fr/assets/mother-soul.png</span> 404 (Not Found - Transmutation interdite)</span>
+                    </div>
+
+                    <!-- Étape 3 : La politique de sécurité s'active -->
+                    <div class="log-line log-warn">
+                        <span>⚠️</span>
+                        <span>[Warning] Permissions-Policy: Le sacrifice de la jambe droite a échoué (equivalent 'equivalent-automaton').</span>
+                    </div>
+
+                    <!-- Étape 4 : Tentative annexe avec la pierre philosophale -->
+                    <div class="log-line log-error">
+                        <span>❌</span>
+                        <span>GET <span class="log-path">https://actu-manga-world.fr/pages/philosophers-stone.html</span> 404 (ERR_ABORTED)</span>
+                    </div>
+
+                    <!-- Étape 5 : Le Portail de la Vérité intervient et bloque tout -->
+                    <div class="log-line log-info">
+                        <span>ℹ️</span>
+                        <span>[Violation] Le portail de la Vérité a bloqué le thread principal pendant 402ms.</span>
+                    </div>
+
+                    <div class="log-line log-error">
+                        <span>❌</span>
+                        <span>HTTP 404 : Le portail de la Vérité refuse l'accès à cette ressource. Aucun bras ni jambe ne sera remboursé.</span>
+                    </div>
+
+                    <!-- Étape 6 : Diagnostic de l'alchimiste et de Supabase -->
+                    <div class="log-line log-info">
+                        <span>ℹ️</span>
+                        <span>[Alchimie] Analyse des cercles de transmutation en cours... Échec critique : le forum ne trouve aucune âme à cet emplacement.</span>
+                    </div>
+
+                    <div class="log-line log-error">
+                        <span>❌</span>
+                        <span>[Database] Supabase signale que la page s'est évaporée suite à un échange équivalent mal négocié.</span>
+                    </div>
+
+                    <!-- Étape 7 : Intervention des frères Elric pour recadrer le visiteur -->
+                    <div class="log-line log-warn">
+                        <span>⚠️</span>
+                        <span>[Alphonse] « Frère, arrête d'insister sur cette URL, on dirait que ça mène tout droit dans un piège de Scar ! »</span>
+                    </div>
+
+                    <div class="log-line log-warn">
+                        <span>⚠️</span>
+                        <span>[Alert] Edward Elric s'énerve car tu cherches une page qui n'a pas d'âme.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="win-footer">
+                <span class="win-status">Code erreur : 0x00000404 (NOT_FOUND)</span>
+                <a href="index.html" class="win-button">Redémarrer vers l'Index</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
